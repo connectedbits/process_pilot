@@ -22,11 +22,20 @@ module Processable
     end
 
     def evaluate_condition(condition)
-      config.evaluate_condition(condition.body, process_instance.data)
+      config.evaluate_condition(condition.body, variables: process_instance.variables)
+    end
+
+    def call_service(topic)
+      service = config.get_service(topic)
+      service.call(process_instance.variables)
+    end
+
+    def run_script(script)
+      config.run_script(script, variables: process_instance.variables)
     end
 
     def step_instance_ended(step_instance)
-      process_instance.variables.merge!(step_instance.variables)
+      process_instance.variables = process_instance.variables.merge(step_instance.variables).with_indifferent_access
       
       if step_instance.tokens_out.empty?
         all_ended = true

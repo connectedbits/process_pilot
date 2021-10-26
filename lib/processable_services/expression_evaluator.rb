@@ -1,12 +1,12 @@
 module ProcessableServices
   class ExpressionEvaluator < ApplicationService
 
-    attr_reader :expression, :data
+    attr_reader :expression, :variables
 
-    def initialize(expression, data: {})
+    def initialize(expression, variables: {})
       super()
       @expression = expression.strip
-      @data = data
+      @variables = variables
     end
 
     def call
@@ -14,11 +14,11 @@ module ProcessableServices
     end
 
     def call_feel
-      FeelEvaluator.call(expression.delete_prefix("${").delete_suffix("}").strip, data: data)
+      FeelEvaluator.call(expression.delete_prefix("${").delete_suffix("}").strip, variables: variables)
     end
 
     def call_json_logic
-      JsonLogicEvaluator.call(expression, data: data)
+      JsonLogicEvaluator.call(expression, variables: variables)
     end
 
     def feel?

@@ -18,20 +18,13 @@ module Bpmn
       let(:process_instance) { @process_instance }
       let(:script_task) { process_instance.step_by_id('ScriptTask') }
 
-      before { @process_instance = runtime.start_process('ScriptTaskTest') }
+      before { @process_instance = runtime.start_process('ScriptTaskTest', variables: { name: "Eric" }) }
 
-      it 'should start the process' do
-        _(process_instance.status).must_equal 'started'
-        _(script_task.status).must_equal 'waiting'
-      end
-
-      describe :invoke do
-        before { script_task.invoke(variables: { outcome: 'complete' }) }
-
-        it 'should end the process' do
-          _(process_instance.status).must_equal 'ended'
-          _(script_task.status).must_equal 'ended'
-        end
+      it 'should run the script task' do
+        _(process_instance.status).must_equal 'ended'
+        _(script_task.status).must_equal 'ended'
+        _(process_instance.variables["greeting"]).must_equal "Hello Eric"
+        _(script_task.variables["greeting"]).must_equal "Hello Eric"
       end
     end
   end

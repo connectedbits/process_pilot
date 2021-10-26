@@ -9,7 +9,7 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1qhq8g6" sourceRef="Start" targetRef="ServiceTask" />
     <bpmn:sequenceFlow id="Flow_1rnbtwj" sourceRef="ServiceTask" targetRef="End" />
-    <bpmn:serviceTask id="ServiceTask" name="Service Task">
+    <bpmn:serviceTask id="ServiceTask" name="Service Task" camunda:type="external" camunda:topic="do_it">
       <bpmn:incoming>Flow_1qhq8g6</bpmn:incoming>
       <bpmn:outgoing>Flow_1rnbtwj</bpmn:outgoing>
     </bpmn:serviceTask>

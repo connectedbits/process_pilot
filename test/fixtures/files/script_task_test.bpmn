@@ -9,9 +9,10 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1qhq8g6" sourceRef="Start" targetRef="ScriptTask" />
     <bpmn:sequenceFlow id="Flow_1rnbtwj" sourceRef="ScriptTask" targetRef="End" />
-    <bpmn:scriptTask id="ScriptTask" name="Script Task">
+    <bpmn:scriptTask id="ScriptTask" name="Script Task" scriptFormat="javascript" camunda:resultVariable="greeting">
       <bpmn:incoming>Flow_1qhq8g6</bpmn:incoming>
       <bpmn:outgoing>Flow_1rnbtwj</bpmn:outgoing>
+      <bpmn:script>`Hello ${variables.name}`</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

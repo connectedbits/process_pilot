@@ -2,6 +2,9 @@ module Processable
   class StepExecution
     attr_reader :step_instance
 
+    delegate :process_execution, to: :step_instance
+    delegate :run_script, :call_service, to: :process_execution
+
     def initialize(step_instance)
       @step_instance = step_instance
     end
@@ -15,7 +18,7 @@ module Processable
     end
 
     def invoke(variables = {})
-      step_instance.variables = variables
+      step_instance.variables = step_instance.variables.merge(variables).with_indifferent_access
       continue
     end
 

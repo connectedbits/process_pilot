@@ -2,8 +2,9 @@ module Processable
   class Runtime
     attr_reader :processes
 
-    def initialize(sources: nil)
+    def initialize(sources: nil, services: nil)
       @processes = []
+      Config.instance.services = services if services
 
       Array.wrap(sources).each do |source|
         if source.include?('http://www.omg.org/spec/DMN/20180521/DC/')

@@ -30,11 +30,11 @@ This is a generic representation of a task.
 
 This task represents work done by a human user.
 
-- [ ] Service Task
+- [x] Service Task
 
 This task represents work done by a ruby service proc when supplied to the Processable context.
 
-- [ ] Script Task
+- [x] Script Task
 
 This task represents work done by the Processable runtime written in Javascript.
 

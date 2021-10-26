@@ -6,8 +6,8 @@ module ProcessableServices
 
     describe :arithmetic do
       let(:expression) { "a + b + c" }
-      let(:data) { { a: 3, b: -1, c: 10 } }
-      let(:result) { service.call(expression, data: data) }
+      let(:variables) { { a: 3, b: -1, c: 10 } }
+      let(:result) { service.call(expression, variables: variables) }
 
       it "should do math" do
         _(result).must_equal(12)
@@ -16,8 +16,8 @@ module ProcessableServices
 
     describe :value do
       let(:expression) { "name" }
-      let(:data) { { name: "Eric" } }
-      let(:result) { service.call(expression, data: data) }
+      let(:variables) { { name: "Eric" } }
+      let(:result) { service.call(expression, variables: variables) }
 
       it "should return value" do
         _(result).must_equal("Eric")

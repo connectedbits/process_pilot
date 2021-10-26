@@ -1,12 +1,11 @@
 module ProcessableServices
   class ScriptRunner < ApplicationService
-    attr_reader :script, :data, :context, :utils
+    attr_reader :script, :variables, :utils
 
-    def initialize(script, data: {}, context: {}, utils: {})
+    def initialize(script, variables: {}, utils: {})
       super()
       @script = script
-      @data = data
-      @context = context
+      @variables = variables
       @utils = utils
     end
 
@@ -15,7 +14,7 @@ module ProcessableServices
       utils.each do |key, value|
         ctx.attach(key.to_s, value)
       end if utils
-      ctx.eval "data = #{data.to_json}; context = #{context.to_json}; #{script}"
+      ctx.eval "variables = #{variables.to_json}; #{script}"
     end
   end
 end

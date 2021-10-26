@@ -20,19 +20,6 @@ module Bpmn
       Expression.json_logic?(body)
     end
 
-    def evaluate(instance)
-      raise "Expression body is required" unless body
-      if language
-        Processable::Config.instance.run_script(body, data: data)
-      else
-        Processable::Config.instance.evaluate_expression(body, data: data)
-      end
-    end
-
-    def truthy?(data)
-      evaluate(data) == true
-    end
-
     def self.feel?(str)
       str&.start_with?("${") && str&.end_with?("}")
     end
@@ -43,14 +30,6 @@ module Bpmn
 
     def self.valid?(str)
       Expression.feel?(str) || Expression.json_logic?(str)
-    end
-
-    def self.evaluate(str, data)
-      Processable::Config.instance.evaluate_expression(str, data: data)
-    end
-
-    def self.truthy?(str, data)
-      Processable::Config.instance.evaluate_expression(str, data: data) == true
     end
   end
 

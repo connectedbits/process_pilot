@@ -9,7 +9,7 @@ module Processable
     def initialize(process, start_event:, variables: {}, key: nil, parent: nil, called_by: nil)
       @process = process
       @start_event = start_event
-      @variables = {}
+      @variables = variables
       @key = key
       @parent = parent
       @called_by = called_by

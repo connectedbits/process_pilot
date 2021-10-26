@@ -8,12 +8,12 @@ module ProcessableServices
       let(:expression) { "person.age > 50" }
 
       it "truthy should be true" do
-        result = service.call(expression, data: { person: { age: 57 } })
+        result = service.call(expression, variables: { person: { age: 57 } })
         _(result).must_equal true
       end
 
       it "not truthy should be false" do
-        result = service.call(expression, data: { person: { age: 44 } })
+        result = service.call(expression, variables: { person: { age: 44 } })
         _(result).must_equal false
       end
     end
@@ -22,12 +22,12 @@ module ProcessableServices
       let(:expression) { '{ ">": [{ "var": "person.age" }, 50] }' }
 
       it "truthy should be true" do
-        result = service.call(expression, data: { person: { age: 57 } })
+        result = service.call(expression, variables: { person: { age: 57 } })
         _(result).must_equal true
       end
 
       it "not truthy should be false" do
-        result = service.call(expression, data: { person: { age: 44 } })
+        result = service.call(expression, variables: { person: { age: 44 } })
         _(result).must_equal false
       end
     end
