@@ -2,23 +2,21 @@
 
 - [x] Process
 
-A process is the work someone (or something) does to accomplish an objective. A process represents a sequence of activities in the form of a graph.
-
-- [x] Sequence Flow
-
-A sequence flow represents the transition in a process from one activity to another. Sequence flows can specify conditions that are checked to determine if the path should be taken.
-
-## Activities
-
-An activity represents a unit of work performed (a step inside a process). It has a defined start and end and generally requires some kind of input to produce an output. Processable supports the following activities:
-
-- [ ] SubProcess
-
-On the other hand, a SubProcess (Embedded, Event, or AdHoc) has parts that are modeled in a child-level process, a process with its own activity flow and start and end states. 
+A process is the work someone (or something) does to accomplish an objective. A process represents a sequence of steps in the form of a graph.
 
 - [ ] CallActivity
 
 A CallActivity invokes a process that is defined external to the model enabling reuse.
+
+- [ ] SubProcess
+
+A SubProcess (Embedded, Event, or AdHoc) has parts that are modeled in a child-level process, a process with its own step flows and start and end states. 
+
+- [x] Sequence Flow
+
+A sequence flow represents the transition in a process from one step to another. Sequence flows can specify conditions that are checked to determine if the path should be taken.
+
+## Tasks
 
 A task (Task, UserTask, ServiceTask, ScriptTask, BusinessRuleTask) has no internal parts, it represents a single action.
 
@@ -106,3 +104,31 @@ A parallel gateway generates a token for each outgoing path and doesn't evaluate
 - [ ] Inclusive Gateway
 
 An inclusive gateway breaks the process flow into one or more flows. It behaves like a parallel gateway execept the conditions are checked on each path and only those paths (or default) will be taken.
+
+## Expressions
+
+Expressions are evaluated at runtime to make decisions. They are frequently used to conditionally take a sequence flow but can also be used to determine a value dynamically (for example which process to call from a CallActivity). This engine supports FEEL expressions or JSONLogic.
+
+[Try Feel](https://nikku.github.io/feel-playground) | 
+[Try JSONLogic](https://jsonlogic.com/play.html)
+
+Required Expressions:
+- Sequence flow on an exclusive gateway: condition
+- Message catch event/receive task (not yet implemented) 
+- Multi-instance activity: input collection, output element (not yet implemented)
+- Input/output variable mappings: source (not yet implemented)
+
+Optional Expressions (conditions can be used in place of a static value):
+- Call activity: process id
+- Timer catch event: timer definition (not yet implemented) 
+- Message catch event/receive task: message name (not yet implemented) 
+- Service task: job type, job retries (not yet implemented) 
+
+Note: sequence flows allow a script instead of an expression. This should only be used when a util function is needed.
+
+## Extensions
+
+Extensions allow for custom configuration of BPMN elements that are used by the engine. The following extensions are supported by the engine:
+
+- [ ] FormData
+- [ ] Properties
