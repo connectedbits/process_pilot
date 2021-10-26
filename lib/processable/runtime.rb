@@ -4,10 +4,12 @@ module Processable
 
     def initialize(sources: nil, services: nil)
       @processes = []
-      Config.instance.services = services if services
+      config.services = services if services
 
       Array.wrap(sources).each do |source|
         if source.include?('http://www.omg.org/spec/DMN/20180521/DC/')
+          moddle = ProcessableServices::DecisionReader.call(source)
+          moddle["drgElement"].each { |d| config.decisions[d["id"]] = source}
         else
           moddle = ProcessableServices::ProcessReader.call(source)
           builder = Bpmn::Builder.new(moddle)
@@ -26,6 +28,10 @@ module Processable
       start_event = start_event_id ? process.start_events.find { |se| se.id == start_event_id } : process.default_start_event
       raise ExecutionError.new("Start event with id #{start_event_id} not found for process #{process_id}.") unless start_event
       ProcessInstance.new(process, start_event: start_event, variables: variables, key: key).tap { |pi| process.execute(pi.execution) } 
+    end
+
+    def config
+      Config.instance
     end
   end
 end

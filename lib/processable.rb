@@ -25,6 +25,7 @@ require "processable/execution_error"
 
 require "processable_services/application_service"
 require "processable_services/decision_evaluator"
+require "processable_services/decision_reader"
 require "processable_services/expression_evaluator"
 require "processable_services/feel_evaluator"
 require "processable_services/json_logic_evaluator"

@@ -4,12 +4,13 @@ module Processable
   class Config
     include Singleton
 
-    attr_accessor :services, :context, :utils, :listeners, :logs
+    attr_accessor :services, :listeners, :utils, :decisions
 
     def initialize
       @services = {}
       @listeners = []
       @utils = {}
+      @decisions = {}
     end
 
     def notify_listeners(event, instance)
@@ -27,8 +28,8 @@ module Processable
       ProcessableServices::ExpressionEvaluator.call(expression, variables: variables)
     end
 
-    def evaluate_decision(ref, source, data: {})
-      ProcessableServices::DecsionEvaluator.call(ref, source, data)
+    def evaluate_decision(ref, source, variables: {})
+      ProcessableServices::DecisionEvaluator.call(ref, source, variables)
     end
   end
 end

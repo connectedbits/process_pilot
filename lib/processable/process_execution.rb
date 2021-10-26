@@ -22,21 +22,32 @@ module Processable
     end
 
     def evaluate_condition(condition)
-      config.evaluate_condition(condition.body, variables: process_instance.variables)
+      evaluate_expression(condition.body) == true
+    end
+
+    def evaluate_expression(expression)
+      config.evaluate_expression(expression, variables: process_instance.variables)
+    end
+
+    def evaluate_decision(decision_ref)
+      source = config.decisions[decision_ref]
+      raise ExecutionError.new("Decision #{decision_ref} not found.") unless source
+      config.evaluate_decision(decision_ref, source, variables: process_instance.variables)
     end
 
     def call_service(topic)
       service = config.get_service(topic)
+      raise ExecutionError.new("Service #{topic} not found.") unless service
       service.call(process_instance.variables)
     end
 
     def run_script(script)
+      raise ExecutionError.new("Script #{script} can't be blank.") unless script.present?
       config.run_script(script, variables: process_instance.variables)
     end
 
     def step_instance_ended(step_instance)
       process_instance.variables = process_instance.variables.merge(step_instance.variables).with_indifferent_access
-      
       if step_instance.tokens_out.empty?
         all_ended = true
         process_instance.steps.each { |step| all_ended = false unless step.status == 'ended' }

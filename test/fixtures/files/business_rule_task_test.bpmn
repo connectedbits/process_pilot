@@ -1,43 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0m4ul3w" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0ilib6z" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.0">
   <bpmn:process id="BusinessRuleTaskTest" name="BusinessRuleTask Test" isExecutable="true">
-    <bpmn:startEvent id="Start" name="Start">
-      <bpmn:outgoing>Flow_1qhq8g6</bpmn:outgoing>
+    <bpmn:startEvent id="ExpressionStart" name="Expression Start">
+      <bpmn:outgoing>Flow_00htsrk</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:endEvent id="End" name="End">
-      <bpmn:incoming>Flow_1rnbtwj</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1qhq8g6" sourceRef="Start" targetRef="BusinessRuleTask" />
-    <bpmn:sequenceFlow id="Flow_1rnbtwj" sourceRef="BusinessRuleTask" targetRef="End" />
-    <bpmn:businessRuleTask id="BusinessRuleTask" name="Business Rule Task">
-      <bpmn:incoming>Flow_1qhq8g6</bpmn:incoming>
-      <bpmn:outgoing>Flow_1rnbtwj</bpmn:outgoing>
+    <bpmn:businessRuleTask id="ExpressionBusinessRule" name="Expression Business Rule" camunda:expression="${ age &#62; 55 }" camunda:resultVariable="senior">
+      <bpmn:incoming>Flow_00htsrk</bpmn:incoming>
+      <bpmn:outgoing>Flow_09a3s3r</bpmn:outgoing>
     </bpmn:businessRuleTask>
+    <bpmn:endEvent id="End">
+      <bpmn:incoming>Flow_09a3s3r</bpmn:incoming>
+      <bpmn:incoming>Flow_1ix75bz</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:businessRuleTask id="DmnBusinessRule" name="DMN Business Rule" camunda:resultVariable="result" camunda:decisionRef="Dish" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_19kpwvv</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ix75bz</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="Flow_09a3s3r" sourceRef="ExpressionBusinessRule" targetRef="End" />
+    <bpmn:sequenceFlow id="Flow_1ix75bz" sourceRef="DmnBusinessRule" targetRef="End" />
+    <bpmn:startEvent id="DMNStart" name="DMN Start">
+      <bpmn:outgoing>Flow_19kpwvv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_19kpwvv" sourceRef="DMNStart" targetRef="DmnBusinessRule" />
+    <bpmn:sequenceFlow id="Flow_00htsrk" sourceRef="ExpressionStart" targetRef="ExpressionBusinessRule" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="BusinessRuleTaskTest">
-      <bpmndi:BPMNEdge id="Flow_1rnbtwj_di" bpmnElement="Flow_1rnbtwj">
-        <di:waypoint x="370" y="97" />
-        <di:waypoint x="422" y="97" />
+      <bpmndi:BPMNEdge id="Flow_1ix75bz_di" bpmnElement="Flow_1ix75bz">
+        <di:waypoint x="380" y="280" />
+        <di:waypoint x="440" y="280" />
+        <di:waypoint x="440" y="215" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1qhq8g6_di" bpmnElement="Flow_1qhq8g6">
-        <di:waypoint x="215" y="97" />
-        <di:waypoint x="270" y="97" />
+      <bpmndi:BPMNEdge id="Flow_09a3s3r_di" bpmnElement="Flow_09a3s3r">
+        <di:waypoint x="380" y="120" />
+        <di:waypoint x="440" y="120" />
+        <di:waypoint x="440" y="179" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="Start">
-        <dc:Bounds x="179" y="79" width="36" height="36" />
+      <bpmndi:BPMNEdge id="Flow_19kpwvv_di" bpmnElement="Flow_19kpwvv">
+        <di:waypoint x="218" y="280" />
+        <di:waypoint x="280" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00htsrk_di" bpmnElement="Flow_00htsrk">
+        <di:waypoint x="218" y="120" />
+        <di:waypoint x="280" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_074dh0e_di" bpmnElement="ExpressionBusinessRule">
+        <dc:Bounds x="280" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0022nlz_di" bpmnElement="End">
+        <dc:Bounds x="422" y="179" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ha4eym_di" bpmnElement="DmnBusinessRule">
+        <dc:Bounds x="280" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="ExpressionStart">
+        <dc:Bounds x="182" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="185" y="122" width="24" height="14" />
+          <dc:Bounds x="161" y="145" width="81" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0xe52om_di" bpmnElement="End">
-        <dc:Bounds x="422" y="79" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_1dmio1s_di" bpmnElement="DMNStart">
+        <dc:Bounds x="182" y="262" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="430" y="122" width="20" height="14" />
+          <dc:Bounds x="174" y="305" width="52" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0d50wrw_di" bpmnElement="BusinessRuleTask">
-        <dc:Bounds x="270" y="57" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

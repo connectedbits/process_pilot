@@ -28,6 +28,25 @@ module Bpmn
   end
 
   class BusinessRuleTask < Task
+    attr_accessor :expression, :decision_ref, :binding, :version
+
+    def initialize(moddle)
+      super
+      @expression = moddle["expression"]
+      @decision_ref = moddle["decisionRef"]
+      @binding = moddle["binding"]
+      @version = moddle["version"]
+    end
+
+    def execute(execution)
+      if expression
+        result = execution.evaluate_expression(expression)
+        execution.invoke(result_to_variables(result))
+      elsif decision_ref
+        result = execution.evaluate_decision(decision_ref)
+        execution.invoke(result_to_variables(result))
+      end
+    end
   end
 
   class ScriptTask < Task

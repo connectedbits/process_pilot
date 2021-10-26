@@ -3,7 +3,7 @@ module Processable
     attr_reader :step_instance
 
     delegate :process_execution, to: :step_instance
-    delegate :run_script, :call_service, to: :process_execution
+    delegate :run_script, :call_service, :evaluate_expression, :evaluate_decision, to: :process_execution
 
     def initialize(step_instance)
       @step_instance = step_instance

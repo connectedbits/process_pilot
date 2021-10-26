@@ -7,12 +7,12 @@ module Bpmn
       @default = moddle["default"]
     end
 
-    def execute(instance)
+    def execute(execution)
       if converging?
-        return leave(instance) if is_enabled?(instance)
-        return waite(instance)
+        return execution.continue if is_enabled?(execution)
+        return execution.wait
       else
-        return leave(instance)
+        return execution.continue
       end
     end
 

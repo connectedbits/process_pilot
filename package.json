@@ -6,7 +6,7 @@
     "@connectedbits/dmn-eval-js": "git@github.com:connectedbits/dmn-eval-js.git",
     "bpmn-moddle": "^7.0.5",
     "camunda-bpmn-moddle": "^5.1.2",
-    "dmn-moddle": "^9.1.0",
+    "dmn-moddle": "^10.0",
     "js-feel": "^1.4.7"
   },
   "version": "0.1.0"

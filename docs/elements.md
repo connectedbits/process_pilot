@@ -26,7 +26,7 @@ A task (Task, UserTask, ServiceTask, ScriptTask, BusinessRuleTask) has no intern
 
 This is a generic representation of a task.
 
-- [ ] User Task
+- [x] User Task
 
 This task represents work done by a human user.
 
@@ -38,7 +38,7 @@ This task represents work done by a ruby service proc when supplied to the Proce
 
 This task represents work done by the Processable runtime written in Javascript.
 
-- [ ] Business Rule Task
+- [x] Business Rule Task
 
 This task represents work done by the Processable rule engine, generally, a complex decision.
 
@@ -91,7 +91,7 @@ Gateways have two behaviors:
 
 This engine supports the following gateway types:
 
-- [x] Exclusive Gateway
+- [ ] Exclusive Gateway
 
 An exclusive gateway evaluates all outgoing paths and the token flows into one of the two or more mutally exclusive paths. One of the conditions must evaluate to true. If none of the conditions evaluate to true the process will get stuck. For this reason it's always a good idea to have a default path.
 
