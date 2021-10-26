@@ -6,9 +6,12 @@ module Processable
       @processes = []
 
       Array.wrap(sources).each do |source|
-        moddle = ProcessableServices::ProcessReader.call(source)
-        builder = Bpmn::Builder.new(moddle)
-        @processes = @processes + builder.processes
+        if source.include?('http://www.omg.org/spec/DMN/20180521/DC/')
+        else
+          moddle = ProcessableServices::ProcessReader.call(source)
+          builder = Bpmn::Builder.new(moddle)
+          @processes = @processes + builder.processes
+        end
       end
     end
 

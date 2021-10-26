@@ -9,7 +9,7 @@ module Bpmn
     describe :definition do
       let(:task) { process.element_by_id('Task') }
 
-      it 'should parse the process' do
+      it 'should parse the task' do
         _(task).wont_be_nil
       end
     end
@@ -29,7 +29,6 @@ module Bpmn
         before { task.invoke }
 
         it 'should end the process' do
-          process_instance.print
           _(process_instance.status).must_equal 'ended'
           _(task.status).must_equal 'ended'
         end
