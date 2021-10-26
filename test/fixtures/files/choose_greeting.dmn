@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="Definitions_ChooseGreeting" name="Choose Greeting" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.8.0">
+  <decision id="ChooseGreeting" name="Choose Greeting">
+    <decisionTable id="DecisionTable_1x25309">
+      <input id="Input_1" label="Language">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>language</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0d7gawf" label="Formal">
+        <inputExpression id="LiteralExpression_0jwgthz" typeRef="boolean">
+          <text>formal</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Greeting" name="greeting" typeRef="string" />
+      <rule id="DecisionRule_0tog1vl">
+        <inputEntry id="UnaryTests_16e20ig">
+          <text>"en"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1690z3h">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0gsyiyp">
+          <text>"Hello"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1tnyqz9">
+        <inputEntry id="UnaryTests_0p7xgmp">
+          <text>"en"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0xjrayv">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1ktp1nf">
+          <text>"What's up?"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1v9w35p">
+        <inputEntry id="UnaryTests_05f3xbi">
+          <text>"es"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1x9t06t">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0ty7mwx">
+          <text>"Hola"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_19l2ccl">
+        <inputEntry id="UnaryTests_1231vi3">
+          <text>"es"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1fng0nc">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1yuf6pb">
+          <text>"¿Qué tal?"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0yboz3z">
+        <inputEntry id="UnaryTests_0aakl4i">
+          <text>"fr"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_05tb48h">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1rk5g4a">
+          <text>"Bonjour"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0z3mopx">
+        <inputEntry id="UnaryTests_1982qva">
+          <text>"fr"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_05zi52f">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0ukc972">
+          <text>"Salut"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1nsm61e">
+        <inputEntry id="UnaryTests_0peu0eu">
+          <text>"it"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1lwfwlf">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1oxava8">
+          <text>"Salve"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0okdyj5">
+        <inputEntry id="UnaryTests_1jv052e">
+          <text>"it"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1t0vpgj">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1tothrz">
+          <text>"Ciao"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1a7krgt">
+        <inputEntry id="UnaryTests_0o7oo3d">
+          <text>"ja"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1rqzh29">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0eup2gx">
+          <text>"Konnichiwa"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_08271dd">
+        <inputEntry id="UnaryTests_0tbswfg">
+          <text>"ja"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1yqoxsp">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_17uds8v">
+          <text>"Yā, Yō"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0d1uoq2">
+        <inputEntry id="UnaryTests_0r15j69">
+          <text>"pl"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ka0qvt">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_16hu3ov">
+          <text>"Dzień dobry"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_04hsipt">
+        <inputEntry id="UnaryTests_11ro1pm">
+          <text>"pl"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0mwaup7">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0itqu8b">
+          <text>"Cześć, Witaj"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1qhh0sg">
+        <inputEntry id="UnaryTests_1bnqpay">
+          <text>"ru"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1t81hfi">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_136jotp">
+          <text>"Zdravstvuyte"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0ex5c9p">
+        <inputEntry id="UnaryTests_0tmcrns">
+          <text>"ru"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0py8uv6">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1sl8j9c">
+          <text>"Privet"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1vn0fl3">
+        <inputEntry id="UnaryTests_0irhnho">
+          <text>"sv"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1uw8que">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_10qfvqs">
+          <text>"God dag"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_08jgwp4">
+        <inputEntry id="UnaryTests_09cmu32">
+          <text>"sv"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_17jz1o3">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_04azblm">
+          <text>"Hej, Tjena"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="ChooseGreeting">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
