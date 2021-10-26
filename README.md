@@ -6,10 +6,13 @@ Processable executes BPMN documents created in the Processable Modeler. Once a p
 
 ```ruby
 process_instance = Processable::Runtime.new(sources: File.read('simple.bpmn')).start_process('SimpleProcess')
-process_instance.print
 ```
 
-The current status of a process instance can be printed.
+The current status of a process instance can be printed to the console.
+
+```ruby
+process_instance.print
+```
 
 ```bash
 SimpleProcess started * Flow_1qhq8g6
@@ -53,9 +56,6 @@ Or install it yourself as:
 ```bash
 $ gem install processable
 ```
-
-## Contributing
-Contribution directions go here.
 
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
