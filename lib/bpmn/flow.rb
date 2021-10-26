@@ -20,13 +20,9 @@ module Bpmn
       @condition = Expression.new(moddle["conditionExpression"]) if moddle["conditionExpression"]
     end
 
-    def evaluate(instance)
+    def evaluate(execution)
       return true unless condition&.body
-      if condition.language
-        Processable::Config.instance.run_script(condition.body, data: instance.process_instance.data) == true
-      else
-        Processable::Config.instance.evaluate_expression(condition.body, data: instance.process_instance.data) == true
-      end
+      execution.process_execution.evaluate_condition(condition)
     end
   end
 end

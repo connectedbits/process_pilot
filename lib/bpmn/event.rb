@@ -10,31 +10,31 @@ module Bpmn
 
   class StartEvent < Event
 
-    def execute(instance)
-      instance.continue
+    def execute(execution)
+      execution.continue
     end
   end
 
   class IntermediateThrowEvent < Event
   
-    def execute(instance)
+    def execute(execution)
       # TODO: throw event
-      instance.continue
+      execution.continue
     end
   end
 
   class IntermediateCatchEvent < Event
 
-    def execute(instance)
+    def execute(execution)
       # TODO: subscribe to event
-      instance.wait
+      execution.wait
     end
   end
 
   class BoundaryEvent < Event
 
-    def execute(instance)
-      instance.wait
+    def execute(execution)
+      execution.wait
     end
   end
 

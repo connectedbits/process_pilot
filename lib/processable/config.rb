@@ -12,6 +12,9 @@ module Processable
       @logs = []
     end
 
+    def notify_listeners(event, instance)
+    end
+
     def run_script(script, data: {})
       ScriptRunner.call(script, data: data, context: context, utils: utils)
     end

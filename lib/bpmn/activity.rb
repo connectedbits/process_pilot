@@ -4,8 +4,8 @@ module Bpmn
 
   class Task < Activity
 
-    def execute(instance)
-      instance.wait
+    def execute(execution)
+      execution.wait
     end
   end
 

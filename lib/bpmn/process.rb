@@ -28,8 +28,8 @@ module Bpmn
       start_events.find { |se| se.event_definitions.empty? }
     end
 
-    def execute(instance)
-      instance.start
+    def execute(execution)
+      execution.start
     end
   end
 

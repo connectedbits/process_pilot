@@ -24,7 +24,7 @@ module Processable
       raise ExecutionError.new("Process with id #{process_id} not found.") unless process
       start_event = start_event_id ? process.start_events.find { |se| se.id == start_event_id } : process.default_start_event
       raise ExecutionError.new("Start event with id #{start_event_id} not found for process #{process_id}.") unless start_event
-      ProcessInstance.new(process, start_event: start_event, variables: variables, key: key).tap { |pi| process.execute(pi) } 
+      ProcessInstance.new(process, start_event: start_event, variables: variables, key: key).tap { |pi| process.execute(pi.execution) } 
     end
   end
 end

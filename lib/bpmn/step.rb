@@ -8,12 +8,12 @@ module Bpmn
       @outgoing = []
     end
 
-    def execute(instance)
+    def execute(execution)
     end
 
-    def outgoing_flows(instance)
+    def outgoing_flows(execution)
       flows = []
-      outgoing.each { |flow| flows.push flow if flow.evaluate(instance) }
+      outgoing.each { |flow| flows.push flow if flow.evaluate(execution) }
       return flows
     end
   end
