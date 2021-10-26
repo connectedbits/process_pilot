@@ -5,12 +5,28 @@ module Processable
     include Singleton
 
     attr_accessor :services, :listeners, :utils, :decisions
+    attr_accessor :run_scripts, :call_services, :evaluate_decisions
 
     def initialize
       @services = {}
       @listeners = []
       @utils = {}
       @decisions = {}
+      @run_scripts = true
+      @call_services = true
+      @evaluate_decisions = true
+    end
+
+    def run_scripts?
+      run_scripts
+    end
+
+    def call_services?
+      call_services
+    end
+
+    def evaluate_decisions?
+      evaluate_decisions
     end
 
     def notify_listeners(event, instance)

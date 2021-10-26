@@ -4,6 +4,7 @@ module Processable
 
     delegate :process_execution, to: :step_instance
     delegate :run_script, :call_service, :evaluate_expression, :evaluate_decision, to: :process_execution
+    delegate :run_scripts?, :call_services?, :evaluate_decisions?, to: :config
 
     def initialize(step_instance)
       @step_instance = step_instance

@@ -37,6 +37,8 @@ module Bpmn
     end
 
     def execute(execution)
+      execution.wait unless execution.evaluate_decisions?
+
       if expression
         result = execution.evaluate_expression(expression)
         execution.invoke(result_to_variables(result))
@@ -56,6 +58,8 @@ module Bpmn
     end
 
     def execute(execution)
+      execution.wait unless execution.run_scripts?
+
       result = execution.run_script(script)
       execution.invoke(result_to_variables(result))
     end
@@ -70,11 +74,17 @@ module Bpmn
     end
 
     def execute(execution)
+      execution.wait unless execution.call_services?
+
       result = execution.call_service(topic)
       execution.invoke(result_to_variables(result))
     end
   end
 
   class UserTask < Task
+
+    def execute(execution)
+      execution.wait
+    end
   end
 end
