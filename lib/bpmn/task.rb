@@ -1,6 +1,5 @@
 module Bpmn
-
-  class Task < Step
+  class Task < Activity
     attr_accessor :result_variable
 
     def initialize(moddle)

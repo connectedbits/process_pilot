@@ -6,32 +6,13 @@ Processable is a BPMN/DMN workflow gem for Rails apps.
 
 Processable `executes` BPMN documents like this one. 
 
-![Example](test/fixtures/files/example.png)
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions>
-  <bpmn:process id="Example" isExecutable="true">
-    <bpmn:startEvent id="Start" name="Start">
-      <bpmn:outgoing>Flow_01qy3jb</bpmn:outgoing>
-    </bpmn:startEvent>
-    <bpmn:task id="MyTask" name="My Task">
-      <bpmn:incoming>Flow_01qy3jb</bpmn:incoming>
-      <bpmn:outgoing>Flow_084gvp7</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:sequenceFlow id="Flow_01qy3jb" sourceRef="Start" targetRef="MyTask" />
-    <bpmn:endEvent id="End" name="End">
-      <bpmn:incoming>Flow_084gvp7</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_084gvp7" sourceRef="MyTask" targetRef="End" />
-  </bpmn:process>
-</definitions>
-```
+![Example](test/fixtures/files/hello_world.png)
+![Source](test/fixtures/files/hello_world.bpmn)
 
 A `Bpmn::Process` definition can be executed by initializing the `Processable::Runtime` with the document's source. Then a `Processable::ProcessInstance` can be created by calling `start_process`.
 
 ```ruby
-process_instance = Processable::Runtime.new(sources: File.read('simple.bpmn')).start_process('SimpleProcess')
+process_instance = Processable::Runtime.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services).start_process('HelloWorld')
 ```
 
 The current status of a `Processable::ProcessInstance` can be printed to the console.
@@ -41,26 +22,39 @@ process_instance.print
 ```
 
 ```bash
-Example started * Flow_1qhq8g6
+HelloWorld started * Flow_016qg9x
 
-0 StartEvent Start: ended * out: Flow_01qy3jb
-1 Task MyTask: waiting * in: Flow_1qhq8g6
+{
+  "greet": true,
+  "cookie": false
+}
+
+0 StartEvent Start: ended * out: Flow_016qg9x
+1 UserTask IntroduceYourself: waiting * in: Flow_016qg9x
 ```
 
-The Task `MyTask` is `waiting` to be `invoked` after the work has been completed. 
+The Task `IntroduceYourself` is `waiting` to be `invoked` after the work has been completed. 
 
 ```ruby
-process_instance.step_by_id('MyTask').invoke
+process_instance.step_by_id('IntroduceYourself').invoke({ name: "Eric", language: "es", formal: true })
 ```
 
-After `invoking` the task the process continues until it reaches the EndEvent.
+After `invoking` the task the process continues executing until it reaches an EndEvent.
 
 ```bash
-Example ended * 
+HelloWorld ended *
 
-0 StartEvent Start: ended * out: Flow_01qy3jb
-1 Task MyTask: ended * in: Flow_01qy3jb * out: Flow_084gvp7
-2 EndEvent End: ended * in: Flow_084gvp7
+{
+  "name": "Eric",
+  "greet": true,
+  "cookie": true,
+  "formal": true,
+  "message": "👋 Hola Eric 🥠 Avoid taking unnecessary gambles. Lucky numbers: 12, 15, 23, 28, 37",
+  "greeting": "Hola",
+  "language": "es",
+  "tell_fortune": "Avoid taking unnecessary gambles. Lucky numbers: 12, 15, 23, 28, 37"
+}
+
 ```
 
 ## Documentation

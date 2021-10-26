@@ -32,7 +32,15 @@ module Bpmn
   end
 
   class BoundaryEvent < Event
+    attr_accessor :attached_to_ref, :attached_to, :cancel_activity
 
+    def initialize(moddle)
+      super
+      @attached_to_ref = moddle[:attachedToRef]
+      @cancel_activity = true
+      @cancel_activity = moddle["cancelActivity"] if moddle["cancelActivity"] != nil
+    end
+    
     def execute(execution)
       execution.wait
     end

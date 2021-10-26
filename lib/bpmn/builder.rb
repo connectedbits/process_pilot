@@ -49,7 +49,7 @@ module Bpmn
           if reference_json["element"]["$type"] == "bpmn:BoundaryEvent"
             event = @elements[reference_json["element"]["id"]]
             owner = @elements[reference_json["id"]]
-            if owner.bpmn_type != "SequenceFlow"
+            if owner.type != "SequenceFlow"
               event.attached_to = owner
               owner.attachments.push(event) if event
             end
