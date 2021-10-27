@@ -16,7 +16,8 @@ module Processable
       end
     end
 
-    def message_thrown(message_name, variables: {})
+    def check_expired_timers
+      process_instance.steps.each { |step_instance| step_instance.invoke if step_instance.expires_at.present? && Time.now > step_instance.expires_at } 
     end
 
     def start
@@ -57,17 +58,29 @@ module Processable
       config.run_script(script, variables: process_instance.variables)
     end
 
-    def step_instance_ended(step_instance)
-      process_instance.variables = process_instance.variables.merge(step_instance.variables).with_indifferent_access
-      
-      if step_instance.element.is_a?(Bpmn::Event)
+    def step_instance_started(step_instance)
+      # Start attachments
+      step_instance.element.attachments&.each { |attachment| execute_element(attachment, attached_to: step_instance) } 
+    end
+
+    def step_instance_ended(step_instance)      
+      # End attachments
+      step_instance.attachments.each { |attached_instance| StepExecution.new(attached_instance).terminate if attached_instance.status == 'waiting' }
+
+      # Cancel event based gateway events?
+      element = step_instance.element
+      if element.is_a?(Bpmn::Event) && 
         source = step_instance.sources.first
         if source && source.element.is_a?(Bpmn::EventBasedGateway)
+          # Event based gateway event caught, terminate others
           source.targets.each do |ti|
             StepExecution.new(ti).terminate if (ti.id != step_instance.id) && (ti.status == 'waiting')
           end
         end
       end
+
+      # Copy up variables
+      process_instance.variables = process_instance.variables.merge(step_instance.variables).with_indifferent_access
 
       if step_instance.tokens_out.empty?
         all_ended = true
@@ -83,12 +96,13 @@ module Processable
 
     private
 
-    def execute_element(element, token: nil)
+    def execute_element(element, token: nil, attached_to: nil)
       step_instance = process_instance.steps.find { |si| si.element.id == element.id && si.status == 'waiting' }
       if step_instance
         step_instance.tokens_in.push token
       else
-        step_instance = StepInstance.new(process_instance, element: element, token: token) 
+        step_instance = StepInstance.new(process_instance, element: element, token: token, attached_to: attached_to) 
+        attached_to&.attachments.push step_instance if attached_to
         process_instance.steps.push step_instance
       end
       element.execute(step_instance.execution)    

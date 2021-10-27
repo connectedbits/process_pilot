@@ -21,8 +21,8 @@ module Bpmn
       before { @process_instance = runtime.start_process('StartEventTest') }
 
       it 'should start the process' do
-        _(process_instance.status).must_equal 'ended'
-        _(start_event.status).must_equal 'ended'
+        _(process_instance.ended?).must_equal true
+        _(start_event.ended?).must_equal true
       end
     end
   end
@@ -42,16 +42,16 @@ module Bpmn
 
       before { @process_instance = runtime.start_process('IntermediateCatchEventTest') }
       it 'should wait at the catch event' do
-        _(process_instance.status).must_equal 'started'
-        _(catch_event.status).must_equal 'waiting'
+        _(process_instance.started?).must_equal true
+        _(catch_event.waiting?).must_equal true
       end
 
       describe :invoke do
         before { catch_event.invoke }
 
         it 'should end the process' do
-          _(process_instance.status).must_equal 'ended'
-          _(catch_event.status).must_equal 'ended'
+          _(process_instance.ended?).must_equal true
+          _(catch_event.ended?).must_equal true
         end
       end
     end
@@ -72,8 +72,8 @@ module Bpmn
 
       before { @process_instance = runtime.start_process('IntermediateThrowEventTest') }
       it 'should throw then end the process' do
-        _(process_instance.status).must_equal 'ended'
-        _(throw_event.status).must_equal 'ended'
+        _(process_instance.ended?).must_equal true
+        _(throw_event.ended?).must_equal true
       end
     end
   end
@@ -106,12 +106,37 @@ module Bpmn
 
       before { @process_instance = runtime.start_process('BoundaryEventTest') }
 
-      # it "should create boundary events" do
-      #   process_instance.print
-      #   _(process_instance.status).must_equal "started"
-      #   _(host_task.status).must_equal "waiting"
-      #   _(boundary_timer.status).must_equal "waiting"
-      #   _(boundary_catch.status).must_equal "waiting"
+      it "should create boundary events" do
+        process_instance.print
+        _(process_instance.status).must_equal "started"
+        _(host_task.status).must_equal "waiting"
+        skip "TODO: boundary events are not created"
+        _(boundary_timer).wont_be_nil
+        _(boundary_catch).wont_be_nil
+      end
+
+      # describe :happy_path do
+      #   before { host_task.invoke }
+
+      #   it "should complete the process" do
+      #     _(process_instance.status).must_equal "ended"
+      #     _(host_task.status).must_equal "ended"
+      #     _(boundary_timer.status).must_equal "terminated"
+      #     _(boundary_catch.status).must_equal "terminated"
+      #   end
+      # end
+
+      # describe :timer do
+      #   before do
+      #     Timecop.travel(70.seconds)
+      #     process_instance.check_expired_timers
+      #   end
+
+      #   it "should end after timer event" do
+      #     _(process_instance.status).must_equal "ended"
+      #     _(throw_message).wont_be_nil
+      #     _(end_interupt).wont_be_nil
+      #   end
       # end
     end
   end

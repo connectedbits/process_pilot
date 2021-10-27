@@ -18,6 +18,8 @@ group :test do
   gem 'pry-rails'
   gem "guard"
   gem "guard-minitest"
+  gem "mocha"
+  gem "timecop"
 end
 
 gem 'byebug', group: [:development, :test]

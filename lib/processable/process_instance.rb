@@ -19,6 +19,18 @@ module Processable
       @status = 'created'
     end
 
+    def started?
+      status == 'started'
+    end
+
+    def ended?
+      status == 'ended'
+    end
+
+    def terminated?
+      status == 'terminated'
+    end
+
     def tokens
       active_tokens = []
       steps.each do |step|

@@ -36,6 +36,18 @@ module Processable
       update_status('ended')
     end
 
+    def set_timer(expires_at)
+      step_instance.expires_at = expires_at
+    end
+
+    def catch_message(message_name)
+      step_instance.message_names.push message_name
+    end
+
+    def throw_message(message_name)
+      process_execution.message_received(message_name)
+    end
+
     private
 
     def update_status(status)

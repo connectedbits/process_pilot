@@ -4,35 +4,10 @@ module Bpmn
 
     def initialize(moddle)
       super
-      @event_definitions = moddle['eventDefinitions'] ? moddle['eventDefinitions'] : []
-    end
-
-    def conditional_event_definition
-      event_definitions.find {|ed| ed.is_a?(ConditionalEventDefinition) }
-    end
-
-    def escalation_event_definition
-      event_definitions.find {|ed| ed.is_a?(EscalationEventDefinition) }
-    end
-
-    def error_event_definition
-      event_definitions.find {|ed| ed.is_a?(ErrorEventDefinition) }
-    end
-
-    def message_event_definitions
-      event_definitions.select {|ed| ed.is_a?(MessageEventDefinition) }
-    end
-
-    def signal_event_definitions
-      event_definitions.select {|ed| ed.is_a?(SignalEventDefinition) }
-    end
-
-    def terminate_event_definition
-      event_definitions.find {|ed| ed.is_a?(TerminateEventDefinition) }
-    end
-
-    def timer_event_definition
-      event_definitions.find {|ed| ed.is_a?(TimerEventDefinition) }
+      @event_definitions = []
+      @event_definitions = moddle['eventDefinitions'].map do |edm|
+        Element.from_moddle(edm)
+      end if moddle['eventDefinitions']
     end
 
     def is_catching?
@@ -42,15 +17,20 @@ module Bpmn
     def is_throwing?
       false
     end
+
+    def execute(execution)
+      event_definitions.each { |ed| ed.execute(self, execution) }
+    end
   end
 
   class StartEvent < Event
 
     def is_catching?
-      message_event_definitions.present? || signal_event_definitions.present?
+      true
     end
 
     def execute(execution)
+      super
       execution.continue
     end
   end
@@ -58,11 +38,11 @@ module Bpmn
   class IntermediateThrowEvent < Event
   
     def is_throwing?
-      message_event_definitions.present? || signal_event_definitions.present?
+      true
     end
 
     def execute(execution)
-      # TODO: throw event
+      super
       execution.continue
     end
   end
@@ -70,11 +50,11 @@ module Bpmn
   class IntermediateCatchEvent < Event
 
     def is_catching?
-      message_event_definitions.present? || signal_event_definitions.present?
+      true
     end
 
     def execute(execution)
-      # TODO: subscribe to event
+      super
       execution.wait
     end
   end
@@ -83,7 +63,7 @@ module Bpmn
     attr_accessor :attached_to_ref, :attached_to, :cancel_activity
 
     def is_catching?
-      message_event_definitions.present?
+      true
     end
 
     def initialize(moddle)
@@ -94,6 +74,7 @@ module Bpmn
     end
     
     def execute(execution)
+      super
       execution.wait
     end
   end
@@ -101,11 +82,12 @@ module Bpmn
   class EndEvent < Event
 
     def is_throwing?
-      message_event_definitions.present? || signal_event_definitions.present?
+      true
     end
     
-    def execute(instance)
-      instance.end
+    def execute(execution)
+      super
+      execution.end
     end
   end
 end
