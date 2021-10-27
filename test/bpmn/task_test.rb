@@ -52,6 +52,7 @@ module Bpmn
 
       it 'should parse the service task' do
         _(service_task).wont_be_nil
+        _(service_task.topic).must_equal 'do_it'
       end
     end
 
@@ -95,6 +96,7 @@ module Bpmn
 
       it 'should parse the script task' do
         _(script_task).wont_be_nil
+        _(script_task.script).wont_be_nil
       end
     end
 
@@ -140,6 +142,7 @@ module Bpmn
   
         it 'should parse the business rule task' do
           _(business_rule_task).wont_be_nil
+          _(business_rule_task.expression).wont_be_nil
         end
       end
   
@@ -178,6 +181,7 @@ module Bpmn
   
         it 'should parse the business rule task' do
           _(business_rule_task).wont_be_nil
+          _(business_rule_task.decision_ref).wont_be_nil
         end
       end
 
@@ -185,7 +189,10 @@ module Bpmn
         let(:process_instance) { @process_instance }
         let(:business_rule_task) { process_instance.step_by_id('DmnBusinessRule') }
   
-        before { @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 }) }
+        before do 
+          runtime.config.async_business_rules = false
+          @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 })
+        end
   
         it 'should run the business rule task' do
           _(process_instance.status).must_equal "ended"
