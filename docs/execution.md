@@ -3,7 +3,7 @@
 
 ## Async Automated (Service, Script, and BusinessRule) Tasks
 
-The Processable runtime will run automated tasks synchronously when the step is executed. This behavior can be bypassed causing the automated task to go directly to `waiting`. Note: the runtime will expect the task to be run by the Rails app and invoked with the result when complete.
+The Processable runtime will run automated tasks synchronously when the step is executed. This behavior can be bypassed causing the automated task to go directly to `waiting`. Note: the runtime will expect the task to be run manually and invoked with the result when complete.
 
 ```ruby
 # This flag will make all services asynchronous
