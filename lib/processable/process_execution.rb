@@ -16,6 +16,9 @@ module Processable
       end
     end
 
+    def message_thrown(message_name, variables: {})
+    end
+
     def start
       update_status('started')
       execute_element(process_instance.start_event)

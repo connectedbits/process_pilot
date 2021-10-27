@@ -7,4 +7,11 @@ module Bpmn
       @attachments = []
     end
   end
+
+  class CallActivity < Activity
+  end
+
+  class SubProcess < Activity
+    attr_accessor :definitions, :elements, :parent
+  end
 end

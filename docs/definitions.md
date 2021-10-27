@@ -1,16 +1,10 @@
-# Supported BPMN Elements
+# Definitions
+
+The Processable runtime supports the following BPMN definitions.
 
 - [x] Process
 
 A process is the work someone (or something) does to accomplish an objective. A process represents a sequence of steps in the form of a graph.
-
-- [ ] CallActivity
-
-A CallActivity invokes a process that is defined external to the model enabling reuse.
-
-- [ ] SubProcess
-
-A SubProcess (Embedded, Event, or AdHoc) has parts that are modeled in a child-level process, a process with its own step flows and start and end states. 
 
 - [x] Sequence Flow
 
@@ -50,23 +44,29 @@ An event is something important that happens during a business process. Events a
 
 This engine supports the following event types:
 
-- [ ] Start Event
+- [x] Start Event
 
 Represents the start of a process or subprocess.
+
+- [x] Intermediate Catch Event
+
+- [x] Intermediate Throw Event
 
 - [ ] Boundary Event
 
 Intermediate events are either placed between activities or attached to the boundary of an activity. The latter are called boundary events. Boundary events are entered when the attached element is started and wait for an event to occur such as a timer, message, or error. Boundary events can be interupting or non-interupting. If the host ends before an event occurs the boundary events are canceled.
 
-- [ ] Intermediate Throw Event
-
-- [ ] Intermediate Catch Event
-
-- [ ] End Event
+- [x] End Event
 
 ## Event Definitions
 
-Event definitions describe the behavior of an event.
+Event definitions futher describe the behavior of an event.
+
+- [ ] Conditional Event Definition
+
+- [ ] Escalation Event Definition
+
+- [ ] Error Event Definition
 
 - [ ] Message Event Definition
 
@@ -75,8 +75,6 @@ Event definitions describe the behavior of an event.
 - [ ] Terminate Event Definition
 
 - [ ] Timer Event Definition
-
-- [ ] Error Event Definition
 
 ## Gateways
 
@@ -93,10 +91,6 @@ This engine supports the following gateway types:
 
 An exclusive gateway evaluates all outgoing paths and the token flows into one of the two or more mutally exclusive paths. One of the conditions must evaluate to true. If none of the conditions evaluate to true the process will get stuck. For this reason it's always a good idea to have a default path.
 
-- [x] Event Based Gateway
-
-An event-based gateway is similar to an exclusive gateway because both involve one path in the flow. In the case of an event-based gateway, however, you evaluate which event has occurred, not which condition has been met. Once the event occurs, all other waiting events are canceled.
-
 - [x] Parallel Gateway
 
 A parallel gateway generates a token for each outgoing path and doesn't evaluate any conditions.
@@ -104,6 +98,20 @@ A parallel gateway generates a token for each outgoing path and doesn't evaluate
 - [x] Inclusive Gateway
 
 An inclusive gateway breaks the process flow into one or more flows. It behaves like a parallel gateway execept the conditions are checked on each path and only those paths (or default) will be taken.
+
+- [x] Event Based Gateway
+
+An event-based gateway is similar to an exclusive gateway because both involve one path in the flow. In the case of an event-based gateway, however, you evaluate which event has occurred, not which condition has been met. Once the event occurs, all other waiting events are canceled.
+
+## Other Activities
+
+- [ ] CallActivity
+
+A CallActivity invokes a process that is defined external to the model enabling reuse.
+
+- [ ] SubProcess
+
+A SubProcess (Embedded, Event, or AdHoc) has parts that are modeled in a child-level process, a process with its own step flows and start and end states. 
 
 ## Expressions
 
@@ -125,10 +133,3 @@ Optional Expressions (conditions can be used in place of a static value):
 - Service task: job type, job retries (not yet implemented) 
 
 Note: sequence flows allow a script instead of an expression. This should only be used when a util function is needed.
-
-## Extensions
-
-Extensions allow for custom configuration of BPMN elements that are used by the engine. The following extensions are supported by the engine:
-
-- [ ] FormData
-- [ ] Properties

@@ -32,7 +32,4 @@ module Bpmn
       execution.start
     end
   end
-
-  class CallActivity < Element
-  end
 end

@@ -59,7 +59,7 @@ HelloWorld ended *
 
 ## Documentation
 
-* [Supported Elements](/docs/elements.md)
+* [Definitions](/docs/definitions.md)
 * [Execution](/docs/execution.md)
 
 ## Installation
