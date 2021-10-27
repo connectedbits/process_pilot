@@ -57,6 +57,8 @@ HelloWorld ended *
 
 ```
 
+You can define your own processes using a  [modeler](https://camunda.com/download/modeler/).
+
 ## Documentation
 
 * [Definitions](/docs/definitions.md)
