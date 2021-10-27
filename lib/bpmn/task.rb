@@ -24,43 +24,10 @@ module Bpmn
     end
   end
 
-  class BusinessRuleTask < Task
-    attr_accessor :expression, :decision_ref, :binding, :version
-
-    def initialize(moddle)
-      super
-      @expression = moddle["expression"]
-      @decision_ref = moddle["decisionRef"]
-      @binding = moddle["binding"]
-      @version = moddle["version"]
-    end
+  class UserTask < Task
 
     def execute(execution)
-      execution.wait unless execution.evaluate_decisions?
-
-      if expression
-        result = execution.evaluate_expression(expression)
-        execution.invoke(result_to_variables(result))
-      elsif decision_ref
-        result = execution.evaluate_decision(decision_ref)
-        execution.invoke(result_to_variables(result))
-      end
-    end
-  end
-
-  class ScriptTask < Task
-    attr_accessor :script
-
-    def initialize(moddle)
-      super
-      @script = moddle["script"]
-    end
-
-    def execute(execution)
-      execution.wait unless execution.run_scripts?
-
-      result = execution.run_script(script)
-      execution.invoke(result_to_variables(result))
+      execution.wait
     end
   end
 
@@ -73,17 +40,68 @@ module Bpmn
     end
 
     def execute(execution)
-      execution.wait unless execution.call_services?
+      if execution.async_services?
+        execution.wait 
+      else
+        run(execution)
+      end
+    end
 
+    def run(execution)
       result = execution.call_service(topic)
       execution.invoke(result_to_variables(result))
     end
   end
 
-  class UserTask < Task
+  class ScriptTask < Task
+    attr_accessor :script
+
+    def initialize(moddle)
+      super
+      @script = moddle["script"]
+    end
 
     def execute(execution)
-      execution.wait
+      if execution.async_scripts?
+        execution.wait 
+      else
+        run(execution)
+      end
+    end
+
+    def run(execution)
+      result = execution.run_script(script)
+      execution.invoke(result_to_variables(result))
+    end
+  end
+
+  class BusinessRuleTask < Task
+    attr_accessor :expression, :decision_ref, :binding, :version
+
+    def initialize(moddle)
+      super
+      @expression = moddle["expression"]
+      @decision_ref = moddle["decisionRef"]
+      @binding = moddle["binding"]
+      @version = moddle["version"]
+    end
+
+    def execute(execution)
+      if execution.async_business_rules?
+        execution.wait 
+      else
+        run(execution)
+      end
+    end
+
+    def run(execution)
+      if expression
+        result = execution.evaluate_expression(expression)
+        execution.invoke(result_to_variables(result))
+      elsif decision_ref
+        result = execution.evaluate_decision(decision_ref)
+        execution.invoke(result_to_variables(result))
+      end
     end
   end
 end

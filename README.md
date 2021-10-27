@@ -7,13 +7,12 @@ Processable is a BPMN/DMN workflow gem for Rails apps.
 Processable `executes` BPMN documents like this one. 
 
 ![Example](test/fixtures/files/hello_world.png)
-
 [Source](test/fixtures/files/hello_world.bpmn)
 
 A `Bpmn::Process` definition can be executed by initializing the `Processable::Runtime` with the document's source. Then a `Processable::ProcessInstance` can be created by calling `start_process`.
 
 ```ruby
-process_instance = Processable::Runtime.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services).start_process('HelloWorld', variables: { greet: true, cookie: true })
+process_instance = Processable::Runtime.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services).start_process('HelloWorld')
 ```
 
 The current status of a `Processable::ProcessInstance` can be printed to the console.
@@ -27,7 +26,7 @@ HelloWorld started * Flow_016qg9x
 
 {
   "greet": true,
-  "cookie": true
+  "cookie": false
 }
 
 0 StartEvent Start: ended * out: Flow_016qg9x

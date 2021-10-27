@@ -84,7 +84,7 @@ module Processable
       before { @process_instance = runtime.start_process('HelloWorld', variables: { greet: true, cookie: false }) }
 
       it 'should start the process' do
-        process_instance.print
+        #process_instance.print
         _(process_instance.status).must_equal 'started'
         _(user_task.status).must_equal 'waiting'
       end

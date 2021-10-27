@@ -5,24 +5,28 @@ module Processable
     include Singleton
 
     attr_accessor :services, :listeners, :utils, :decisions
-    attr_accessor :run_scripts, :call_services, :evaluate_decisions
+    attr_accessor :async_services, :async_scripts, :async_business_rules
 
     def initialize
       @services = {}
       @listeners = []
       @utils = {}
       @decisions = {}
-      @run_scripts = true
-      @call_services = true
-      @evaluate_decisions = true
+      @async_services = false
+      @async_scripts = false
+      @async_business_rules = false
     end
 
-    def run_scripts?
-      run_scripts
+    def async_services?
+      @async_services
     end
 
-    def call_services?
-      call_services
+    def async_scripts?
+      @async_scripts
+    end
+
+    def async_business_rules?
+      @async_business_rules
     end
 
     def evaluate_decisions?
