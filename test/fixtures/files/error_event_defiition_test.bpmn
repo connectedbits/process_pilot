@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1ku8y7y" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.10.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="Error" name="Error" isExecutable="true">
+    <bpmn:startEvent id="Start">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="error" label="Throw Error?" type="boolean" defaultValue="true" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_00zgmwu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_00zgmwu" sourceRef="Start" targetRef="ErrorService" />
+    <bpmn:endEvent id="EndSucceeded" name="Succeeded">
+      <bpmn:incoming>Flow_1hqr2gy</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1hqr2gy" sourceRef="ErrorService" targetRef="EndSucceeded" />
+    <bpmn:boundaryEvent id="ErrorEvent" attachedToRef="ErrorService">
+      <bpmn:outgoing>Flow_0pae8ja</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1yioyus" />
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="EndFailed" name="Failed">
+      <bpmn:incoming>Flow_0pae8ja</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0pae8ja" sourceRef="ErrorEvent" targetRef="EndFailed" />
+    <bpmn:serviceTask id="ErrorService" name="Service" camunda:type="external" camunda:topic="raise_error">
+      <bpmn:incoming>Flow_00zgmwu</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hqr2gy</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Error">
+      <bpmndi:BPMNEdge id="Flow_00zgmwu_di" bpmnElement="Flow_00zgmwu">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hqr2gy_di" bpmnElement="Flow_1hqr2gy">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0pae8ja_di" bpmnElement="Flow_0pae8ja">
+        <di:waypoint x="340" y="175" />
+        <di:waypoint x="340" y="240" />
+        <di:waypoint x="412" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="Start">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19ljxq5_di" bpmnElement="EndSucceeded">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="422" y="142" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0w35ycc_di" bpmnElement="EndFailed">
+        <dc:Bounds x="412" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="415" y="265" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0c7inil_di" bpmnElement="ErrorService">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1gx2ywi_di" bpmnElement="ErrorEvent">
+        <dc:Bounds x="322" y="139" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

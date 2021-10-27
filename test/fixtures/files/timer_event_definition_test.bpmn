@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0wa9xg9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="TimerEventDefinitionTest" isExecutable="true">
-    <bpmn:startEvent id="Start" name="Start Timer">
-      <bpmn:outgoing>Flow_09ni0ls</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_1h50vlk">
-        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R/P1D</bpmn:timeCycle>
-      </bpmn:timerEventDefinition>
-    </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_09ni0ls" sourceRef="Start" targetRef="IntermediateTimer" />
+    <bpmn:sequenceFlow id="Flow_09ni0ls" sourceRef="StartTimer" targetRef="IntermediateTimer" />
     <bpmn:task id="HostTask" name="Host Task">
       <bpmn:incoming>Flow_1jgoa5c</bpmn:incoming>
       <bpmn:outgoing>Flow_0spf11c</bpmn:outgoing>
@@ -19,25 +13,28 @@
     </bpmn:endEvent>
     <bpmn:boundaryEvent id="BoundaryTimer" name="Boundary Timer" attachedToRef="HostTask">
       <bpmn:outgoing>Flow_1amlpc4</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_0v4geog" />
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0v4geog">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
     </bpmn:boundaryEvent>
     <bpmn:intermediateCatchEvent id="IntermediateTimer" name="Intermediate Timer">
       <bpmn:incoming>Flow_09ni0ls</bpmn:incoming>
       <bpmn:outgoing>Flow_1jgoa5c</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_09bdzw3" />
+      <bpmn:timerEventDefinition id="TimerEventDefinition_09bdzw3">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="Flow_1amlpc4" sourceRef="BoundaryTimer" targetRef="End" />
     <bpmn:sequenceFlow id="Flow_0spf11c" sourceRef="HostTask" targetRef="End" />
+    <bpmn:startEvent id="StartTimer" name="Start Timer">
+      <bpmn:outgoing>Flow_09ni0ls</bpmn:outgoing>
+    </bpmn:startEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TimerEventDefinitionTest">
-      <bpmndi:BPMNEdge id="Flow_09ni0ls_di" bpmnElement="Flow_09ni0ls">
-        <di:waypoint x="215" y="120" />
-        <di:waypoint x="272" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1jgoa5c_di" bpmnElement="Flow_1jgoa5c">
-        <di:waypoint x="308" y="120" />
-        <di:waypoint x="370" y="120" />
+      <bpmndi:BPMNEdge id="Flow_0spf11c_di" bpmnElement="Flow_0spf11c">
+        <di:waypoint x="470" y="120" />
+        <di:waypoint x="532" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1amlpc4_di" bpmnElement="Flow_1amlpc4">
         <di:waypoint x="420" y="178" />
@@ -45,16 +42,14 @@
         <di:waypoint x="550" y="210" />
         <di:waypoint x="550" y="138" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0spf11c_di" bpmnElement="Flow_0spf11c">
-        <di:waypoint x="470" y="120" />
-        <di:waypoint x="532" y="120" />
+      <bpmndi:BPMNEdge id="Flow_1jgoa5c_di" bpmnElement="Flow_1jgoa5c">
+        <di:waypoint x="308" y="120" />
+        <di:waypoint x="370" y="120" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1sfjtka_di" bpmnElement="Start">
-        <dc:Bounds x="179" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="171" y="145" width="55" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_09ni0ls_di" bpmnElement="Flow_09ni0ls">
+        <di:waypoint x="215" y="120" />
+        <di:waypoint x="272" y="120" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_09ijx4k_di" bpmnElement="HostTask">
         <dc:Bounds x="370" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -68,6 +63,12 @@
         <dc:Bounds x="272" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="260" y="145" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0mhq6g1_di" bpmnElement="StartTimer">
+        <dc:Bounds x="179" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="171" y="145" width="55" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_04xzbix_di" bpmnElement="BoundaryTimer">

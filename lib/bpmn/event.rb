@@ -18,6 +18,66 @@ module Bpmn
       false
     end
 
+    def is_none?
+      event_definitions.empty?
+    end
+
+    def is_conditional?
+      conditional_event_definition.present?
+    end
+
+    def is_escalation?
+      escalation_event_definition.present?
+    end
+
+    def is_error?
+      error_event_definition.present?
+    end
+
+    def is_message?
+      !message_event_definitions.empty?
+    end
+
+    def is_signal?
+      !signal_event_definitions.empty?
+    end
+
+    def is_terminate?
+      terminate_event_definition.present?
+    end
+
+    def is_timer?
+      timer_event_definition.present?
+    end
+
+    def conditional_event_definition
+      event_definitions.find {|ed| ed.is_a?(Bpmn::ConditionalEventDefinition) }
+    end
+
+    def escalation_event_definition
+      event_definitions.find {|ed| ed.is_a?(Bpmn::EscalationEventDefinition) }
+    end
+
+    def error_event_definition
+      event_definitions.find {|ed| ed.is_a?(Bpmn::ErrorEventDefinition) }
+    end
+
+    def message_event_definitions
+      event_definitions.select {|ed| ed.is_a?(Bpmn::MessageEventDefinition) }
+    end
+
+    def signal_event_definitions
+      event_definitions.select {|ed| ed.is_a?(Bpmn::SignalEventDefinition) }
+    end
+
+    def terminate_event_definition
+      event_definitions.find {|ed| ed.is_a?(Bpmn::TerminateEventDefinition) }
+    end
+
+    def timer_event_definition
+      event_definitions.find {|ed| ed.is_a?(Bpmn::TimerEventDefinition) }
+    end
+
     def execute(execution)
       event_definitions.each { |ed| ed.execute(self, execution) }
     end
