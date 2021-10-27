@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_13kxjgo" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.10.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_13kxjgo" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="InclusiveGatewayTest" name="Inclusive Gateway Test" isExecutable="true">
     <bpmn:startEvent id="Start">
       <bpmn:outgoing>Flow_1</bpmn:outgoing>
@@ -26,14 +26,14 @@
       <bpmn:outgoing>Flow_8</bpmn:outgoing>
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_4" sourceRef="Split" targetRef="CheckPrinterParts">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ data.include_printer_parts = true }</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ include_printer_parts = true }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:task id="CheckLaptopParts" name="Check Laptop Parts">
       <bpmn:incoming>Flow_5</bpmn:incoming>
       <bpmn:outgoing>Flow_6</bpmn:outgoing>
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_5" sourceRef="Split" targetRef="CheckLaptopParts">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ data.include_laptop_parts = true }</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ include_laptop_parts = true }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_7" sourceRef="CheckPrices" targetRef="Join" />
     <bpmn:inclusiveGateway id="Join" name="Join">

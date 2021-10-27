@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0cmqbjy" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.10.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0cmqbjy" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="ExclusiveGatewayTest" isExecutable="true">
     <bpmn:startEvent id="Start" name="Start">
       <bpmn:outgoing>Flow_0iqmkir</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:exclusiveGateway id="Decision" name="Decision" default="Flow_165lfvg">
+    <bpmn:exclusiveGateway id="ExclusiveGateway" name="Exclusive Gateway" default="Flow_165lfvg">
       <bpmn:incoming>Flow_0iqmkir</bpmn:incoming>
       <bpmn:outgoing>Flow_0fpu3hq</bpmn:outgoing>
       <bpmn:outgoing>Flow_165lfvg</bpmn:outgoing>
       <bpmn:outgoing>Flow_04i98ff</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0iqmkir" sourceRef="Start" targetRef="Decision" />
+    <bpmn:sequenceFlow id="Flow_0iqmkir" sourceRef="Start" targetRef="ExclusiveGateway" />
     <bpmn:endEvent id="EndOK" name="End OK">
       <bpmn:incoming>Flow_0fpu3hq</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0fpu3hq" name="action == ok" sourceRef="Decision" targetRef="EndOK">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ data.action = 'ok' }</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0fpu3hq" name="action == ok" sourceRef="ExclusiveGateway" targetRef="EndOK">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ action = 'ok' }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="EndDefault" name="End Default">
       <bpmn:incoming>Flow_165lfvg</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_165lfvg" sourceRef="Decision" targetRef="EndDefault" />
+    <bpmn:sequenceFlow id="Flow_165lfvg" sourceRef="ExclusiveGateway" targetRef="EndDefault" />
     <bpmn:endEvent id="EndNotOK" name="End Not OK">
       <bpmn:incoming>Flow_04i98ff</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_04i98ff" name="action == not ok" sourceRef="Decision" targetRef="EndNotOK">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ data.action = 'not_ok' }</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_04i98ff" name="action == not ok" sourceRef="ExclusiveGateway" targetRef="EndNotOK">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ action = 'not_ok' }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -60,10 +60,10 @@
           <dc:Bounds x="185" y="252" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1023p94_di" bpmnElement="Decision" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="Gateway_1023p94_di" bpmnElement="ExclusiveGateway" isMarkerVisible="true">
         <dc:Bounds x="265" y="202" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="228" y="193" width="43" height="14" />
+          <dc:Bounds x="227" y="193" width="47" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_00saxcv_di" bpmnElement="EndOK">

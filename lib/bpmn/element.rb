@@ -13,7 +13,7 @@ module Bpmn
       begin
         klass = "Bpmn::#{moddle["$type"].split(':').last}".constantize
         return klass.new(moddle)
-      rescue => e
+      rescue # => e
         return Element.new(moddle)
       end
     end

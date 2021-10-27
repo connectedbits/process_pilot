@@ -1,11 +1,5 @@
 module Bpmn
   class Gateway < Step
-    attr_accessor :default
-
-    def initialize(moddle)
-      super
-      @default = moddle["default"]
-    end
 
     def execute(execution)
       if converging?
@@ -19,11 +13,11 @@ module Bpmn
     #
     # Algorithm from https://researcher.watson.ibm.com/researcher/files/zurich-hvo/bpm2010-1.pdf
     #
-    def is_enabled?(instance)
+    def is_enabled?(execution)
       filled = []
       empty = []
 
-      incoming.each { |flow| instance.tokens_in.include?(flow.id) ? filled.push(flow) : empty.push(flow) }
+      incoming.each { |flow| execution.step_instance.tokens_in.include?(flow.id) ? filled.push(flow) : empty.push(flow) }
 
       # Filled slots don't need to be searched for tokens
       index = 0
@@ -48,38 +42,28 @@ module Bpmn
       empty_ids = empty.map { |g| g.id }
 
       # If there are empty slots with tokens we need to wait
-      return false if (empty_ids & instance.process_instance.tokens).length > 0
+      return false if (empty_ids & execution.step_instance.process_instance.tokens).length > 0
       return true
     end
   end
 
   class ExclusiveGateway < Gateway
-
     # RULE: Only one flow is taken
     def outgoing_flows(instance)
       flows = super
-      return [default] if flows.empty? && default
       return [flows.first]
     end
   end
 
   class ParallelGateway < Gateway
-    
-    # RULE: All flows are taken, conditions are ignored.
+    # RULE: All flows are taken
   end
 
-  class InclusiveGateway < Gateway
-    
-    # RULE: The default flow will only fire if no other flows are valid.
-    def outgoing_flows(instance)
-      flows = super
-      return [default] if flows.empty? && default
-      return flows
-    end
+  class InclusiveGateway < Gateway 
+    # RULE: All valid flows are take
   end
 
   class EventBasedGateway < Gateway
-
     # RULE: All flows are taken
 
     #

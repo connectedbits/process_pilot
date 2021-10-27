@@ -77,26 +77,25 @@ module Processable
       end
     end
 
-    describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:user_task) { process_instance.step_by_id('IntroduceYourself') }
+    # describe :execution do
+    #   let(:process_instance) { @process_instance }
+    #   let(:user_task) { process_instance.step_by_id('IntroduceYourself') }
 
-      before { @process_instance = runtime.start_process('HelloWorld', variables: { greet: true, cookie: false }) }
+    #   before { @process_instance = runtime.start_process('HelloWorld', variables: { greet: true, cookie: false }) }
 
-      it 'should start the process' do
-        #process_instance.print
-        _(process_instance.status).must_equal 'started'
-        _(user_task.status).must_equal 'waiting'
-      end
+    #   it 'should start the process' do
+    #     _(process_instance.status).must_equal 'started'
+    #     _(user_task.status).must_equal 'waiting'
+    #   end
 
-      # describe :invoke do
-      #   before { task.invoke }
+    #   describe :invoke do
+    #     before { user_task.invoke }
 
-      #   it 'should end the process' do
-      #     _(process_instance.status).must_equal 'ended'
-      #     _(task.status).must_equal 'ended'
-      #   end
-      # end
-    end
+    #     it 'should end the process' do
+    #       _(process_instance.status).must_equal 'ended'
+    #       _(user_task.status).must_equal 'ended'
+    #     end
+    #   end
+    # end
   end
 end

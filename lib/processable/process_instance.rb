@@ -2,11 +2,13 @@ module Processable
   class ProcessInstance
     include ActiveModel::Model
     
-    attr_accessor :process, :start_event, :variables, :key, :parent, :called_by, :status, :steps
+    attr_accessor :process, :start_event, :variables, :key, :parent, :called_by, :id, :status, :steps
 
     delegate :element_by_id, to: :process
+    delegate :message_received, to: :execution
 
     def initialize(process, start_event:, variables: {}, key: nil, parent: nil, called_by: nil)
+      @id = SecureRandom.uuid
       @process = process
       @start_event = start_event
       @variables = variables

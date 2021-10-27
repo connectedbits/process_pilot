@@ -72,16 +72,16 @@
 
 let parts = []
 
-if (data.greeting) {
-  parts.push(`👋 ${data.greeting}`)
+if (variables.greeting) {
+  parts.push(`👋 ${variables.greeting}`)
 }
 
-if (data.name) {
+if (variables.name) {
   parts.push(data.name)
 }
               
-if (data.tell_fortune) {
-  parts.push(`🥠 ${data.tell_fortune}`)
+if (variables.tell_fortune) {
+  parts.push(`🥠 ${variables.tell_fortune}`)
 }
         
 parts.join(' ')
@@ -91,10 +91,10 @@ parts.join(' ')
     <bpmn:sequenceFlow id="Flow_1xiabfq" sourceRef="Join" targetRef="SayHello" />
     <bpmn:sequenceFlow id="Flow_1t20i0c" sourceRef="TellFortune" targetRef="Join" />
     <bpmn:sequenceFlow id="Flow_09yhdyi" sourceRef="Split" targetRef="TellFortune">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ data.cookie = true }</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ cookie = true }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_00mppvp" sourceRef="Split" targetRef="ChooseGreeting">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ data.greet = true }</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ greet = true }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0f1v8du" sourceRef="IntroduceYourself" targetRef="Split" />
     <bpmn:sequenceFlow id="Flow_1ezhtuc" sourceRef="ChooseGreeting" targetRef="Join" />

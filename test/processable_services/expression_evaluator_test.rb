@@ -5,16 +5,34 @@ module ProcessableServices
     let(:service) { ExpressionEvaluator }
 
     describe :feel do
-      let(:expression) { "person.age > 50" }
+      describe :val do
+        let(:expression) { "person.name" }
 
-      it "truthy should be true" do
-        result = service.call(expression, variables: { person: { age: 57 } })
-        _(result).must_equal true
+        it "should evaluate expression" do
+          result = service.call(expression, variables: { person: { name: 'Eric' } })
+          _(result).must_equal 'Eric'
+        end
       end
 
-      it "not truthy should be false" do
-        result = service.call(expression, variables: { person: { age: 44 } })
-        _(result).must_equal false
+      describe :test do
+        it "should evaluate expression" do
+          result = service.call("${ action = 'ok' }", variables: { action: 'ok' })
+          _(result).must_equal true
+        end
+      end
+
+      describe :truthy do
+        let(:expression) { "person.age > 50" }
+
+        it "truthy should be true" do
+          result = service.call(expression, variables: { person: { age: 57 } })
+          _(result).must_equal true
+        end
+
+        it "not truthy should be false" do
+          result = service.call(expression, variables: { person: { age: 44 } })
+          _(result).must_equal false
+        end
       end
     end
 

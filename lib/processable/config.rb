@@ -8,6 +8,10 @@ module Processable
     attr_accessor :async_services, :async_scripts, :async_business_rules
 
     def initialize
+      reset_default_values
+    end
+
+    def reset_default_values
       @services = {}
       @listeners = []
       @utils = {}

@@ -82,6 +82,10 @@ module Bpmn
           _(process_instance.status).must_equal 'started'
           _(service_task.status).must_equal 'waiting'
         end
+
+        after do
+          runtime.config.reset_default_values
+        end
       end
     end
   end
@@ -104,10 +108,7 @@ module Bpmn
       let(:process_instance) { @process_instance }
       let(:script_task) { process_instance.step_by_id('ScriptTask') }
 
-      before do 
-        runtime.config.async_scripts = false
-        @process_instance = runtime.start_process('ScriptTaskTest', variables: { name: "Eric" })
-      end
+      before { @process_instance = runtime.start_process('ScriptTaskTest', variables: { name: "Eric" }) }
 
       it 'should run the script task' do
         _(process_instance.status).must_equal 'ended'
@@ -125,6 +126,10 @@ module Bpmn
         it 'should not run the script task' do
           _(process_instance.status).must_equal 'started'
           _(script_task.status).must_equal 'waiting'
+        end
+
+        after do
+          runtime.config.async_scripts = false
         end
       end
     end
@@ -150,10 +155,7 @@ module Bpmn
         let(:process_instance) { @process_instance }
         let(:business_rule_task) { process_instance.step_by_id('ExpressionBusinessRule') }
   
-        before do
-          runtime.config.async_business_rules = false
-          @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'ExpressionStart', variables: { age: 57 })
-        end
+        before { @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'ExpressionStart', variables: { age: 57 }) }
   
         it 'should run the business rule task' do
           _(process_instance.status).must_equal "ended"
@@ -170,6 +172,10 @@ module Bpmn
           it 'should not run the business rule task' do
             _(process_instance.status).must_equal "started"
             _(business_rule_task.status).must_equal "waiting"
+          end
+
+          after do
+            runtime.config.async_business_rules = false
           end
         end
       end
@@ -189,10 +195,7 @@ module Bpmn
         let(:process_instance) { @process_instance }
         let(:business_rule_task) { process_instance.step_by_id('DmnBusinessRule') }
   
-        before do 
-          runtime.config.async_business_rules = false
-          @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 })
-        end
+        before { @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 }) }
   
         it 'should run the business rule task' do
           _(process_instance.status).must_equal "ended"
