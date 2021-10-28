@@ -1,12 +1,15 @@
 module Bpmn
   class Event < Step
-    attr_accessor :event_definitions
+    attr_accessor :event_definitions, :event_definition_ids
 
     def initialize(moddle)
       super
       @event_definitions = []
-      @event_definitions = moddle['eventDefinitions'].map do |edm|
-        Element.from_moddle(edm)
+      @event_definition_ids = []
+
+      @event_definition_ids = moddle['eventDefinitions'].map do |edm|
+        #Element.from_moddle(edm)
+        edm["id"]
       end if moddle['eventDefinitions']
     end
 
@@ -79,6 +82,7 @@ module Bpmn
     end
 
     def execute(execution)
+      super
       event_definitions.each { |ed| ed.execute(self, execution) }
     end
   end
@@ -121,6 +125,13 @@ module Bpmn
 
   class BoundaryEvent < Event
     attr_accessor :attached_to_ref, :attached_to, :cancel_activity
+
+    def initialize(moddle)
+      super
+      @attached_to_ref = moddle[:attachedToRef]
+      @cancel_activity = true
+      @cancel_activity = moddle["cancelActivity"] if moddle["cancelActivity"] != nil
+    end
 
     def is_catching?
       true

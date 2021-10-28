@@ -52,7 +52,7 @@ Represents the start of a process or subprocess.
 
 - [x] Intermediate Throw Event
 
-- [ ] Boundary Event
+- [x] Boundary Event
 
 Intermediate events are either placed between activities or attached to the boundary of an activity. The latter are called boundary events. Boundary events are entered when the attached element is started and wait for an event to occur such as a timer, message, or error. Boundary events can be interupting or non-interupting. If the host ends before an event occurs the boundary events are canceled.
 

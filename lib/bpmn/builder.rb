@@ -40,37 +40,40 @@ module Bpmn
           gateway = @elements[reference_json["element"]["id"]]
           gateway.default = @elements[reference_json["id"]] if gateway
         when "bpmn:messageRef"
-          message_definition = @elements[reference_json["element"]["id"]]
-          message_definition.message_ref = @elements[reference_json["id"]] if message_definition
+          message_event_definition = @elements[reference_json["element"]["id"]]
+          if message_event_definition
+            message_event_definition.message_ref = reference_json["id"] 
+            message_event_definition.message = @elements[reference_json["id"]]
+          end
         when "bpmn:signalRef"
-          signal_definition = @elements[reference_json["element"]["id"]]
-          signal_definition.signal_ref = @elements[reference_json["id"]] if signal_definition
+          signal_event_definition = @elements[reference_json["element"]["id"]]
+          if signal_event_definition
+            signal_event_definition.signal_ref = reference_json["id"]
+            message_event_definition.signal = @elements[reference_json["id"]]
+          end
+        when "bpmn:errorlRef"
+          if error_event_definition
+            error_event_definition.error_ref = reference_json["id"]
+            error_event_definition.error = @elements[reference_json["element"]["id"]]
+          end
         else
           if reference_json["element"]["$type"] == "bpmn:BoundaryEvent"
             event = @elements[reference_json["element"]["id"]]
             owner = @elements[reference_json["id"]]
-            if owner.type != "SequenceFlow"
+            if owner.type != "bpmn:SequenceFlow"
               event.attached_to = owner
               owner.attachments.push(event) if event
             end
-          elsif reference_json["element"]["$type"] == "bpmn:MessageEventDefinition"
-            message = @elements[reference_json["id"]]
-            message_definition = @elements[reference_json["element"]["id"]]
-            message_definition.message_ref = message.id
-            message_definition.message = message
-          elsif reference_json["element"]["$type"] == "bpmn:SignalEventDefinition"
-            signal = @elements[reference_json["id"]]
-            signal_definition = @elements[reference_json["element"]["id"]]
-            signal_definition.signal_ref = signal.id
-            signal_definition.signal = signal
-          elsif reference_json["element"]["$type"] == "bpmn:ErrorEventDefinition"
-            error = @elements[reference_json["id"]]
-            error_definition = @elements[reference_json["element"]["id"]]
-            error_definition.error_ref = error.id
-            error_definition.error = error
           else
             ap "Unhandled reference #{reference_json["property"]}"
           end
+        end
+      end
+
+      # Hack: wire up event definitions to event (has to be a better way)
+      @elements.values.each do |element|
+        if element.is_a?(Bpmn::Event) && element.event_definition_ids.present?
+          element.event_definition_ids.each { |edid| element.event_definitions.push @elements[edid] } 
         end
       end
 

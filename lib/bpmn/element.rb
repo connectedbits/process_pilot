@@ -18,4 +18,13 @@ module Bpmn
       end
     end
   end
+
+  class Message < Element
+  end
+
+  class Signal < Element
+  end
+
+  class Error < Element
+  end
 end

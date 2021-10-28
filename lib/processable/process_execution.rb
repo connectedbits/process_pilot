@@ -11,7 +11,7 @@ module Processable
     def message_received(message_name, variables: {})
       process_instance.steps.each do |step|
         if step.status == 'waiting' && step.element.is_a?(Bpmn::Event) && step.element.is_catching?
-          step.element.message_event_definitions.each { |med| step.invoke if med.message.name == message_name }
+          step.element.message_event_definitions.each { |med| ap med; step.invoke if med.message.name == message_name }
         end
       end
     end
@@ -58,23 +58,30 @@ module Processable
       config.run_script(script, variables: process_instance.variables)
     end
 
-    def step_instance_started(step_instance)
+    def step_instance_waiting(step_instance)
       # Start attachments
-      step_instance.element.attachments&.each { |attachment| execute_element(attachment, attached_to: step_instance) } 
+      step_instance.element.attachments&.each { |attachment| execute_element(attachment, attached_to: step_instance) } if step_instance.element.respond_to?(:attachments)
+    end
+
+    def step_instance_terminated(step_instance)
+      terminate_attachments(step_instance)    
     end
 
     def step_instance_ended(step_instance)      
-      # End attachments
-      step_instance.attachments.each { |attached_instance| StepExecution.new(attached_instance).terminate if attached_instance.status == 'waiting' }
+      terminate_attachments(step_instance)
 
       # Cancel event based gateway events?
       element = step_instance.element
-      if element.is_a?(Bpmn::Event) && 
-        source = step_instance.sources.first
-        if source && source.element.is_a?(Bpmn::EventBasedGateway)
-          # Event based gateway event caught, terminate others
-          source.targets.each do |ti|
-            StepExecution.new(ti).terminate if (ti.id != step_instance.id) && (ti.status == 'waiting')
+      if element.is_a?(Bpmn::Event) &&
+        if element.is_a?(Bpmn::BoundaryEvent) && element.cancel_activity
+          StepExecution.new(step_instance.attached_to).terminate
+        else
+          source = step_instance.sources.first
+          if source && source.element.is_a?(Bpmn::EventBasedGateway)
+            # Event based gateway event caught, terminate others
+            source.targets.each do |ti|
+              StepExecution.new(ti).terminate if (ti.id != step_instance.id) && (ti.waiting?)
+            end
           end
         end
       end
@@ -112,6 +119,11 @@ module Processable
       process_instance.status = status
       event = "process_instance_#{status}".to_sym
       config.notify_listeners(event, process_instance)
+    end
+
+    def terminate_attachments(step_instance)
+      return unless step_instance.respond_to?(:attachments) && step_instance.attachments.present?
+      step_instance.attachments.each { |attached_instance| StepExecution.new(attached_instance).terminate if attached_instance.waiting? }
     end
 
     def config

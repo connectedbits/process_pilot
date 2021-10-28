@@ -10,6 +10,7 @@ module Bpmn
     end
 
     def execute(execution)
+      execution.start
     end
 
     def diverging?

@@ -2,6 +2,7 @@ module Bpmn
   class Gateway < Step
 
     def execute(execution)
+      super
       if converging?
         return execution.continue if is_enabled?(execution)
         return execution.wait

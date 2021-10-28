@@ -46,11 +46,11 @@ module Bpmn
     end
 
     def message_id
-      message_ref&.id
+      message&.id
     end
 
     def message_name
-      message_ref&.name
+      message&.name
     end
   end
 
@@ -63,11 +63,11 @@ module Bpmn
     end
 
     def signal_id
-      signal_ref&.id
+      signal&.id
     end
 
     def signal_name
-      signal_ref&.name
+      signal&.name
     end
   end
 

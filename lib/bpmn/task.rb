@@ -8,6 +8,7 @@ module Bpmn
     end
 
     def execute(execution)
+      super
       execution.wait
     end
 
@@ -27,6 +28,7 @@ module Bpmn
   class UserTask < Task
 
     def execute(execution)
+      super
       execution.wait
     end
   end
@@ -62,6 +64,7 @@ module Bpmn
     end
 
     def execute(execution)
+      super
       if execution.async_scripts?
         execution.wait 
       else
@@ -87,6 +90,7 @@ module Bpmn
     end
 
     def execute(execution)
+      super
       if execution.async_business_rules?
         execution.wait 
       else

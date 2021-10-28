@@ -20,6 +20,7 @@ group :test do
   gem "guard-minitest"
   gem "mocha"
   gem "timecop"
+  gem "m"
 end
 
 gem 'byebug', group: [:development, :test]

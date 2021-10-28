@@ -86,58 +86,67 @@ module Bpmn
     describe :definitions do
       let(:start) { process.element_by_id("Start") }
       let(:host_task) { process.element_by_id("HostTask") }
-      let(:boundary_timer) { process.element_by_id("BoundaryTimer") }
-      let(:boundary_message) { process.element_by_id("BoundaryMessage") }
-      let(:boundary_error) { process.element_by_id("BoundaryError") }
-      let(:end_timer) { process.element_by_id("EndTimer") }
-      let(:end_message) { process.element_by_id("EndMessage") }
-      let(:end_error) { process.element_by_id("EndError") }
+      let(:non_interrupting) { process.element_by_id("NonInterrupting") }
+      let(:interrupting) { process.element_by_id("Interrupting") }
+      let(:end) { process.element_by_id("End") }
+      let(:end_interrupted) { process.element_by_id("EndInterrupted") }
+
+      it 'should attach boundary to host' do
+        _(host_task.attachments.present?).must_equal true
+        _(host_task.attachments).must_equal [non_interrupting, interrupting]
+      end
     end
 
     describe :execution do
       let(:process_instance) { @process_instance }
       let(:start) { process_instance.step_by_id("Start") }
       let(:host_task) { process_instance.step_by_id("HostTask") }
-      let(:boundary_timer) { process_instance.step_by_id("BoundaryTimer") }
-      let(:boundary_catch) { process_instance.step_by_id("BoundaryCatch") }
-      let(:throw_message) { process_instance.step_by_id("ThrowMessage") }
+      let(:non_interrupting) { process_instance.step_by_id("NonInterrupting") }
+      let(:interrupting) { process_instance.step_by_id("Interrupting") }
       let(:end) { process_instance.step_by_id("End") }
-      let(:end_interupt) { process_instance.step_by_id("EndInterupt") }
+      let(:end_interrupted) { process_instance.step_by_id("EndInterrupted") }
 
       before { @process_instance = runtime.start_process('BoundaryEventTest') }
 
       it "should create boundary events" do
-        skip "TODO: boundary events are not created"
-        process_instance.print
         _(process_instance.status).must_equal "started"
         _(host_task.status).must_equal "waiting"
-        _(boundary_timer).wont_be_nil
-        _(boundary_catch).wont_be_nil
+        _(non_interrupting).wont_be_nil
+        _(interrupting).wont_be_nil
       end
 
-      # describe :happy_path do
-      #   before { host_task.invoke }
+      describe :happy_path do
+        before { host_task.invoke }
 
-      #   it "should complete the process" do
-      #     _(process_instance.status).must_equal "ended"
-      #     _(host_task.status).must_equal "ended"
-      #     _(boundary_timer.status).must_equal "terminated"
-      #     _(boundary_catch.status).must_equal "terminated"
-      #   end
-      # end
+        it "should complete the process" do
+          _(process_instance.status).must_equal "ended"
+          _(host_task.status).must_equal "ended"
+          _(non_interrupting.status).must_equal "terminated"
+          _(interrupting.status).must_equal "terminated"
+        end
+      end
 
-      # describe :timer do
-      #   before do
-      #     Timecop.travel(70.seconds)
-      #     process_instance.check_expired_timers
-      #   end
+      describe :non_interrupting do
+        before { non_interrupting.invoke }
 
-      #   it "should end after timer event" do
-      #     _(process_instance.status).must_equal "ended"
-      #     _(throw_message).wont_be_nil
-      #     _(end_interupt).wont_be_nil
-      #   end
-      # end
+        it "should not terminate host task" do
+          _(process_instance.status).must_equal "started"
+          _(host_task.status).must_equal "waiting"
+          _(non_interrupting.status).must_equal "ended"
+          _(interrupting.status).must_equal "waiting"
+        end
+      end
+
+      describe :interrupting do
+        before { interrupting.invoke }
+
+        it "should terminate host task" do
+          _(process_instance.status).must_equal "ended"
+          _(host_task.status).must_equal "terminated"
+          _(non_interrupting.status).must_equal "terminated"
+          _(interrupting.status).must_equal "ended"
+        end
+      end
     end
   end
 

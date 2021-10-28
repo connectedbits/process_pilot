@@ -5,7 +5,7 @@ module Processable
     attr_accessor :process, :start_event, :variables, :key, :parent, :called_by, :id, :status, :steps
 
     delegate :element_by_id, to: :process
-    delegate :message_received, to: :execution
+    delegate :message_received, :check_expired_timers, to: :execution
 
     def initialize(process, start_event:, variables: {}, key: nil, parent: nil, called_by: nil)
       @id = SecureRandom.uuid

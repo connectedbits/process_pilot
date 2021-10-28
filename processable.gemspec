@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "json_logic", "~> 0.4.7"
   spec.add_dependency "awesome_print", "~> 1.9"
   spec.add_dependency "mini_racer", "~> 0.4.0"
+  spec.add_development_dependency "m", "~> 1.5.0"
 end
