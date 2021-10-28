@@ -1,13 +1,12 @@
 # Processable
 
-Processable is a BPMN/DMN workflow gem for Rails apps.
+Processable is a workflow gem for Rails applications based on the [bpmn](https://www.bpmn.org) standard. It executes business processes and rules defined in a [modeler](https://camunda.com/download/modeler/).
 
 ## Usage
 
-Processable `executes` BPMN documents like this one. 
+Processable executes BPMN documents like [this one](/test/fixtures/hello_world.bpmn). 
 
 ![Example](test/fixtures/files/hello_world.png)
-[Source](test/fixtures/files/hello_world.bpmn)
 
 A `Bpmn::Process` definition can be executed by initializing the `Processable::Runtime` with the document's source. Then a `Processable::ProcessInstance` can be created by calling `start_process`.
 
@@ -56,8 +55,6 @@ HelloWorld ended *
 }
 
 ```
-
-You can define your own processes using a  [modeler](https://camunda.com/download/modeler/).
 
 ## Documentation
 
