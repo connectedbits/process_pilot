@@ -2,7 +2,7 @@
 
 The Processable runtime supports the following BPMN definitions.
 
-- [x] Process
+- [x] [Process](../test/bpmn/process_test.rb)
 
 A process is the work someone (or something) does to accomplish an objective. A process represents a sequence of steps in the form of a graph.
 
@@ -74,7 +74,7 @@ Event definitions futher describe the behavior of an event.
 
 - [ ] Terminate Event Definition
 
-- [ ] Timer Event Definition
+- [x] Timer Event Definition
 
 ## Gateways
 

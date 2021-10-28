@@ -84,9 +84,9 @@ module Bpmn
 
     def initialize(moddle)
       super
-      if moddle[:timeDuration]
-        @time_duration_type = moddle[:timeDuration][:$type]
-        @time_duration = moddle[:timeDuration][:body]
+      if moddle['timeDuration']
+        @time_duration_type = moddle['timeDuration']['$type']
+        @time_duration = moddle['timeDuration']['body']
       end
     end
 

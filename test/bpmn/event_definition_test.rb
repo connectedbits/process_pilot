@@ -43,38 +43,48 @@ module Bpmn
     let(:process) { runtime.process_by_id('TimerEventDefinitionTest') }
 
     describe :definitions do
-      let(:start_timer) { process.element_by_id("StartTimer") }
-      let(:intermediate_timer) { process.element_by_id("IntermediateTimer") }
-      let(:boundary_timer) { process.element_by_id("BoundaryTimer") }
-      let(:host_task) { process.element_by_id("HostTask") }
+      let(:start_event) { process.element_by_id("Start") }
+      let(:catch_event) { process.element_by_id("Catch") }
       let(:end_event) { process.element_by_id("End") }
 
       it "should parse the timers" do
-        #_(start_timer.timer_event_definition).wont_be_nil
-        _(intermediate_timer.timer_event_definition).wont_be_nil
-        _(boundary_timer.timer_event_definition).wont_be_nil
+        _(catch_event.timer_event_definition).wont_be_nil
+        _(catch_event.timer_event_definition.time_duration).wont_be_nil
       end
     end
 
     describe :execution do
       let(:process_instance) { @process_instance }
-      let(:start_timer) { process_instance.step_by_id("StartTimer") }
-      let(:intermediate_timer) { process_instance.step_by_id("IntermediateTimer") }
-      let(:boundary_timer) { process_instance.step_by_id("BoundaryTimer") }
-      let(:host_task) { process_instance.step_by_id("HostTask") }
-      let(:end_event) { process_instance.step_by_id("End") }
+      let(:catch_event) { process_instance.step_by_id("Catch") }
 
       before { @process_instance = runtime.start_process('TimerEventDefinitionTest') }
 
-      it "should wait at intermediate event and set the timer" do
-        _(intermediate_timer.waiting?).must_equal true
-        _(intermediate_timer.expires_at).wont_be_nil
+      it "should wait at catch event and set the timer" do
+        _(catch_event.waiting?).must_equal true
+        _(catch_event.expires_at).wont_be_nil
       end
 
-      describe :intermediate_timer do
+      describe :before_timer_expiration do
+        before do 
+          Timecop.travel(15.seconds)
+          process_instance.check_expired_timers
+        end
 
-        describe :boundary_timer do
+        it "should still be waiting" do
+          _(catch_event.waiting?).must_equal true
+        end
+      end
 
+      describe :after_timer_expiration do
+        before do 
+          Timecop.travel(35.seconds)
+          process_instance.check_expired_timers
+        end
+
+        it "should end the process" do
+          _(catch_event.expires_at < Time.now).must_equal true
+          _(process_instance.ended?).must_equal true
+          _(catch_event.ended?).must_equal true
         end
       end
     end
