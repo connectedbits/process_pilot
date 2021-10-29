@@ -25,4 +25,4 @@ An inclusive gateway breaks the process flow into one or more flows. It behaves 
 
 An event-based gateway is similar to an exclusive gateway because both involve one path in the flow. In the case of an event-based gateway, however, you evaluate which event has occurred, not which condition has been met. Once the event occurs, all other waiting events are canceled.
 
-[source](../lib/bpmn/gateway.rb) | [tests](../test/bpmn/gateway.rb)
+[source](../lib/bpmn/gateway.rb) | [tests](../test/bpmn/gateway_test.rb)

@@ -4,7 +4,7 @@ Processable is a workflow gem for Rails applications based on the [bpmn](https:/
 
 ## Usage
 
-Processable executes BPMN documents like [this one](/test/fixtures/hello_world.bpmn). 
+Processable executes BPMN documents like [this one](/test/fixtures/files/hello_world.bpmn). 
 
 ![Example](test/fixtures/files/hello_world.png)
 
@@ -71,7 +71,7 @@ HelloWorld ended *
 {
   "greet": true,
   "cookie": true,
-  "message": "👋 Hola Eric 🥠 Avoid taking unnecessary gambles. Lucky numbers: 12, 15, 23, 28, 37",
+  "message": "👋 Hola Eric",
 }
 
 0 StartEvent Start: ended * out: Flow_016qg9x
@@ -89,9 +89,9 @@ HelloWorld ended *
 * [Tasks](/docs/tasks.md)
 * [Events](/docs/events.md)
 * [Event Definitions](/docs/event_definitions.md)
-* [Gateways](/docs/gateways)
-* [Expressions](/docs/expressions)
-* [Runtime](/docs/runtime)
+* [Gateways](/docs/gateways.md)
+* [Expressions](/docs/expressions.md)
+* [Runtime](/docs/runtime.md)
 ## Installation
 Add this line to your application's Gemfile:
 

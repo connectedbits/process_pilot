@@ -11,3 +11,5 @@ A CallActivity invokes a process that is defined external to the model enabling 
 ## SubProcess (WIP)
 
 A SubProcess (Embedded, Event, or AdHoc) has parts that are modeled in a child-level process, a process with its own step flows and start and end states. 
+
+[source](../lib/bpmn/process.rb) | [tests](../test/bpmn/process_test.rb)

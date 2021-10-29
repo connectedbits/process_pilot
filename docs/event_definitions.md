@@ -30,4 +30,4 @@ Example (timer will expire in 4 days):
 </bpmn:timerEventDefinition>
 ```
 
-[source](../lib/bpmn/event_definition.rb) | [tests](../test/bpmn/event_definition.rb)
+[source](../lib/bpmn/event_definition.rb) | [tests](../test/bpmn/event_definition_test.rb)

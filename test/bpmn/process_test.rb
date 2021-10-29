@@ -32,4 +32,10 @@ module Bpmn
       end
     end
   end
+
+  describe CallActivity do
+  end
+
+  describe SubProcess do
+  end
 end

@@ -22,4 +22,4 @@ Intermediate events are either placed between activities or attached to the boun
 
 ## End Event
 
-[source](../lib/bpmn/event.rb) | [tests](../test/bpmn/event.rb)
+[source](../lib/bpmn/event.rb) | [tests](../test/bpmn/event_test.rb)

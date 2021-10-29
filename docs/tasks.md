@@ -22,4 +22,4 @@ This task represents work done by the Processable runtime written in Javascript.
 
 This task represents work done by the Processable rule engine, generally, a complex decision.
 
-[source](../lib/bpmn/task.rb) | [tests](../test/bpmn/task.rb)
+[source](../lib/bpmn/task.rb) | [tests](../test/bpmn/task_test.rb)
