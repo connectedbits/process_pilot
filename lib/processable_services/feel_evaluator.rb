@@ -4,7 +4,7 @@ module ProcessableServices
 
     attr_reader :expression, :variables
 
-    def initialize(expression, variables: {})
+    def initialize(expression:, variables: {})
       super()
       @expression = expression
       @variables = variables

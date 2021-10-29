@@ -6,7 +6,7 @@ module ProcessableServices
 
     describe :simple do
       let(:script) { "2 + 2" }
-      let(:result) { service.call(script) }
+      let(:result) { service.call(script: script) }
 
       it "should eval the script correctly" do
         _(result).must_equal 4
@@ -19,7 +19,7 @@ module ProcessableServices
       let(:utils) {
         { 'reverse': proc { |input| input.reverse } }
       }
-      let(:result) { service.call(script, variables: variables, utils: utils) }
+      let(:result) { service.call(script: script, variables: variables, utils: utils) }
 
       it "should eval the script correctly" do
         _(result).must_equal "Hello cirE"

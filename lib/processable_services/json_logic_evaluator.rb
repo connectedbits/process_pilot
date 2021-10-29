@@ -2,7 +2,7 @@ module ProcessableServices
   class JsonLogicEvaluator < ApplicationService
     attr_reader :expression, :variables
 
-    def initialize(expression, variables: {})
+    def initialize(expression:, variables: {})
       super()
       @expression = expression
       @variables = variables

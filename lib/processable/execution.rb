@@ -48,7 +48,7 @@ module Processable
     end
 
     def evaluate_expression(expression)
-      ProcessableServices::ExpressionEvaluator.call(expression, variables: variables)
+      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: variables)
     end
 
     def evaluate_decision(decision_ref)
@@ -65,7 +65,7 @@ module Processable
 
     def run_script(script)
       raise ExecutionError.new("Script #{script} can't be blank.") unless script.present?
-      ProcessableServices::ScriptRunner.call(script, variables: variables, utils: runtime.utils)
+      ProcessableServices::ScriptRunner.call(script: script, variables: variables, utils: runtime.utils)
     end
 
     def step_waiting(step)

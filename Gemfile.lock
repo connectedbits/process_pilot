@@ -105,6 +105,7 @@ GEM
     importmap-rails (0.7.6)
       rails (>= 6.0.0)
     json_logic (0.4.7)
+    libv8-node (15.14.0.1)
     libv8-node (15.14.0.1-x86_64-darwin-20)
     listen (3.7.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
@@ -221,6 +222,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-20
+  x86_64-darwin-21
 
 DEPENDENCIES
   byebug
@@ -237,4 +239,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   2.2.19
+   2.2.22

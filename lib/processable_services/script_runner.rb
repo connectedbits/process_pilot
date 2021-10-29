@@ -2,7 +2,7 @@ module ProcessableServices
   class ScriptRunner < ApplicationService
     attr_reader :script, :variables, :utils
 
-    def initialize(script, variables: {}, utils: {})
+    def initialize(script:, variables: {}, utils: {})
       super()
       @script = script
       @variables = variables

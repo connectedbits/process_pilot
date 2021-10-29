@@ -9,14 +9,14 @@ module ProcessableServices
         let(:expression) { "person.name" }
 
         it "should evaluate expression" do
-          result = service.call(expression, variables: { person: { name: 'Eric' } })
+          result = service.call(expression: expression, variables: { person: { name: 'Eric' } })
           _(result).must_equal 'Eric'
         end
       end
 
       describe :test do
         it "should evaluate expression" do
-          result = service.call("${ action = 'ok' }", variables: { action: 'ok' })
+          result = service.call(expression: "${ action = 'ok' }", variables: { action: 'ok' })
           _(result).must_equal true
         end
       end
@@ -25,12 +25,12 @@ module ProcessableServices
         let(:expression) { "person.age > 50" }
 
         it "truthy should be true" do
-          result = service.call(expression, variables: { person: { age: 57 } })
+          result = service.call(expression: expression, variables: { person: { age: 57 } })
           _(result).must_equal true
         end
 
         it "not truthy should be false" do
-          result = service.call(expression, variables: { person: { age: 44 } })
+          result = service.call(expression: expression, variables: { person: { age: 44 } })
           _(result).must_equal false
         end
       end
@@ -40,12 +40,12 @@ module ProcessableServices
       let(:expression) { '{ ">": [{ "var": "person.age" }, 50] }' }
 
       it "truthy should be true" do
-        result = service.call(expression, variables: { person: { age: 57 } })
+        result = service.call(expression: expression, variables: { person: { age: 57 } })
         _(result).must_equal true
       end
 
       it "not truthy should be false" do
-        result = service.call(expression, variables: { person: { age: 44 } })
+        result = service.call(expression: expression, variables: { person: { age: 44 } })
         _(result).must_equal false
       end
     end

@@ -3,7 +3,7 @@ module ProcessableServices
 
     attr_reader :expression, :variables
 
-    def initialize(expression, variables: {})
+    def initialize(expression:, variables: {})
       super()
       @expression = expression.strip
       @variables = variables
@@ -14,11 +14,11 @@ module ProcessableServices
     end
 
     def call_feel
-      FeelEvaluator.call(expression.delete_prefix("${").delete_suffix("}").strip, variables: variables)
+      FeelEvaluator.call(expression: expression.delete_prefix("${").delete_suffix("}").strip, variables: variables)
     end
 
     def call_json_logic
-      JsonLogicEvaluator.call(expression, variables: variables)
+      JsonLogicEvaluator.call(expression: expression, variables: variables)
     end
 
     def feel?
