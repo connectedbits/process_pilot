@@ -34,7 +34,7 @@ With the runtime initialized a process can be started by calling `start_process`
 execution = runtime.start_process(process_id: 'HelloWorld', start_event_id: 'Start', variables: { greet: true, cookie: false })
 ```
 
-The runtime with return an [Execution](lib/processable/execution.rb) instance. It is often useful to `print` the execution's current state.
+The runtime with return an [ProcessExecution](lib/processable/process_execution.rb) instance. It is often useful to `print` the execution's current state.
 
 ```ruby
 execution.print

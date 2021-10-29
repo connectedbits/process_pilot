@@ -1,5 +1,5 @@
 module Processable
-  class Execution
+  class ProcessExecution
     attr_reader :runtime, :process, :start_event, :variables, :parent, :called_by
     attr_reader :id, :status, :steps
 
@@ -135,6 +135,10 @@ module Processable
       steps.find { |step| step.element.id == id }
     end
 
+    #
+    # Debug
+    #
+
     def print
       puts
       puts "#{process.id} #{status} * #{tokens.join(', ')}"
@@ -156,6 +160,24 @@ module Processable
     def print_variables
       puts
       puts JSON.pretty_generate(variables)
+    end
+
+    #
+    # Serialization
+    #
+
+    def to_json
+      ProcessInstance.new(
+        id: id,
+        process_id: process.id,
+        status: status, 
+        started_at: started_at, 
+        ended_at: ended_at, 
+        variables: variables, 
+        parent_id: parent&.id, 
+        called_by_id: called_by&.id,
+        steps: steps.map { |step| step.to_json }
+      )
     end
 
     private
@@ -183,6 +205,31 @@ module Processable
 
     def terminate_attachments(step)
       step.attachments.each { |attached| attached.terminate if attached.waiting? }
+    end
+  end
+
+  class ProcessInstance
+    include ActiveModel::Serializers::JSON
+  
+    attr_accessor :id, :process_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id
+
+    def attributes=(hash)
+      hash.each do |key, value|
+        send("#{key}=", value)
+      end
+    end
+   
+    def attributes
+      {
+        'id' => nil,
+        'element_id' => nil,
+        'status' => nil,
+        'started_at' => nil,
+        'ended_at' => nil,
+        'variables' => nil,
+        'parent_id' => nil,
+        'called_by_id' => nil
+      }
     end
   end
 end

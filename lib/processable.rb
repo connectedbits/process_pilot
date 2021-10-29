@@ -18,7 +18,7 @@ require "bpmn/expression"
 require "bpmn/event_definition"
 
 require "processable/runtime"
-require "processable/execution"
+require "processable/process_execution"
 require "processable/step_execution"
 require "processable/execution_error"
 

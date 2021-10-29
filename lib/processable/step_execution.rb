@@ -80,12 +80,62 @@ module Processable
       execution.steps.select { |step| (step.tokens_in & tokens_out).length > 0 }
     end
 
+        #
+    # Serialization
+    #
+
+    def to_json
+      StepInstance.new(
+        id: id,
+        process_id: process.id,
+        status: status, 
+        started_at: started_at, 
+        ended_at: ended_at, 
+        variables: variables, 
+        tokens_in: tokens_in, 
+        tokens_out: tokens_out,
+        message_names: message_names,
+        expires_at: expires_at,
+        attached_to_id: attached_to&.id,
+        attachment_ids: attachments.map { |attachment| attachment.id }
+      )
+    end
+
     private
 
     def update_status(status)
       @status = status
       event = "step_#{status}".to_sym
       execution.send(event, self) if execution.respond_to?(event)
+    end
+  end
+
+  class StepInstance
+    include ActiveModel::Serializers::JSON
+  
+    attr_accessor :id, :element_id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :message_names, :expires_at, :attached_to_id, :attachment_ids
+
+    def attributes=(hash)
+      hash.each do |key, value|
+        send("#{key}=", value)
+      end
+    end
+   
+    def attributes
+      {
+        'id' => nil,
+        'element_id' => nil,
+        'status' => nil,
+        'started_at' => nil,
+        'ended_at' => nil,
+        'variables' => nil,
+        'tokens_in' => nil,
+        'tokens_out' => nil,
+        'message_names' => nil,
+        'expires_at' => nil,
+        'attached_to_id' => nil,
+        'attachment_ids' => nil,
+      }
     end
   end
 end
