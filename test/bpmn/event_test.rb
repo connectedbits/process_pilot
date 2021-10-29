@@ -15,14 +15,14 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:start_event) { process_instance.step_by_id("Start") }
+      let(:execution) { @execution }
+      let(:start_step) { execution.step_by_id("Start") }
 
-      before { @process_instance = runtime.start_process('StartEventTest') }
+      before { @execution = runtime.start_process('StartEventTest') }
 
       it 'should start the process' do
-        _(process_instance.ended?).must_equal true
-        _(start_event.ended?).must_equal true
+        _(execution.ended?).must_equal true
+        _(start_step.ended?).must_equal true
       end
     end
   end
@@ -37,21 +37,21 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:catch_event) { process_instance.step_by_id("Catch") }
+      let(:execution) { @execution }
+      let(:catch_step) { execution.step_by_id("Catch") }
 
-      before { @process_instance = runtime.start_process('IntermediateCatchEventTest') }
+      before { @execution = runtime.start_process('IntermediateCatchEventTest') }
       it 'should wait at the catch event' do
-        _(process_instance.started?).must_equal true
-        _(catch_event.waiting?).must_equal true
+        _(execution.started?).must_equal true
+        _(catch_step.waiting?).must_equal true
       end
 
       describe :invoke do
-        before { catch_event.invoke }
+        before { catch_step.invoke }
 
         it 'should end the process' do
-          _(process_instance.ended?).must_equal true
-          _(catch_event.ended?).must_equal true
+          _(execution.ended?).must_equal true
+          _(catch_step.ended?).must_equal true
         end
       end
     end
@@ -67,13 +67,13 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:throw_event) { process_instance.step_by_id("Throw") }
+      let(:execution) { @execution }
+      let(:throw_step) { execution.step_by_id("Throw") }
 
-      before { @process_instance = runtime.start_process('IntermediateThrowEventTest') }
+      before { @execution = runtime.start_process('IntermediateThrowEventTest') }
       it 'should throw then end the process' do
-        _(process_instance.ended?).must_equal true
-        _(throw_event.ended?).must_equal true
+        _(execution.ended?).must_equal true
+        _(throw_step.ended?).must_equal true
       end
     end
   end
@@ -98,53 +98,53 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:start) { process_instance.step_by_id("Start") }
-      let(:host_task) { process_instance.step_by_id("HostTask") }
-      let(:non_interrupting) { process_instance.step_by_id("NonInterrupting") }
-      let(:interrupting) { process_instance.step_by_id("Interrupting") }
-      let(:end) { process_instance.step_by_id("End") }
-      let(:end_interrupted) { process_instance.step_by_id("EndInterrupted") }
+      let(:execution) { @execution }
+      let(:start_step) { execution.step_by_id("Start") }
+      let(:host_task_step) { execution.step_by_id("HostTask") }
+      let(:non_interrupting_step) { execution.step_by_id("NonInterrupting") }
+      let(:interrupting_step) { execution.step_by_id("Interrupting") }
+      let(:end_step) { execution.step_by_id("End") }
+      let(:end_interrupted_step) { execution.step_by_id("EndInterrupted") }
 
-      before { @process_instance = runtime.start_process('BoundaryEventTest') }
+      before { @execution = runtime.start_process('BoundaryEventTest') }
 
       it "should create boundary events" do
-        _(process_instance.status).must_equal "started"
-        _(host_task.status).must_equal "waiting"
-        _(non_interrupting).wont_be_nil
-        _(interrupting).wont_be_nil
+        _(execution.started?).must_equal true
+        _(host_task_step.waiting?).must_equal true
+        _(non_interrupting_step).wont_be_nil
+        _(interrupting_step).wont_be_nil
       end
 
       describe :happy_path do
-        before { host_task.invoke }
+        before { host_task_step.invoke }
 
         it "should complete the process" do
-          _(process_instance.status).must_equal "ended"
-          _(host_task.status).must_equal "ended"
-          _(non_interrupting.status).must_equal "terminated"
-          _(interrupting.status).must_equal "terminated"
+          _(execution.ended?).must_equal true
+          _(host_task_step.ended?).must_equal true
+          _(non_interrupting_step.terminated?).must_equal true
+          _(interrupting_step.terminated?).must_equal true
         end
       end
 
       describe :non_interrupting do
-        before { non_interrupting.invoke }
+        before { non_interrupting_step.invoke }
 
         it "should not terminate host task" do
-          _(process_instance.status).must_equal "started"
-          _(host_task.status).must_equal "waiting"
-          _(non_interrupting.status).must_equal "ended"
-          _(interrupting.status).must_equal "waiting"
+          _(execution.started?).must_equal true
+          _(host_task_step.waiting?).must_equal true
+          _(non_interrupting_step.ended?).must_equal true
+          _(interrupting_step.waiting?).must_equal true
         end
       end
 
       describe :interrupting do
-        before { interrupting.invoke }
+        before { interrupting_step.invoke }
 
         it "should terminate host task" do
-          _(process_instance.status).must_equal "ended"
-          _(host_task.status).must_equal "terminated"
-          _(non_interrupting.status).must_equal "terminated"
-          _(interrupting.status).must_equal "ended"
+          _(execution.ended?).must_equal true
+          _(host_task_step.terminated?).must_equal true
+          _(non_interrupting_step.terminated?).must_equal true
+          _(interrupting_step.ended?).must_equal true
         end
       end
     end
@@ -164,14 +164,14 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:end_event) { process_instance.step_by_id("End") }
+      let(:execution) { @execution }
+      let(:end_step) { execution.step_by_id("End") }
 
-      before { @process_instance = runtime.start_process('EndEventTest') }
+      before { @execution = runtime.start_process('EndEventTest') }
 
       it 'should end the process' do
-        _(process_instance.status).must_equal 'ended'
-        _(end_event.status).must_equal 'ended'
+        _(execution.ended?).must_equal true
+        _(end_step.ended?).must_equal true
       end
     end
   end

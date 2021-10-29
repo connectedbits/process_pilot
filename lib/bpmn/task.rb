@@ -7,9 +7,9 @@ module Bpmn
       @result_variable = moddle["resultVariable"]
     end
 
-    def execute(execution)
+    def execute(step_execution)
       super
-      execution.wait
+      step_execution.wait
     end
 
     def result_to_variables(result)
@@ -27,9 +27,9 @@ module Bpmn
 
   class UserTask < Task
 
-    def execute(execution)
+    def execute(step_execution)
       super
-      execution.wait
+      step_execution.wait
     end
   end
 
@@ -41,17 +41,17 @@ module Bpmn
       @topic = moddle["topic"]
     end
 
-    def execute(execution)
-      if execution.async_services?
-        execution.wait 
+    def execute(step_execution)
+      if step_execution.async_services?
+        step_execution.wait 
       else
-        run(execution)
+        run(step_execution)
       end
     end
 
-    def run(execution)
-      result = execution.call_service(topic)
-      execution.invoke(result_to_variables(result))
+    def run(step_execution)
+      result = step_execution.call_service(topic)
+      step_execution.invoke(result_to_variables(result))
     end
   end
 
@@ -63,18 +63,14 @@ module Bpmn
       @script = moddle["script"]
     end
 
-    def execute(execution)
+    def execute(step_execution)
       super
-      if execution.async_scripts?
-        execution.wait 
-      else
-        run(execution)
-      end
+      run(step_execution)
     end
 
-    def run(execution)
-      result = execution.run_script(script)
-      execution.invoke(result_to_variables(result))
+    def run(step_execution)
+      result = step_execution.run_script(script)
+      step_execution.invoke(result_to_variables(result))
     end
   end
 
@@ -89,22 +85,18 @@ module Bpmn
       @version = moddle["version"]
     end
 
-    def execute(execution)
+    def execute(step_execution)
       super
-      if execution.async_business_rules?
-        execution.wait 
-      else
-        run(execution)
-      end
+      run(step_execution)
     end
 
-    def run(execution)
+    def run(step_execution)
       if expression
-        result = execution.evaluate_expression(expression)
-        execution.invoke(result_to_variables(result))
+        result = step_execution.evaluate_expression(expression)
+        step_execution.invoke(result_to_variables(result))
       elsif decision_ref
-        result = execution.evaluate_decision(decision_ref)
-        execution.invoke(result_to_variables(result))
+        result = step_execution.evaluate_decision(decision_ref)
+        step_execution.invoke(result_to_variables(result))
       end
     end
   end

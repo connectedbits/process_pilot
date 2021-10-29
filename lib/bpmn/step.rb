@@ -9,8 +9,8 @@ module Bpmn
       @default = moddle["default"]
     end
 
-    def execute(execution)
-      execution.start
+    def execute(step_execution)
+      step_execution.start
     end
 
     def diverging?
@@ -21,16 +21,16 @@ module Bpmn
       incoming.length > 1
     end
 
-    def outgoing_flows(execution)
+    def outgoing_flows(step_execution)
       flows = []
-      outgoing.each { |flow| flows.push flow if flow.evaluate(execution) }
+      outgoing.each { |flow| flows.push flow if flow.evaluate(step_execution) }
       return flows
     end
 
-    def outgoing_flows(execution)
+    def outgoing_flows(step_execution)
       flows = []
       outgoing.each do |flow|
-        result = flow.evaluate(execution) unless default&.id == flow.id
+        result = flow.evaluate(step_execution) unless default&.id == flow.id
         flows.push flow if result
       end
       flows = [default] if flows.empty? && default

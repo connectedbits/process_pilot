@@ -1,15 +1,21 @@
 module Processable
   class Runtime
-    attr_reader :processes
+    attr_reader :processes, :decisions
+    attr_accessor :services, :listeners, :utils
 
-    def initialize(sources: nil, services: nil)
+    def initialize(sources: nil, services: {}, listeners: {}, utils: {}, async_services: false)
+      @services = services
+      @listeners = listeners
+
+      @async_services = async_services
+
       @processes = []
-      config.services = services if services
+      @decisions = {}
 
       Array.wrap(sources).each do |source|
         if source.include?('http://www.omg.org/spec/DMN/20180521/DC/')
           moddle = ProcessableServices::DecisionReader.call(source)
-          moddle["drgElement"].each { |d| config.decisions[d["id"]] = source}
+          moddle["drgElement"].each { |d| decisions[d["id"]] = source}
         else
           moddle = ProcessableServices::ProcessReader.call(source)
           builder = Bpmn::Builder.new(moddle)
@@ -27,11 +33,11 @@ module Processable
       raise ExecutionError.new("Process with id #{process_id} not found.") unless process
       start_event = start_event_id ? process.start_events.find { |se| se.id == start_event_id } : process.default_start_event
       raise ExecutionError.new("Start event with id #{start_event_id} not found for process #{process_id}.") unless start_event
-      ProcessInstance.new(process, start_event: start_event, variables: variables, key: key).tap { |pi| process.execute(pi.execution) } 
+      Execution.new(runtime: self, process: process, start_event: start_event, variables: variables).tap { |e| process.execute(e) } 
     end
 
-    def config
-      Config.instance
+    def async_services?
+      @async_services
     end
   end
 end

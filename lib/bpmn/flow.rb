@@ -20,9 +20,9 @@ module Bpmn
       @condition = Expression.new(moddle["conditionExpression"]) if moddle["conditionExpression"]
     end
 
-    def evaluate(execution)
+    def evaluate(step_execution)
       return true unless condition&.body
-      execution.process_execution.evaluate_condition(condition)
+      step_execution.evaluate_condition(condition)
     end
   end
 end

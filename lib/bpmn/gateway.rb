@@ -1,24 +1,24 @@
 module Bpmn
   class Gateway < Step
 
-    def execute(execution)
+    def execute(step_execution)
       super
       if converging?
-        return execution.continue if is_enabled?(execution)
-        return execution.wait
+        return step_execution.continue if is_enabled?(step_execution)
+        return step_execution.wait
       else
-        return execution.continue
+        return step_execution.continue
       end
     end
 
     #
     # Algorithm from https://researcher.watson.ibm.com/researcher/files/zurich-hvo/bpm2010-1.pdf
     #
-    def is_enabled?(execution)
+    def is_enabled?(step_execution)
       filled = []
       empty = []
 
-      incoming.each { |flow| execution.step_instance.tokens_in.include?(flow.id) ? filled.push(flow) : empty.push(flow) }
+      incoming.each { |flow| step_execution.tokens_in.include?(flow.id) ? filled.push(flow) : empty.push(flow) }
 
       # Filled slots don't need to be searched for tokens
       index = 0
@@ -43,14 +43,14 @@ module Bpmn
       empty_ids = empty.map { |g| g.id }
 
       # If there are empty slots with tokens we need to wait
-      return false if (empty_ids & execution.step_instance.process_instance.tokens).length > 0
+      return false if (empty_ids & step_execution.execution.tokens).length > 0
       return true
     end
   end
 
   class ExclusiveGateway < Gateway
     # RULE: Only one flow is taken
-    def outgoing_flows(instance)
+    def outgoing_flows(step_execution)
       flows = super
       return [flows.first]
     end
@@ -71,9 +71,9 @@ module Bpmn
     # RULE: when an event created from an event gateway is caught,
     # all other waiting events must be canceled.
     #
-    def cancel_waiting_events(instance)
-      instance.targets.each do |target_instance|
-        target_instance.cancel if target_instance.status == :waiting
+    def cancel_waiting_events(step_execution)
+      step_execution.targets.each do |target_execution|
+        target_execution.cancel if target_execution.waiting?
       end
     end
   end

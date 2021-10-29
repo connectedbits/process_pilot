@@ -90,8 +90,8 @@ module Bpmn
       end
     end
 
-    def execute(host_element, execution)
-      execution.set_timer(time_due)
+    def execute(host_element, step_execution)
+      step_execution.set_timer(time_due)
     end
 
     private

@@ -54,37 +54,37 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:catch_event) { process_instance.step_by_id("Catch") }
+      let(:execution) { @execution }
+      let(:catch_step) { execution.step_by_id("Catch") }
 
-      before { @process_instance = runtime.start_process('TimerEventDefinitionTest') }
+      before { @execution = runtime.start_process('TimerEventDefinitionTest') }
 
       it "should wait at catch event and set the timer" do
-        _(catch_event.waiting?).must_equal true
-        _(catch_event.expires_at).wont_be_nil
+        _(catch_step.waiting?).must_equal true
+        _(catch_step.expires_at).wont_be_nil
       end
 
       describe :before_timer_expiration do
         before do 
           Timecop.travel(15.seconds)
-          process_instance.check_expired_timers
+          execution.check_expired_timers
         end
 
         it "should still be waiting" do
-          _(catch_event.waiting?).must_equal true
+          _(catch_step.waiting?).must_equal true
         end
       end
 
       describe :after_timer_expiration do
         before do 
           Timecop.travel(35.seconds)
-          process_instance.check_expired_timers
+          execution.check_expired_timers
         end
 
         it "should end the process" do
-          _(catch_event.expires_at < Time.now).must_equal true
-          _(process_instance.ended?).must_equal true
-          _(catch_event.ended?).must_equal true
+          _(catch_step.expires_at < Time.now).must_equal true
+          _(execution.ended?).must_equal true
+          _(catch_step.ended?).must_equal true
         end
       end
     end

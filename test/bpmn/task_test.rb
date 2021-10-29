@@ -16,22 +16,22 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:task) { process_instance.step_by_id('Task') }
+      let(:execution) { @execution }
+      let(:task_step) { execution.step_by_id('Task') }
 
-      before { @process_instance = runtime.start_process('TaskTest') }
+      before { @execution = runtime.start_process('TaskTest') }
 
       it 'should start the process' do
-        _(process_instance.status).must_equal 'started'
-        _(task.status).must_equal 'waiting'
+        _(execution.started?).must_equal true
+        _(task_step.waiting?).must_equal true
       end
 
       describe :invoke do
-        before { task.invoke }
+        before { task_step.invoke }
 
         it 'should end the process' do
-          _(process_instance.status).must_equal 'ended'
-          _(task.status).must_equal 'ended'
+          _(execution.ended?).must_equal true
+          _(task_step.ended?).must_equal true
         end
       end
     end
@@ -57,34 +57,26 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:service_task) { process_instance.step_by_id('ServiceTask') }
+      let(:execution) { @execution }
+      let(:service_step) { execution.step_by_id('ServiceTask') }
 
-      before do 
-        runtime.config.async_services = false
-        @process_instance = runtime.start_process('ServiceTaskTest', variables: { name: "Eric" })
-      end
+      before { @execution = runtime.start_process('ServiceTaskTest', variables: { name: "Eric" }) } 
 
       it 'should run the service task' do
-        _(process_instance.status).must_equal 'ended'
-        _(service_task.status).must_equal 'ended'
-        _(process_instance.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
-        _(service_task.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
+        _(execution.ended?).must_equal true
+        _(service_step.ended?).must_equal true
+        _(execution.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
+        _(service_step.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
       end
 
       describe :async_services do
-        before do
-          runtime.config.async_services = true
-          @process_instance = runtime.start_process('ServiceTaskTest', variables: { name: "Eric" }) 
-        end
+        let(:runtime) { Processable::Runtime.new(sources: source, services: services, async_services: true) }
+
+        before { @execution = runtime.start_process('ServiceTaskTest', variables: { name: "Eric" })  }
 
         it 'should not run the service task' do
-          _(process_instance.status).must_equal 'started'
-          _(service_task.status).must_equal 'waiting'
-        end
-
-        after do
-          runtime.config.reset_default_values
+          _(execution.started?).must_equal true
+          _(service_step.waiting?).must_equal true
         end
       end
     end
@@ -105,32 +97,16 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:script_task) { process_instance.step_by_id('ScriptTask') }
+      let(:execution) { @execution }
+      let(:script_step) { execution.step_by_id('ScriptTask') }
 
-      before { @process_instance = runtime.start_process('ScriptTaskTest', variables: { name: "Eric" }) }
+      before { @execution = runtime.start_process('ScriptTaskTest', variables: { name: "Eric" }) }
 
       it 'should run the script task' do
-        _(process_instance.status).must_equal 'ended'
-        _(script_task.status).must_equal 'ended'
-        _(process_instance.variables["greeting"]).must_equal "Hello Eric"
-        _(script_task.variables["greeting"]).must_equal "Hello Eric"
-      end
-
-      describe :async_scripts do
-        before do
-          runtime.config.async_scripts = true
-          @process_instance = runtime.start_process('ScriptTaskTest', variables: { name: "Eric" }) 
-        end
-
-        it 'should not run the script task' do
-          _(process_instance.status).must_equal 'started'
-          _(script_task.status).must_equal 'waiting'
-        end
-
-        after do
-          runtime.config.async_scripts = false
-        end
+        _(execution.ended?).must_equal true
+        _(script_step.ended?).must_equal true
+        _(execution.variables["greeting"]).must_equal "Hello Eric"
+        _(script_step.variables["greeting"]).must_equal "Hello Eric"
       end
     end
   end
@@ -152,31 +128,15 @@ module Bpmn
       end
   
       describe :execution do
-        let(:process_instance) { @process_instance }
-        let(:business_rule_task) { process_instance.step_by_id('ExpressionBusinessRule') }
+        let(:execution) { @execution }
+        let(:business_rule_step) { execution.step_by_id('ExpressionBusinessRule') }
   
-        before { @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'ExpressionStart', variables: { age: 57 }) }
+        before { @execution = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'ExpressionStart', variables: { age: 57 }) }
   
         it 'should run the business rule task' do
-          _(process_instance.status).must_equal "ended"
-          _(business_rule_task.status).must_equal "ended"
-          _(business_rule_task.variables["senior"]).must_equal true
-        end
-
-        describe :async_business_rules do
-          before do
-            runtime.config.async_business_rules = true
-            @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'ExpressionStart', variables: { age: 57 })
-          end
-  
-          it 'should not run the business rule task' do
-            _(process_instance.status).must_equal "started"
-            _(business_rule_task.status).must_equal "waiting"
-          end
-
-          after do
-            runtime.config.async_business_rules = false
-          end
+          _(execution.ended?).must_equal true
+          _(business_rule_step.ended?).must_equal true
+          _(business_rule_step.variables["senior"]).must_equal true
         end
       end
     end
@@ -192,15 +152,15 @@ module Bpmn
       end
 
       describe :execution do
-        let(:process_instance) { @process_instance }
-        let(:business_rule_task) { process_instance.step_by_id('DmnBusinessRule') }
+        let(:execution) { @execution }
+        let(:business_rule_step) { execution.step_by_id('DmnBusinessRule') }
   
-        before { @process_instance = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 }) }
+        before { @execution = runtime.start_process('BusinessRuleTaskTest', start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 }) }
   
         it 'should run the business rule task' do
-          _(process_instance.status).must_equal "ended"
-          _(business_rule_task.status).must_equal "ended"
-          _(business_rule_task.variables["result"]["dish"]).must_equal "Steak"
+          _(execution.ended?).must_equal true
+          _(business_rule_step.ended?).must_equal true
+          _(business_rule_step.variables["result"]["dish"]).must_equal "Steak"
         end
       end
     end

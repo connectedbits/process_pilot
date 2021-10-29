@@ -81,9 +81,9 @@ module Bpmn
       event_definitions.find {|ed| ed.is_a?(Bpmn::TimerEventDefinition) }
     end
 
-    def execute(execution)
+    def execute(step_execution)
       super
-      event_definitions.each { |ed| ed.execute(self, execution) }
+      event_definitions.each { |ed| ed.execute(self, step_execution) }
     end
   end
 
@@ -93,9 +93,9 @@ module Bpmn
       true
     end
 
-    def execute(execution)
+    def execute(step_execution)
       super
-      execution.continue
+      step_execution.continue
     end
   end
 
@@ -105,9 +105,9 @@ module Bpmn
       true
     end
 
-    def execute(execution)
+    def execute(step_execution)
       super
-      execution.continue
+      step_execution.continue
     end
   end
 
@@ -117,9 +117,9 @@ module Bpmn
       true
     end
 
-    def execute(execution)
+    def execute(step_execution)
       super
-      execution.wait
+      step_execution.wait
     end
   end
 
@@ -144,9 +144,9 @@ module Bpmn
       @cancel_activity = moddle["cancelActivity"] if moddle["cancelActivity"] != nil
     end
     
-    def execute(execution)
+    def execute(step_execution)
       super
-      execution.wait
+      step_execution.wait
     end
   end
 
@@ -156,9 +156,9 @@ module Bpmn
       true
     end
     
-    def execute(execution)
+    def execute(step_execution)
       super
-      execution.end
+      step_execution.end
     end
   end
 end

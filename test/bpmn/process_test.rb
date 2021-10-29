@@ -19,16 +19,16 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:start_event) { process_instance.step_by_id('Start') }
-      let(:end_event) { process_instance.step_by_id('End') }
+      let(:execution) { @execution }
+      let(:start_step) { execution.step_by_id('Start') }
+      let(:end_step) { execution.step_by_id('End') }
 
-      before { @process_instance = runtime.start_process('ProcessTest', start_event_id: 'Start') }
+      before { @execution = runtime.start_process('ProcessTest', start_event_id: 'Start') }
 
       it 'should start and end the process' do
-        _(process_instance.status).must_equal 'ended'
-        _(start_event.status).must_equal 'ended'
-        _(end_event.status).must_equal 'ended'
+        _(execution.ended?).must_equal true
+        _(start_step.ended?).must_equal true
+        _(end_step.ended?).must_equal true
       end
     end
   end

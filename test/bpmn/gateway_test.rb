@@ -17,31 +17,31 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:exclusive_gateway) { process_instance.step_by_id('ExclusiveGateway') }
-      let(:end_ok) { process_instance.step_by_id('EndOK') }
-      let(:end_not_ok) { process_instance.step_by_id('EndNotOK') }
-      let(:end_default) { process_instance.step_by_id('EndDefault') }
+      let(:execution) { @execution }
+      let(:exclusive_gateway_step) { execution.step_by_id('ExclusiveGateway') }
+      let(:end_ok_step) { execution.step_by_id('EndOK') }
+      let(:end_not_ok_step) { execution.step_by_id('EndNotOK') }
+      let(:end_default_step) { execution.step_by_id('EndDefault') }
 
       describe :happy_path do
-        before { @process_instance = runtime.start_process('ExclusiveGatewayTest', variables: { action: "ok" }) }
+        before { @execution = runtime.start_process('ExclusiveGatewayTest', variables: { action: "ok" }) }
 
         it "should complete ok" do
-          _(process_instance.status).must_equal "ended"
-          _(end_ok).wont_be_nil
-          _(end_not_ok).must_be_nil
-          _(end_default).must_be_nil
+          _(execution.ended?).must_equal true
+          _(end_ok_step).wont_be_nil
+          _(end_not_ok_step).must_be_nil
+          _(end_default_step).must_be_nil
         end
       end
 
       describe :default_path do
-        before { @process_instance = runtime.start_process('ExclusiveGatewayTest', variables: { action: '¯\_(ツ)_/¯' }) }
+        before { @execution = runtime.start_process('ExclusiveGatewayTest', variables: { action: '¯\_(ツ)_/¯' }) }
 
         it "should complete ok" do
-          _(process_instance.status).must_equal "ended"
-          _(end_ok).must_be_nil
-          _(end_not_ok).must_be_nil
-          _(end_default).wont_be_nil
+          _(execution.ended?).must_equal true
+          _(end_ok_step).must_be_nil
+          _(end_not_ok_step).must_be_nil
+          _(end_default_step).wont_be_nil
         end
       end
     end
@@ -67,37 +67,37 @@ module Bpmn
     end
 
     describe :execution do
-      let(:process_instance) { @process_instance }
-      let(:split) { process_instance.step_by_id('Split') }
-      let(:join) { process_instance.step_by_id('Join') }
-      let(:task_a) { process_instance.step_by_id('TaskA') }
-      let(:task_b) { process_instance.step_by_id('TaskB') }
+      let(:execution) { @execution }
+      let(:split_step) { execution.step_by_id('Split') }
+      let(:join_step) { execution.step_by_id('Join') }
+      let(:task_a_step) { execution.step_by_id('TaskA') }
+      let(:task_b_step) { execution.step_by_id('TaskB') }
 
-      before { @process_instance = runtime.start_process('ParallelGatewayTest') }
+      before { @execution = runtime.start_process('ParallelGatewayTest') }
 
       it "should diverge at the first gateway" do
-        _(split.status).must_equal "ended"
-        _(join).must_be_nil
-        _(process_instance.steps.count).must_equal 4
+        _(split_step.ended?).must_equal true
+        _(join_step).must_be_nil
+        _(execution.steps.count).must_equal 4
       end
 
       describe :converging do
-        before { task_a.invoke }
+        before { task_a_step.invoke }
 
         it "should wait when first token arrives" do
-          _(task_a.status).must_equal "ended"
-          _(task_b.status).must_equal "waiting"
-          _(join.status).must_equal "waiting"
+          _(task_a_step.ended?).must_equal true
+          _(task_b_step.waiting?).must_equal true
+          _(join_step.waiting?).must_equal true
         end
 
         describe :join do
-          before { task_b.invoke }
+          before { task_b_step.invoke }
 
           it "should continue from join gateway" do
-            _(process_instance.status).must_equal "ended"
-            _(task_a.status).must_equal "ended"
-            _(task_b.status).must_equal "ended"
-            _(join.status).must_equal "ended"
+            _(execution.ended?).must_equal true
+            _(task_a_step.ended?).must_equal true
+            _(task_b_step.ended?).must_equal true
+            _(join_step.ended?).must_equal true
           end
         end
       end
@@ -123,74 +123,74 @@ module Bpmn
       end
   
       describe :execution do
-        let(:process_instance) { @process_instance }
-        let(:split) { process_instance.step_by_id('Split') }
-        let(:join) { process_instance.step_by_id('Join') }
-        let(:receive_order) { process_instance.step_by_id('ReceiveOrder') }
-        let(:check_laptop_parts) { process_instance.step_by_id('CheckLaptopParts') }
-        let(:check_prices) { process_instance.step_by_id('CheckPrices') }
-        let(:check_printer_parts) { process_instance.step_by_id('CheckPrinterParts') }
+        let(:execution) { @execution }
+        let(:split_step) { execution.step_by_id('Split') }
+        let(:join_step) { execution.step_by_id('Join') }
+        let(:receive_order_step) { execution.step_by_id('ReceiveOrder') }
+        let(:check_laptop_parts_step) { execution.step_by_id('CheckLaptopParts') }
+        let(:check_prices_step) { execution.step_by_id('CheckPrices') }
+        let(:check_printer_parts_step) { execution.step_by_id('CheckPrinterParts') }
     
-        before { @process_instance = runtime.start_process('InclusiveGatewayTest') }
+        before { @execution = runtime.start_process('InclusiveGatewayTest') }
 
         it "should wait at receive order task" do
-          _(receive_order.status).must_equal "waiting"
+          _(receive_order_step.waiting?).must_equal true
         end
 
         describe :first_path do
-          before { receive_order.invoke({ include_laptop_parts: true, include_printer_parts: false }) }
+          before { receive_order_step.invoke({ include_laptop_parts: true, include_printer_parts: false }) }
 
           it "should create correct task" do
-            _(check_laptop_parts).wont_be_nil
-            _(check_laptop_parts.status).must_equal 'waiting'
-            _(check_printer_parts).must_be_nil
-            _(check_prices).must_be_nil
+            _(check_laptop_parts_step).wont_be_nil
+            _(check_laptop_parts_step.waiting?).must_equal true
+            _(check_printer_parts_step).must_be_nil
+            _(check_prices_step).must_be_nil
           end
         end
 
         describe :second_path do
-          before { receive_order.invoke({ include_laptop_parts: false, include_printer_parts: true }) }
+          before { receive_order_step.invoke({ include_laptop_parts: false, include_printer_parts: true }) }
 
           it "should create correct task" do
-            _(check_laptop_parts).must_be_nil
-            _(check_printer_parts).wont_be_nil
-            _(check_prices).must_be_nil
+            _(check_laptop_parts_step).must_be_nil
+            _(check_printer_parts_step).wont_be_nil
+            _(check_prices_step).must_be_nil
           end
         end
 
         describe :default_path do
-          before { receive_order.invoke({ include_laptop_parts: false, include_printer_parts: false }) }
+          before { receive_order_step.invoke({ include_laptop_parts: false, include_printer_parts: false }) }
 
           it "should create the default task" do
-            _(check_laptop_parts).must_be_nil
-            _(check_printer_parts).must_be_nil
-            _(check_prices).wont_be_nil
+            _(check_laptop_parts_step).must_be_nil
+            _(check_printer_parts_step).must_be_nil
+            _(check_prices_step).wont_be_nil
           end
         end
 
         describe :multiple_paths do
-          before { receive_order.invoke({ include_laptop_parts: true, include_printer_parts: true }) }
+          before { receive_order_step.invoke({ include_laptop_parts: true, include_printer_parts: true }) }
 
           it "should create the correct tasks" do
-            _(check_laptop_parts).wont_be_nil
-            _(check_printer_parts).wont_be_nil
-            _(check_prices).must_be_nil
+            _(check_laptop_parts_step).wont_be_nil
+            _(check_printer_parts_step).wont_be_nil
+            _(check_prices_step).must_be_nil
           end
 
           describe :resume_first do
-            before { check_laptop_parts.invoke }
+            before { check_laptop_parts_step.invoke }
 
             it "should wait at join gateway" do
-              _(check_laptop_parts.status).must_equal "ended"
-              _(check_printer_parts.status).must_equal "waiting"
+              _(check_laptop_parts_step.ended?).must_equal true
+              _(check_printer_parts_step.waiting?).must_equal true
             end
 
             describe :resume_second do
-              before { check_printer_parts.invoke }
+              before { check_printer_parts_step.invoke }
 
               it "should complete the process" do
-                _(process_instance.status).must_equal "ended"
-                _(check_printer_parts.status).must_equal "ended"
+                _(execution.ended?).must_equal true
+                _(check_printer_parts_step.ended?).must_equal true
               end
             end
           end
@@ -220,34 +220,33 @@ module Bpmn
       end
 
       describe :execution do
-        let(:process_instance) { @process_instance }
-        let(:gateway) { process_instance.step_by_id('EventBasedGateway') }
-        let(:message_event) { process_instance.step_by_id('MessageEvent') }
-        let(:timer_event) { process_instance.step_by_id('TimerEvent') }
-        let(:end_message) { process_instance.step_by_id('EndMessage') }
-        let(:end_timer) { process_instance.step_by_id('EndTimer') }
+        let(:execution) { @execution }
+        let(:gateway_step) { execution.step_by_id('EventBasedGateway') }
+        let(:message_event_step) { execution.step_by_id('MessageEvent') }
+        let(:timer_event_step) { execution.step_by_id('TimerEvent') }
+        let(:end_message_step) { execution.step_by_id('EndMessage') }
+        let(:end_timer_step) { execution.step_by_id('EndTimer') }
         
-        before { @process_instance = runtime.start_process('EventBasedGatewayTest') }
+        before { @execution = runtime.start_process('EventBasedGatewayTest') }
 
         it "should diverge at the event gateway" do
-          _(gateway.status).must_equal "ended"
-          _(message_event.status).must_equal "waiting"
-          _(timer_event.status).must_equal "waiting"
+          _(gateway_step.ended?).must_equal true
+          _(message_event_step.waiting?).must_equal true
+          _(timer_event_step.waiting?).must_equal true
         end
 
         describe :event_occurs do
-          before { message_event.invoke }
+          before { message_event_step.invoke }
 
           it "should complete the process" do
-            _(process_instance.status).must_equal "ended"
-            _(message_event.status).must_equal "ended"
-            _(timer_event.status).must_equal "terminated"
-            _(end_message.status).must_equal "ended"
-            _(end_timer).must_be_nil
+            _(execution.ended?).must_equal true
+            _(message_event_step.ended?).must_equal true
+            _(timer_event_step.terminated?).must_equal true
+            _(end_message_step.ended?).must_equal true
+            _(end_timer_step).must_be_nil
           end
         end
       end
     end
-
   end
 end
