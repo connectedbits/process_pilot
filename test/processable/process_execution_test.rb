@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Processable
-  describe Runtime do
+  describe ProcessExecution do
     let(:bpmn_source) { fixture_source('hello_world.bpmn') }
     let(:dmn_source) { fixture_source('choose_greeting.dmn') }
     let(:services) {
@@ -66,8 +66,8 @@ module Processable
         },
       }
     }
-    let(:runtime) { Processable::Runtime.new(sources: [bpmn_source, dmn_source], services: services) }
-    let(:process) { runtime.process_by_id('HelloWorld') }
+    let(:context) { Context.new(sources: [bpmn_source, dmn_source], services: services) }
+    let(:process) { context.process_by_id('HelloWorld') }
 
     describe :definition do
       let(:user_task) { process.element_by_id('IntroduceYourself') }
@@ -77,25 +77,43 @@ module Processable
       end
     end
 
-    # describe :execution do
-    #   let(:execution) { @execution }
-    #   let(:user_step) { execution.step_by_id('IntroduceYourself') }
+    describe :execution do
+      let(:execution) { @execution }
+      let(:user_step) { execution.step_by_id('IntroduceYourself') }
 
-    #   before { @execution = runtime.start_process('HelloWorld', variables: { greet: true, cookie: false }) }
+      before { @execution = ProcessExecution.start(context: context, process_id: 'HelloWorld', variables: { greet: true, cookie: true }) }
 
-    #   it 'should start the process' do
-    #     _(execution.started?).must_equal true
-    #     _(user_step.waiting?).must_equal true
-    #   end
+      it 'should start the process' do
+        _(execution.started?).must_equal true
+        _(user_step.waiting?).must_equal true
+      end
 
-    #   describe :invoke do
-    #     before { user_step.invoke }
+      describe :invoke do
+        before { user_step.invoke(variables: { name: "Eric", language: "it", formal: false }) }
 
-    #     it 'should end the process' do
-    #       _(execution.ended?).must_equal true
-    #       _(user_step.ended?).must_equal true
-    #     end
-    #   end
-    # end
+        it 'should end the process' do
+          _(execution.ended?).must_equal true
+          _(user_step.ended?).must_equal true
+        end
+
+        describe :serialize do
+          let(:serialized) { execution.instance.to_json }
+
+          it 'should serailize the execution state' do
+            _(serialized).wont_be_nil
+          end
+
+          describe :deserialize do
+            let(:deserialized) { ProcessInstance.new }
+
+            before { deserialized.from_json(serialized) }
+
+            it 'should be lossy' do
+              #_(execution.instance).must_equal deserialized
+            end
+          end
+        end
+      end
+    end
   end
 end

@@ -3,8 +3,8 @@ require "test_helper"
 module Bpmn
   describe Process do
     let(:source) { fixture_source('process_test.bpmn') }
-    let(:runtime) { Processable::Runtime.new(sources: source) }
-    let(:process) { runtime.process_by_id('ProcessTest') }
+    let(:context) { Processable::Context.new(sources: source) }
+    let(:process) { context.process_by_id('ProcessTest') }
 
     describe :definition do
       let(:start_event) { process.element_by_id('Start') }
@@ -23,7 +23,7 @@ module Bpmn
       let(:start_step) { execution.step_by_id('Start') }
       let(:end_step) { execution.step_by_id('End') }
 
-      before { @execution = runtime.start_process('ProcessTest', start_event_id: 'Start') }
+      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ProcessTest', start_event_id: 'Start') }
 
       it 'should start and end the process' do
         _(execution.ended?).must_equal true

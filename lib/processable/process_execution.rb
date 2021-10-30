@@ -1,12 +1,20 @@
 module Processable
   class ProcessExecution
-    attr_reader :runtime, :process, :start_event, :variables, :parent, :called_by
-    attr_reader :id, :status, :steps
+    attr_reader :context, :process, :start_event, :variables, :parent, :called_by
+    attr_reader :id, :status, :steps, :started_at, :ended_at
 
-    delegate :async_services?, to: :runtime
+    delegate :async_services?, to: :context
 
-    def initialize(runtime:, process:, start_event: nil, variables: {}, parent: nil, called_by: nil)
-      @runtime = runtime
+    def self.start(context:, process_id:, start_event_id: nil, variables: {}, key: nil)
+      process = context.process_by_id(process_id)
+      raise ExecutionError.new("Process with id #{process_id} not found.") unless process
+      start_event = start_event_id ? process.start_events.find { |se| se.id == start_event_id } : process.default_start_event
+      raise ExecutionError.new("Start event with id #{start_event_id} not found for process #{process_id}.") unless start_event
+      ProcessExecution.new(context: context, process: process, start_event: start_event, variables: variables).tap { |e| process.execute(e) } 
+    end
+
+    def initialize(context:, process:, start_event: nil, variables: {}, parent: nil, called_by: nil)
+      @context = context
       @id = SecureRandom.uuid
       @process = process
       @start_event = start_event
@@ -31,15 +39,18 @@ module Processable
     end
 
     def start
+      @started_at = Time.now
       update_status('started')
       execute_element(start_event)
     end
 
     def terminate
+      @ended_at = Time.now
       update_status('terminated')
     end
 
     def end
+      @ended_at = Time.now
       update_status('ended')
     end
 
@@ -52,20 +63,20 @@ module Processable
     end
 
     def evaluate_decision(decision_ref)
-      source = runtime.decisions[decision_ref]
+      source = context.decisions[decision_ref]
       raise ExecutionError.new("Decision #{decision_ref} not found.") unless source
       ProcessableServices::DecisionEvaluator.call(decision_ref, source, variables)
     end
 
     def call_service(topic)
-      service = runtime.services[topic.to_sym]
+      service = context.services[topic.to_sym]
       raise ExecutionError.new("Service #{topic} not found.") unless service
       service.call(variables)
     end
 
     def run_script(script)
       raise ExecutionError.new("Script #{script} can't be blank.") unless script.present?
-      ProcessableServices::ScriptRunner.call(script: script, variables: variables, utils: runtime.utils)
+      ProcessableServices::ScriptRunner.call(script: script, variables: variables, utils: context.utils)
     end
 
     def step_waiting(step)
@@ -166,7 +177,7 @@ module Processable
     # Serialization
     #
 
-    def to_json
+    def instance
       ProcessInstance.new(
         id: id,
         process_id: process.id,
@@ -174,9 +185,9 @@ module Processable
         started_at: started_at, 
         ended_at: ended_at, 
         variables: variables, 
-        parent_id: parent&.id, 
+        parent_id: parent&.id,
         called_by_id: called_by&.id,
-        steps: steps.map { |step| step.to_json }
+        steps: steps.map { |step| step.instance }
       )
     end
 
@@ -209,9 +220,10 @@ module Processable
   end
 
   class ProcessInstance
+    include ActiveModel::Model
     include ActiveModel::Serializers::JSON
   
-    attr_accessor :id, :process_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id
+    attr_accessor :id, :process_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id, :steps
 
     def attributes=(hash)
       hash.each do |key, value|
@@ -222,13 +234,14 @@ module Processable
     def attributes
       {
         'id' => nil,
-        'element_id' => nil,
+        'process_id' => nil,
         'status' => nil,
         'started_at' => nil,
         'ended_at' => nil,
         'variables' => nil,
         'parent_id' => nil,
-        'called_by_id' => nil
+        'called_by_id' => nil,
+        'steps' => nil
       }
     end
   end

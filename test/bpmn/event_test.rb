@@ -3,8 +3,8 @@ require "test_helper"
 module Bpmn
   describe StartEvent do
     let(:source) { fixture_source('start_event_test.bpmn') }
-    let(:runtime) { Processable::Runtime.new(sources: source) }
-    let(:process) { runtime.process_by_id('StartEventTest') }
+    let(:context) { Processable::Context.new(sources: source) }
+    let(:process) { context.process_by_id('StartEventTest') }
 
     describe :definitions do
       let(:start_event) { process.element_by_id("Start") }
@@ -18,7 +18,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:start_step) { execution.step_by_id("Start") }
 
-      before { @execution = runtime.start_process('StartEventTest') }
+      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'StartEventTest') }
 
       it 'should start the process' do
         _(execution.ended?).must_equal true
@@ -29,8 +29,8 @@ module Bpmn
 
   describe IntermediateCatchEvent do
     let(:source) { fixture_source('intermediate_catch_event_test.bpmn') }
-    let(:runtime) { Processable::Runtime.new(sources: source) }
-    let(:process) { runtime.process_by_id('IntermediateCatchEventTest') }
+    let(:context) { Processable::Context.new(sources: source) }
+    let(:process) { context.process_by_id('IntermediateCatchEventTest') }
 
     describe :definitions do
       let(:catch_event) { process.element_by_id("Catch") }
@@ -40,7 +40,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:catch_step) { execution.step_by_id("Catch") }
 
-      before { @execution = runtime.start_process('IntermediateCatchEventTest') }
+      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'IntermediateCatchEventTest') }
       it 'should wait at the catch event' do
         _(execution.started?).must_equal true
         _(catch_step.waiting?).must_equal true
@@ -59,8 +59,8 @@ module Bpmn
 
   describe IntermediateThrowEvent do
     let(:source) { fixture_source('intermediate_throw_event_test.bpmn') }
-    let(:runtime) { Processable::Runtime.new(sources: source) }
-    let(:process) { runtime.process_by_id('IntermediateThrowEventTest') }
+    let(:context) { Processable::Context.new(sources: source) }
+    let(:process) { context.process_by_id('IntermediateThrowEventTest') }
 
     describe :definitions do
       let(:throw_event) { process.element_by_id("Throw") }
@@ -70,7 +70,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:throw_step) { execution.step_by_id("Throw") }
 
-      before { @execution = runtime.start_process('IntermediateThrowEventTest') }
+      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'IntermediateThrowEventTest') }
       it 'should throw then end the process' do
         _(execution.ended?).must_equal true
         _(throw_step.ended?).must_equal true
@@ -80,8 +80,8 @@ module Bpmn
 
   describe BoundaryEvent do
     let(:source) { fixture_source('boundary_event_test.bpmn') }
-    let(:runtime) { Processable::Runtime.new(sources: source) }
-    let(:process) { runtime.process_by_id('BoundaryEventTest') }
+    let(:context) { Processable::Context.new(sources: source) }
+    let(:process) { context.process_by_id('BoundaryEventTest') }
 
     describe :definitions do
       let(:start) { process.element_by_id("Start") }
@@ -106,7 +106,7 @@ module Bpmn
       let(:end_step) { execution.step_by_id("End") }
       let(:end_interrupted_step) { execution.step_by_id("EndInterrupted") }
 
-      before { @execution = runtime.start_process('BoundaryEventTest') }
+      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'BoundaryEventTest') }
 
       it "should create boundary events" do
         _(execution.started?).must_equal true
@@ -152,8 +152,8 @@ module Bpmn
 
   describe EndEvent do
     let(:source) { fixture_source('end_event_test.bpmn') }
-    let(:runtime) { Processable::Runtime.new(sources: source) }
-    let(:process) { runtime.process_by_id('EndEventTest') }
+    let(:context) { Processable::Context.new(sources: source) }
+    let(:process) { context.process_by_id('EndEventTest') }
 
     describe :definitions do
       let(:end_event) { process.element_by_id("End") }
@@ -167,7 +167,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:end_step) { execution.step_by_id("End") }
 
-      before { @execution = runtime.start_process('EndEventTest') }
+      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'EndEventTest') }
 
       it 'should end the process' do
         _(execution.ended?).must_equal true

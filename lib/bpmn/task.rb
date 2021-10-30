@@ -51,7 +51,7 @@ module Bpmn
 
     def run(step_execution)
       result = step_execution.call_service(topic)
-      step_execution.invoke(result_to_variables(result))
+      step_execution.invoke(variables: result_to_variables(result))
     end
   end
 
@@ -70,7 +70,7 @@ module Bpmn
 
     def run(step_execution)
       result = step_execution.run_script(script)
-      step_execution.invoke(result_to_variables(result))
+      step_execution.invoke(variables: result_to_variables(result))
     end
   end
 
@@ -93,10 +93,10 @@ module Bpmn
     def run(step_execution)
       if expression
         result = step_execution.evaluate_expression(expression)
-        step_execution.invoke(result_to_variables(result))
+        step_execution.invoke(variables: result_to_variables(result))
       elsif decision_ref
         result = step_execution.evaluate_decision(decision_ref)
-        step_execution.invoke(result_to_variables(result))
+        step_execution.invoke(variables: result_to_variables(result))
       end
     end
   end

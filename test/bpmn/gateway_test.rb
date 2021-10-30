@@ -4,8 +4,8 @@ module Bpmn
 
   describe ExclusiveGateway do
     let(:source) { fixture_source('exclusive_gateway_test.bpmn') }
-    let(:runtime) { Processable::Runtime.new(sources: source) }
-    let(:process) { runtime.process_by_id('ExclusiveGatewayTest') }
+    let(:context) { Processable::Context.new(sources: source) }
+    let(:process) { context.process_by_id('ExclusiveGatewayTest') }
 
     describe :definition do
       let(:exclusive_gateway) { process.element_by_id('ExclusiveGateway') }
@@ -24,7 +24,7 @@ module Bpmn
       let(:end_default_step) { execution.step_by_id('EndDefault') }
 
       describe :happy_path do
-        before { @execution = runtime.start_process('ExclusiveGatewayTest', variables: { action: "ok" }) }
+        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ExclusiveGatewayTest', variables: { action: "ok" }) }
 
         it "should complete ok" do
           _(execution.ended?).must_equal true
@@ -35,7 +35,7 @@ module Bpmn
       end
 
       describe :default_path do
-        before { @execution = runtime.start_process('ExclusiveGatewayTest', variables: { action: '¯\_(ツ)_/¯' }) }
+        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ExclusiveGatewayTest', variables: { action: '¯\_(ツ)_/¯' }) }
 
         it "should complete ok" do
           _(execution.ended?).must_equal true
@@ -49,8 +49,8 @@ module Bpmn
 
   describe ParallelGateway do
     let(:source) { fixture_source('parallel_gateway_test.bpmn') }
-    let(:runtime) { Processable::Runtime.new(sources: source) }
-    let(:process) { runtime.process_by_id('ParallelGatewayTest') }
+    let(:context) { Processable::Context.new(sources: source) }
+    let(:process) { context.process_by_id('ParallelGatewayTest') }
 
     describe :definition do
       let(:split) { process.element_by_id('Split') }
@@ -73,7 +73,7 @@ module Bpmn
       let(:task_a_step) { execution.step_by_id('TaskA') }
       let(:task_b_step) { execution.step_by_id('TaskB') }
 
-      before { @execution = runtime.start_process('ParallelGatewayTest') }
+      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ParallelGatewayTest') }
 
       it "should diverge at the first gateway" do
         _(split_step.ended?).must_equal true
@@ -105,8 +105,8 @@ module Bpmn
 
     describe InclusiveGateway do
       let(:source) { fixture_source('inclusive_gateway_test.bpmn') }
-      let(:runtime) { Processable::Runtime.new(sources: source) }
-      let(:process) { runtime.process_by_id('InclusiveGatewayTest') }
+      let(:context) { Processable::Context.new(sources: source) }
+      let(:process) { context.process_by_id('InclusiveGatewayTest') }
   
       describe :definition do
         let(:split) { process.element_by_id('Split') }
@@ -131,14 +131,14 @@ module Bpmn
         let(:check_prices_step) { execution.step_by_id('CheckPrices') }
         let(:check_printer_parts_step) { execution.step_by_id('CheckPrinterParts') }
     
-        before { @execution = runtime.start_process('InclusiveGatewayTest') }
+        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'InclusiveGatewayTest') }
 
         it "should wait at receive order task" do
           _(receive_order_step.waiting?).must_equal true
         end
 
         describe :first_path do
-          before { receive_order_step.invoke({ include_laptop_parts: true, include_printer_parts: false }) }
+          before { receive_order_step.invoke(variables: { include_laptop_parts: true, include_printer_parts: false }) }
 
           it "should create correct task" do
             _(check_laptop_parts_step).wont_be_nil
@@ -149,7 +149,7 @@ module Bpmn
         end
 
         describe :second_path do
-          before { receive_order_step.invoke({ include_laptop_parts: false, include_printer_parts: true }) }
+          before { receive_order_step.invoke(variables: { include_laptop_parts: false, include_printer_parts: true }) }
 
           it "should create correct task" do
             _(check_laptop_parts_step).must_be_nil
@@ -159,7 +159,7 @@ module Bpmn
         end
 
         describe :default_path do
-          before { receive_order_step.invoke({ include_laptop_parts: false, include_printer_parts: false }) }
+          before { receive_order_step.invoke(variables: { include_laptop_parts: false, include_printer_parts: false }) }
 
           it "should create the default task" do
             _(check_laptop_parts_step).must_be_nil
@@ -169,7 +169,7 @@ module Bpmn
         end
 
         describe :multiple_paths do
-          before { receive_order_step.invoke({ include_laptop_parts: true, include_printer_parts: true }) }
+          before { receive_order_step.invoke(variables: { include_laptop_parts: true, include_printer_parts: true }) }
 
           it "should create the correct tasks" do
             _(check_laptop_parts_step).wont_be_nil
@@ -200,8 +200,8 @@ module Bpmn
 
     describe EventBasedGateway do
       let(:source) { fixture_source('event_based_gateway_test.bpmn') }
-      let(:runtime) { Processable::Runtime.new(sources: source) }
-      let(:process) { runtime.process_by_id('EventBasedGatewayTest') }
+      let(:context) { Processable::Context.new(sources: source) }
+      let(:process) { context.process_by_id('EventBasedGatewayTest') }
   
       describe :definition do
         let(:gateway) { process.element_by_id('EventBasedGateway') }
@@ -227,7 +227,7 @@ module Bpmn
         let(:end_message_step) { execution.step_by_id('EndMessage') }
         let(:end_timer_step) { execution.step_by_id('EndTimer') }
         
-        before { @execution = runtime.start_process('EventBasedGatewayTest') }
+        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'EventBasedGatewayTest') }
 
         it "should diverge at the event gateway" do
           _(gateway_step.ended?).must_equal true

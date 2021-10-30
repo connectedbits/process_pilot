@@ -1,6 +1,6 @@
 # Expressions
 
-Expressions are evaluated at runtime to make decisions. They are frequently used to conditionally take a sequence flow but can also be used to determine a value dynamically (for example which process to call from a CallActivity). This engine supports FEEL expressions or JSONLogic.
+Expressions are evaluated at execution time to make decisions. They are frequently used to conditionally take a sequence flow but can also be used to determine a value dynamically (for example which process to call from a CallActivity). This engine supports FEEL expressions or JSONLogic.
 
 [Try Feel](https://nikku.github.io/feel-playground) | 
 [Try JSONLogic](https://jsonlogic.com/play.html)

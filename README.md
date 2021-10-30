@@ -4,11 +4,11 @@ Processable is a workflow gem for Rails applications based on the [bpmn](https:/
 
 ## Usage
 
-Processable executes BPMN documents like [this one](/test/fixtures/files/hello_world.bpmn). 
+Once defined, Processable can execute business processes like [this one](/test/fixtures/files/hello_world.bpmn). 
 
 ![Example](test/fixtures/files/hello_world.png)
 
-Before executing a [Process](lib/bpmn/process.rb) the [Runtime](lib/processable/runtime.rb) must be initialized with sources and other configuration information.
+Before execution a Context must be initialized with sources, services and other configuration.
 
 ```ruby
 services = {
@@ -25,27 +25,26 @@ services = {
     ].sample
   }
 }
-runtime = Processable::Runtime.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services)
+context = Processable::Context.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services)
 ```
 
-With the runtime initialized a process can be started by calling `start_process` and passing the process id and start event id.
+Now a process can be started by calling `Execution.start` and passing the process id, start event id, and variables returning a process execution instance.
 
 ```ruby
-execution = runtime.start_process(process_id: 'HelloWorld', start_event_id: 'Start', variables: { greet: true, cookie: false })
+execution = Processable::Execution.start(context: context, process_id: 'HelloWorld', start_event_id: 'Start', variables: { greet: true, cookie: false })
 ```
 
-The runtime with return an [ProcessExecution](lib/processable/process_execution.rb) instance. It is often useful to `print` the execution's current state.
+It is often useful to print the execution's current state.
 
 ```ruby
 execution.print
 ```
-
 ```
 HelloWorld started * Flow_016qg9x
 
 {
   "greet": true,
-  "cookie": false
+  "cookie": true
 }
 
 0 StartEvent Start: ended * out: Flow_016qg9x
@@ -53,9 +52,9 @@ HelloWorld started * Flow_016qg9x
 2 BoundaryEvent Timeout: waiting * in: 
 ```
 
-The output shows the process id, it's current state, and active tokens. Below it shows the processes' variables followed by a list of [StepExecution](/lib/processable/step_execution.rb). Each step execution displays the element type, id, status, and tokens in and out.
+The output shows the process id, it's current state, and active tokens. Below it shows the processes' variables followed by a list of execution steps. Each step displays the element type, id, status, and tokens in and out.
 
-In this case the process execution has stopped since the UserTask IntroduceYourself is waiting. Notice a BoundaryEvent Timeout has been started since it's attached to the UserTask.
+In this case the execution has stopped since the UserTask IntroduceYourself is `waiting`.
 
 Execution is continued after the work is complete by `invoking` the step.
 
@@ -63,25 +62,31 @@ Execution is continued after the work is complete by `invoking` the step.
 execution.step_by_id('IntroduceYourself').invoke({ name: "Eric", language: "es", formal: true })
 ```
 
-After `invoking` the task the process continues executing until it reaches an EndEvent.
+Once the task is invoked the process continues executing until it reaches an EndEvent.
 
 ```
-HelloWorld ended * 
+HelloWorld ended * Flow_1ezhtuc
 
 {
   "greet": true,
   "cookie": true,
-  "message": "👋 Hola Eric",
+  "name": "Eric",
+  "language": "it",
+  "formal": false,
+  "tell_fortune": "Help! I am being held prisoner in a fortune cookie factory.",
+  "greeting": "Ciao",
+  "message": "👋 Ciao Eric 🥠 Help! I am being held prisoner in a fortune cookie factory."
 }
 
 0 StartEvent Start: ended * out: Flow_016qg9x
-1 UserTask IntroduceYourself: ended * in: Flow_016qg9x * out: Flow_0f1v8du
+1 UserTask IntroduceYourself: ended {"name"=>"Eric", "language"=>"it", "formal"=>false} * in: Flow_016qg9x * out: Flow_0f1v8du
 2 BoundaryEvent Timeout: terminated * in: 
-3 InclusiveGateway Split: ended * in: Flow_0f1v8du * out: Flow_00mppvp
-4 BusinessRuleTask ChooseGreeting: ended * in: Flow_00mppvp * out: Flow_1ezhtuc
-5 InclusiveGateway Join: ended * in: Flow_1ezhtuc * out: Flow_1xiabfq
-6 ScriptTask SayHello: ended {"message"=>"Hola Eric"} * in: Flow_1xiabfq * out: Flow_15lbcry
-7 EndEvent End: ended * in: Flow_15lbcry
+3 InclusiveGateway Split: ended * in: Flow_0f1v8du * out: Flow_09yhdyi, Flow_00mppvp
+4 ServiceTask TellFortune: ended {"tell_fortune"=>"Help! I am being held prisoner in a fortune cookie factory."} * in: Flow_09yhdyi * out: Flow_1t20i0c
+5 InclusiveGateway Join: ended * in: Flow_1t20i0c, Flow_1ezhtuc * out: Flow_1xiabfq
+6 BusinessRuleTask ChooseGreeting: ended {"greeting"=>"Ciao"} * in: Flow_00mppvp * out: Flow_1ezhtuc
+7 ScriptTask SayHello: ended {"message"=>"👋 Ciao Eric 🥠 Help! I am being held prisoner in a fortune cookie factory."} * in: Flow_1xiabfq * out: Flow_15lbcry
+8 EndEvent End: ended * in: Flow_15lbcry
 ```
 ## Documentation
 
@@ -91,7 +96,8 @@ HelloWorld ended *
 * [Event Definitions](/docs/event_definitions.md)
 * [Gateways](/docs/gateways.md)
 * [Expressions](/docs/expressions.md)
-* [Runtime](/docs/runtime.md)
+* [Execution](/docs/execution.md)
+
 ## Installation
 Add this line to your application's Gemfile:
 

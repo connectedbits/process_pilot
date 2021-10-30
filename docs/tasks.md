@@ -12,14 +12,14 @@ This task represents work done by a human user.
 
 ## Service Task
 
-This task represents work done by a ruby service proc when supplied to the Processable context.
+This task represents work done by a ruby service proc when supplied to the context.
 
 ## Script Task
 
-This task represents work done by the Processable runtime written in Javascript.
+This task represents work done by the execution process engine written in Javascript.
 
 ## Business Rule Task
 
-This task represents work done by the Processable rule engine, generally, a complex decision.
+This task represents work done by the execution rule engine, generally, a complex decision.
 
 [source](../lib/bpmn/task.rb) | [tests](../test/bpmn/task_test.rb)

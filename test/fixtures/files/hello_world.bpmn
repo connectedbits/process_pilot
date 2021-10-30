@@ -77,7 +77,7 @@ if (variables.greeting) {
 }
 
 if (variables.name) {
-  parts.push(data.name)
+  parts.push(variables.name)
 }
               
 if (variables.tell_fortune) {

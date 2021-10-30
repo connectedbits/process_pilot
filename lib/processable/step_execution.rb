@@ -1,6 +1,7 @@
 module Processable
   class StepExecution
     attr_reader :id, :status, :execution, :element, :tokens_in, :tokens_out, :variables, :attached_to, :attachments, :message_names, :expires_at
+    attr_accessor :started_at, :ended_at
 
     delegate :evaluate_condition, :evaluate_expression, :evaluate_decision, :run_script, :call_service, :async_services?, to: :execution
 
@@ -19,6 +20,7 @@ module Processable
     end
 
     def start
+      @started_at = Time.now
       update_status('started')
     end
 
@@ -26,12 +28,13 @@ module Processable
       update_status('waiting')
     end
 
-    def invoke(variables = {})
+    def invoke(variables: {})
       @variables = variables.merge(variables).with_indifferent_access
       continue
     end
 
     def terminate
+      @ended_at = Time.now
       update_status('terminated')
     end
 
@@ -40,6 +43,7 @@ module Processable
     end
 
     def end
+      @ended_at = Time.now
       @tokens_out = element.outgoing_flows(self).map { |flow| flow.id }
       update_status('ended')
     end
@@ -80,14 +84,14 @@ module Processable
       execution.steps.select { |step| (step.tokens_in & tokens_out).length > 0 }
     end
 
-        #
+    #
     # Serialization
     #
 
-    def to_json
+    def instance
       StepInstance.new(
         id: id,
-        process_id: process.id,
+        element_id: element.id,
         status: status, 
         started_at: started_at, 
         ended_at: ended_at, 
@@ -111,6 +115,7 @@ module Processable
   end
 
   class StepInstance
+    include ActiveModel::Model
     include ActiveModel::Serializers::JSON
   
     attr_accessor :id, :element_id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :message_names, :expires_at, :attached_to_id, :attachment_ids

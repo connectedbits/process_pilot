@@ -10,6 +10,7 @@ end
 
 group :development do
   gem 'puma'
+  gem 'solargraph'
 end
 
 group :test do
