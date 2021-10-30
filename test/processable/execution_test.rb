@@ -95,24 +95,36 @@ module Processable
           _(execution.ended?).must_equal true
           _(user_step.ended?).must_equal true
         end
+      end
 
-        describe :serialize do
-          let(:serialized) { execution.instance.to_json }
+      describe :serialize do
+        let(:serialized) { @serialized }
 
-          it 'should serailize the execution state' do
-            _(serialized).wont_be_nil
-          end
+        before { @serialized = execution.to_json }
 
-          describe :deserialize do
-            let(:deserialized) { ProcessInstance.new }
-
-            before { deserialized.from_json(serialized) }
-
-            it 'should be lossy' do
-              #_(execution.instance).must_equal deserialized
-            end
-          end
+        it 'should serialize execution state' do
+          _(serialized).wont_be_nil
         end
+
+        # describe :deserialize do
+        #   before do 
+        #     @execution = Execution.new
+        #     @execution.from_json(serialized)
+        #   end
+
+        #   it 'should deserialize execution state' do
+        #     _(execution).wont_be_nil
+        #   end
+
+        #   describe :invoke do
+        #     before { user_step.invoke(variables: { name: "Eric", language: "it", formal: false }) }
+    
+        #     it 'should end the process' do
+        #       _(execution.ended?).must_equal true
+        #       _(user_step.ended?).must_equal true
+        #     end
+        #   end
+        # end
       end
     end
   end

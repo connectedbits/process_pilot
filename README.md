@@ -4,11 +4,11 @@ Processable is a workflow gem for Rails applications based on the [bpmn](https:/
 
 ## Usage
 
-Once defined, Processable can execute business processes like [this one](/test/fixtures/files/hello_world.bpmn). 
+Processable executes business processes like [this one](/test/fixtures/files/hello_world.bpmn). 
 
 ![Example](test/fixtures/files/hello_world.png)
 
-Before execution a Context must be initialized with sources, services and other configuration.
+Prior to execution, a Context must be initialized with sources, services and other configuration.
 
 ```ruby
 services = {
@@ -28,13 +28,13 @@ services = {
 context = Processable::Context.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services)
 ```
 
-Now a process can be started by calling `Execution.start` and passing the process id, start event id, and variables returning a process execution instance.
+Then an Execution can be started.
 
 ```ruby
 execution = Processable::Execution.start(context: context, process_id: 'HelloWorld', start_event_id: 'Start', variables: { greet: true, cookie: false })
 ```
 
-It is often useful to print the execution's current state.
+It is often useful to print the current state of the Execution.
 
 ```ruby
 execution.print
@@ -52,11 +52,24 @@ HelloWorld started * Flow_016qg9x
 2 BoundaryEvent Timeout: waiting * in: 
 ```
 
-The output shows the process id, it's current state, and active tokens. Below it shows the processes' variables followed by a list of execution steps. Each step displays the element type, id, status, and tokens in and out.
+This shows the process id, it's current status, and active tokens. Below it shows the processes' variables followed by a list of execution steps. Each step displays the element type, id, status, and tokens in and out.
 
 In this case the execution has stopped since the UserTask IntroduceYourself is `waiting`.
 
-Execution is continued after the work is complete by `invoking` the step.
+At this point you may want to save the current state of execution in a Rails model.
+
+```ruby
+json = execution.to_json
+```
+
+Later, when the task has been completed, execution can be deserialized.
+
+```ruby
+execution = Procesable::Execution.new(context: context)
+execution.from_json(json)
+```
+
+Execution is continued by `invoking` the `waiting` step.
 
 ```ruby
 execution.step_by_id('IntroduceYourself').invoke({ name: "Eric", language: "es", formal: true })

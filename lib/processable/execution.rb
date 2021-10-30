@@ -177,6 +177,14 @@ module Processable
     # Serialization
     #
 
+    def from_json(json)
+      instance.from_json(json)
+    end
+    
+    def to_json
+      instance.to_json
+    end
+
     def instance
       ProcessInstance.new(
         id: id,
