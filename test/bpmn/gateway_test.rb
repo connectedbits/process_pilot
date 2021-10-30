@@ -24,7 +24,7 @@ module Bpmn
       let(:end_default_step) { execution.step_by_id('EndDefault') }
 
       describe :happy_path do
-        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ExclusiveGatewayTest', variables: { action: "ok" }) }
+        before { @execution = Processable::Execution.start(context: context, process_id: 'ExclusiveGatewayTest', variables: { action: "ok" }) }
 
         it "should complete ok" do
           _(execution.ended?).must_equal true
@@ -35,7 +35,7 @@ module Bpmn
       end
 
       describe :default_path do
-        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ExclusiveGatewayTest', variables: { action: '¯\_(ツ)_/¯' }) }
+        before { @execution = Processable::Execution.start(context: context, process_id: 'ExclusiveGatewayTest', variables: { action: '¯\_(ツ)_/¯' }) }
 
         it "should complete ok" do
           _(execution.ended?).must_equal true
@@ -73,7 +73,7 @@ module Bpmn
       let(:task_a_step) { execution.step_by_id('TaskA') }
       let(:task_b_step) { execution.step_by_id('TaskB') }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ParallelGatewayTest') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'ParallelGatewayTest') }
 
       it "should diverge at the first gateway" do
         _(split_step.ended?).must_equal true
@@ -131,7 +131,7 @@ module Bpmn
         let(:check_prices_step) { execution.step_by_id('CheckPrices') }
         let(:check_printer_parts_step) { execution.step_by_id('CheckPrinterParts') }
     
-        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'InclusiveGatewayTest') }
+        before { @execution = Processable::Execution.start(context: context, process_id: 'InclusiveGatewayTest') }
 
         it "should wait at receive order task" do
           _(receive_order_step.waiting?).must_equal true
@@ -227,7 +227,7 @@ module Bpmn
         let(:end_message_step) { execution.step_by_id('EndMessage') }
         let(:end_timer_step) { execution.step_by_id('EndTimer') }
         
-        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'EventBasedGatewayTest') }
+        before { @execution = Processable::Execution.start(context: context, process_id: 'EventBasedGatewayTest') }
 
         it "should diverge at the event gateway" do
           _(gateway_step.ended?).must_equal true

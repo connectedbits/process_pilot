@@ -57,7 +57,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:catch_step) { execution.step_by_id("Catch") }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'TimerEventDefinitionTest') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'TimerEventDefinitionTest') }
 
       it "should wait at catch event and set the timer" do
         _(catch_step.waiting?).must_equal true

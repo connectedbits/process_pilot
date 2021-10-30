@@ -23,7 +23,7 @@ module Bpmn
       let(:start_step) { execution.step_by_id('Start') }
       let(:end_step) { execution.step_by_id('End') }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ProcessTest', start_event_id: 'Start') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'ProcessTest', start_event_id: 'Start') }
 
       it 'should start and end the process' do
         _(execution.ended?).must_equal true

@@ -18,7 +18,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:start_step) { execution.step_by_id("Start") }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'StartEventTest') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'StartEventTest') }
 
       it 'should start the process' do
         _(execution.ended?).must_equal true
@@ -40,7 +40,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:catch_step) { execution.step_by_id("Catch") }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'IntermediateCatchEventTest') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'IntermediateCatchEventTest') }
       it 'should wait at the catch event' do
         _(execution.started?).must_equal true
         _(catch_step.waiting?).must_equal true
@@ -70,7 +70,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:throw_step) { execution.step_by_id("Throw") }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'IntermediateThrowEventTest') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'IntermediateThrowEventTest') }
       it 'should throw then end the process' do
         _(execution.ended?).must_equal true
         _(throw_step.ended?).must_equal true
@@ -106,7 +106,7 @@ module Bpmn
       let(:end_step) { execution.step_by_id("End") }
       let(:end_interrupted_step) { execution.step_by_id("EndInterrupted") }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'BoundaryEventTest') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'BoundaryEventTest') }
 
       it "should create boundary events" do
         _(execution.started?).must_equal true
@@ -167,7 +167,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:end_step) { execution.step_by_id("End") }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'EndEventTest') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'EndEventTest') }
 
       it 'should end the process' do
         _(execution.ended?).must_equal true

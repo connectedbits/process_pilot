@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Processable
-  describe ProcessExecution do
+  describe Execution do
     let(:bpmn_source) { fixture_source('hello_world.bpmn') }
     let(:dmn_source) { fixture_source('choose_greeting.dmn') }
     let(:services) {
@@ -81,7 +81,7 @@ module Processable
       let(:execution) { @execution }
       let(:user_step) { execution.step_by_id('IntroduceYourself') }
 
-      before { @execution = ProcessExecution.start(context: context, process_id: 'HelloWorld', variables: { greet: true, cookie: true }) }
+      before { @execution = Execution.start(context: context, process_id: 'HelloWorld', variables: { greet: true, cookie: true }) }
 
       it 'should start the process' do
         _(execution.started?).must_equal true

@@ -1,5 +1,5 @@
 module Processable
-  class ProcessExecution
+  class Execution
     attr_reader :context, :process, :start_event, :variables, :parent, :called_by
     attr_reader :id, :status, :steps, :started_at, :ended_at
 
@@ -10,7 +10,7 @@ module Processable
       raise ExecutionError.new("Process with id #{process_id} not found.") unless process
       start_event = start_event_id ? process.start_events.find { |se| se.id == start_event_id } : process.default_start_event
       raise ExecutionError.new("Start event with id #{start_event_id} not found for process #{process_id}.") unless start_event
-      ProcessExecution.new(context: context, process: process, start_event: start_event, variables: variables).tap { |e| process.execute(e) } 
+      Execution.new(context: context, process: process, start_event: start_event, variables: variables).tap { |e| process.execute(e) } 
     end
 
     def initialize(context:, process:, start_event: nil, variables: {}, parent: nil, called_by: nil)

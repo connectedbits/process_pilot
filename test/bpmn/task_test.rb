@@ -19,7 +19,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:task_step) { execution.step_by_id('Task') }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'TaskTest') }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'TaskTest') }
 
       it 'should start the process' do
         _(execution.started?).must_equal true
@@ -60,7 +60,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:service_step) { execution.step_by_id('ServiceTask') }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ServiceTaskTest', variables: { name: "Eric" }) } 
+      before { @execution = Processable::Execution.start(context: context, process_id: 'ServiceTaskTest', variables: { name: "Eric" }) } 
 
       it 'should run the service task' do
         _(execution.ended?).must_equal true
@@ -72,7 +72,7 @@ module Bpmn
       describe :async_services do
         let(:context) { Processable::Context.new(sources: source, services: services, async_services: true) }
 
-        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ServiceTaskTest', variables: { name: "Eric" })  }
+        before { @execution = Processable::Execution.start(context: context, process_id: 'ServiceTaskTest', variables: { name: "Eric" })  }
 
         it 'should not run the service task' do
           _(execution.started?).must_equal true
@@ -100,7 +100,7 @@ module Bpmn
       let(:execution) { @execution }
       let(:script_step) { execution.step_by_id('ScriptTask') }
 
-      before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'ScriptTaskTest', variables: { name: "Eric" }) }
+      before { @execution = Processable::Execution.start(context: context, process_id: 'ScriptTaskTest', variables: { name: "Eric" }) }
 
       it 'should run the script task' do
         _(execution.ended?).must_equal true
@@ -131,7 +131,7 @@ module Bpmn
         let(:execution) { @execution }
         let(:business_rule_step) { execution.step_by_id('ExpressionBusinessRule') }
   
-        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'BusinessRuleTaskTest', start_event_id: 'ExpressionStart', variables: { age: 57 }) }
+        before { @execution = Processable::Execution.start(context: context, process_id: 'BusinessRuleTaskTest', start_event_id: 'ExpressionStart', variables: { age: 57 }) }
   
         it 'should run the business rule task' do
           _(execution.ended?).must_equal true
@@ -155,7 +155,7 @@ module Bpmn
         let(:execution) { @execution }
         let(:business_rule_step) { execution.step_by_id('DmnBusinessRule') }
   
-        before { @execution = Processable::ProcessExecution.start(context: context, process_id: 'BusinessRuleTaskTest', start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 }) }
+        before { @execution = Processable::Execution.start(context: context, process_id: 'BusinessRuleTaskTest', start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 }) }
   
         it 'should run the business rule task' do
           _(execution.ended?).must_equal true
