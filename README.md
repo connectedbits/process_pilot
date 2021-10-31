@@ -59,14 +59,13 @@ In this case the execution has stopped since the UserTask IntroduceYourself is `
 At this point you may want to save the current state of execution in a Rails model.
 
 ```ruby
-json = execution.to_json
+json = execution.serialize
 ```
 
 Later, when the task has been completed, execution can be deserialized.
 
 ```ruby
-execution = Procesable::Execution.new(context: context)
-execution.from_json(json)
+execution = Procesable::Execution.deserialize(json, context: context)
 ```
 
 Execution is continued by `invoking` the `waiting` step.
