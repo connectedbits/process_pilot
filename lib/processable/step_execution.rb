@@ -13,13 +13,14 @@ module Processable
     end
 
     def initialize(attributes={})
-      super
-      @id ||= SecureRandom.uuid
-      @status ||= 'initialized'
-      @variables ||= {}
-      @tokens_in ||= []
-      @tokens_out ||= []
-      @message_names ||= []
+      super.tap do
+        @id ||= SecureRandom.uuid
+        @status ||= 'initialized'
+        @variables ||= {}
+        @tokens_in ||= []
+        @tokens_out ||= []
+        @message_names ||= []
+      end
     end
 
     def element
@@ -126,6 +127,22 @@ module Processable
 
     def attributes
       { 'id': nil, 'element_id': nil, 'status': nil, 'started_at': nil, 'ended_at': nil, 'variables': nil, 'tokens_in': nil, 'tokens_out': nil, 'message_names': nil, 'expires_at': nil, 'attached_to_id': nil }
+    end
+
+    def as_json(options = {})
+      {
+        id: id,
+        element_id: element_id,
+        status: status,
+        started_at: started_at,
+        ended_at: ended_at,
+        variables: variables,
+        tokens_in: tokens_in,
+        tokens_out: tokens_out,
+        message_names: message_names,
+        expires_at: expires_at,
+        attached_to_id: attached_to_id
+      }.compact
     end
 
     private

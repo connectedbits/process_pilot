@@ -98,18 +98,28 @@ module Processable
       end
 
       describe :serialization do
+        let(:json) { @json }
+        let(:new_execution) { @new_execution }
 
-        it 'should be lossless' do
+        before do 
+          @json = execution.to_json(include: :steps)
+          @new_execution = Execution.deserialize(json, context: context)
         end
 
-        # describe :execution_after_serialization do
-        #   before { user_step.invoke(variables: { name: "Eric", language: "it", formal: false }) }
+        it 'should be lossless' do
+          _(new_execution.serialize).must_equal(json)
+        end
 
-        #   it 'should end the process' do
-        #     _(execution.ended?).must_equal true
-        #     _(user_step.ended?).must_equal true
-        #   end
-        # end
+        describe :execution_after_serialization do
+          let (:user_step) { new_execution.step_by_id('IntroduceYourself') }
+
+          before { user_step.invoke(variables: { name: "Eric", language: "it", formal: false }) }
+
+          it 'should end the process' do
+            _(new_execution.ended?).must_equal true
+            _(user_step.ended?).must_equal true
+          end
+        end
       end
     end
   end

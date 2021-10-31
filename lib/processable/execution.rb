@@ -3,7 +3,7 @@ module Processable
     include ActiveModel::Model
     include ActiveModel::Serializers::JSON
 
-    attr_accessor :id, :process_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id, :steps
+    attr_accessor :id, :process_id, :start_event_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id, :steps
     attr_accessor :context, :process, :start_event
 
     delegate :element_by_id, to: :process
@@ -15,18 +15,19 @@ module Processable
       raise ExecutionError.new("Process with id #{process_id} not found.") unless process
       start_event = start_event_id ? process.start_events.find { |se| se.id == start_event_id } : process.default_start_event
       raise ExecutionError.new("Start event with id #{start_event_id} not found for process #{process_id}.") unless start_event
-      Execution.new(context: context, process: process, start_event: start_event, variables: variables).tap { |e| process.execute(e) } 
+      Execution.new(context: context, process_id: process&.id, start_event_id: start_event&.id, variables: variables).tap { |e| process.execute(e) } 
     end
 
     def initialize(attributes={})
-      super
-      @id ||= SecureRandom.uuid
-      @process_id ||= process&.id
-      @start_event_id ||= start_event&.id
-      @status ||= 'initialized'
-      @variables ||= {}
-      @called_by_id ||= called_by&.id
-      @steps ||= []
+      super.tap do
+        @id ||= SecureRandom.uuid
+        @process_id ||= process&.id
+        @start_event_id ||= start_event_id
+        @status ||= 'initialized'
+        @variables ||= {}
+        @called_by_id ||= called_by_id
+        @steps ||= []
+      end
     end
 
     def process
@@ -150,6 +151,34 @@ module Processable
 
     def attributes
       { 'id': nil, 'process_id': nil, 'status': nil, 'started_at': nil, 'ended_at': nil, 'variables': nil, 'parent_id': nil, 'called_by_id': nil }
+    end
+
+    def as_json(options = {})
+      {
+        id: id,
+        process_id: process_id,
+        status: status,
+        started_at: started_at,
+        ended_at: ended_at,
+        variables: variables,
+        parent_id: parent_id,
+        called_by_id: called_by_id,
+        steps: steps.map { |step| step.as_json }
+      }.compact
+    end
+
+    def serialize
+      to_json
+    end
+
+    def self.deserialize(json, context:)
+      attrs = JSON.parse(json)
+      steps_attrs = attrs.delete('steps')
+      Execution.new(attrs.merge(context: context)).tap do |e|
+        e.steps = steps_attrs.map do |sa|
+          StepExecution.new(sa.merge(execution: e))
+        end
+      end
     end
 
     private
