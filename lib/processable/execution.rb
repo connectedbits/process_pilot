@@ -1,11 +1,16 @@
 module Processable
   class Execution
-    attr_reader :context, :process, :start_event, :variables, :parent, :called_by
-    attr_reader :id, :status, :steps, :started_at, :ended_at
+    include ActiveModel::Model
+    include ActiveModel::Serializers::JSON
 
+    attr_accessor :id, :process_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id, :steps
+    attr_accessor :context, :process, :start_event
+
+    delegate :element_by_id, to: :process
     delegate :async_services?, to: :context
+    delegate :print, to: :printer
 
-    def self.start(context:, process_id:, start_event_id: nil, variables: {}, key: nil)
+    def self.start(context:, process_id:, start_event_id: nil, variables: {})
       process = context.process_by_id(process_id)
       raise ExecutionError.new("Process with id #{process_id} not found.") unless process
       start_event = start_event_id ? process.start_events.find { |se| se.id == start_event_id } : process.default_start_event
@@ -13,17 +18,31 @@ module Processable
       Execution.new(context: context, process: process, start_event: start_event, variables: variables).tap { |e| process.execute(e) } 
     end
 
-    def initialize(context:, process:, start_event: nil, variables: {}, parent: nil, called_by: nil)
-      @context = context
-      @id = SecureRandom.uuid
-      @process = process
-      @start_event = start_event
-      @variables = variables
-      @parent = parent
-      @called_by = called_by
+    def initialize(attributes={})
+      super
+      @id ||= SecureRandom.uuid
+      @process_id ||= process&.id
+      @start_event_id ||= start_event&.id
+      @status ||= 'initialized'
+      @variables ||= {}
+      @called_by_id ||= called_by&.id
+      @steps ||= []
+    end
 
-      @status = 'created'
-      @steps = []
+    def process
+      @process ||= context.process_by_id(process_id)
+    end
+    
+    def start_event
+      @start_event ||= process&.element_by_id(start_event_id)
+    end
+
+    def parent
+      @parent ||= parent_id ? context.execution_by_id(parent_id) : nil
+    end
+
+    def called_by
+      @called_by ||= called_by_id ? parent&.steps.find { |step| step.id == called_by_id } : nil
     end
 
     def message_received(message_name, variables: {})
@@ -52,31 +71,6 @@ module Processable
     def end
       @ended_at = Time.now
       update_status('ended')
-    end
-
-    def evaluate_condition(condition)
-      evaluate_expression(condition.body) == true
-    end
-
-    def evaluate_expression(expression)
-      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: variables)
-    end
-
-    def evaluate_decision(decision_ref)
-      source = context.decisions[decision_ref]
-      raise ExecutionError.new("Decision #{decision_ref} not found.") unless source
-      ProcessableServices::DecisionEvaluator.call(decision_ref, source, variables)
-    end
-
-    def call_service(topic)
-      service = context.services[topic.to_sym]
-      raise ExecutionError.new("Service #{topic} not found.") unless service
-      service.call(variables)
-    end
-
-    def run_script(script)
-      raise ExecutionError.new("Script #{script} can't be blank.") unless script.present?
-      ProcessableServices::ScriptRunner.call(script: script, variables: variables, utils: context.utils)
     end
 
     def step_waiting(step)
@@ -142,61 +136,20 @@ module Processable
       active_tokens.uniq
     end
 
-    def step_by_id(id)
-      steps.find { |step| step.element.id == id }
+    def steps_by_id(id)
+      steps.select { |step| step.element.id == id }
     end
 
-    #
-    # Debug
-    #
-
-    def print
-      puts
-      puts "#{process.id} #{status} * #{tokens.join(', ')}"
-      print_variables unless variables.empty?
-      print_steps
-      puts
+    def step_by_id(id, latest: true)
+      latest ? steps_by_id(id).last : steps_by_id(id).first
     end
 
-    def print_steps
-      puts
-      steps.each_with_index do |step, index|
-        str = "#{index} #{step.element.type.split(':').last} #{step.element.id}: #{step.status} #{step.variables unless step.variables.empty? }".strip
-        str = "#{str} * in: #{step.tokens_in.join(', ')}" if step.tokens_in.present?
-        str = "#{str} * out: #{step.tokens_out.join(', ')}" if step.tokens_out.present?
-        puts str
-      end
+    def printer
+      @printer ||= Printer.new(self)
     end
 
-    def print_variables
-      puts
-      puts JSON.pretty_generate(variables)
-    end
-
-    #
-    # Serialization
-    #
-
-    def from_json(json)
-      instance.from_json(json)
-    end
-    
-    def to_json
-      instance.to_json
-    end
-
-    def instance
-      ProcessInstance.new(
-        id: id,
-        process_id: process.id,
-        status: status, 
-        started_at: started_at, 
-        ended_at: ended_at, 
-        variables: variables, 
-        parent_id: parent&.id,
-        called_by_id: called_by&.id,
-        steps: steps.map { |step| step.instance }
-      )
+    def attributes
+      { 'id': nil, 'process_id': nil, 'status': nil, 'started_at': nil, 'ended_at': nil, 'variables': nil, 'parent_id': nil, 'called_by_id': nil }
     end
 
     private
@@ -206,7 +159,7 @@ module Processable
       if step
         step.tokens_in.push token
       else
-        step = StepExecution.new(execution: self, element: element, token: token, attached_to: attached_to) 
+        step = StepExecution.new_for_execution(execution: self, element: element, token: token, attached_to: attached_to) 
         attached_to&.attachments.push step if attached_to
         steps.push step
       end
@@ -227,30 +180,36 @@ module Processable
     end
   end
 
-  class ProcessInstance
-    include ActiveModel::Model
-    include ActiveModel::Serializers::JSON
-  
-    attr_accessor :id, :process_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id, :steps
+  class Printer
+    attr_accessor :execution
 
-    def attributes=(hash)
-      hash.each do |key, value|
-        send("#{key}=", value)
+    delegate :process_id, :status, :tokens, :variables, :steps, to: :execution
+
+    def initialize(execution)
+      @execution = execution
+    end
+
+    def print
+      puts
+      puts "#{process_id} #{status} * #{tokens.join(', ')}"
+      print_variables unless variables.empty?
+      print_steps
+      puts
+    end
+
+    def print_steps
+      puts
+      steps.each_with_index do |step, index|
+        str = "#{index} #{step.element.type.split(':').last} #{step.element.id}: #{step.status} #{step.variables unless step.variables.empty? }".strip
+        str = "#{str} * in: #{step.tokens_in.join(', ')}" if step.tokens_in.present?
+        str = "#{str} * out: #{step.tokens_out.join(', ')}" if step.tokens_out.present?
+        puts str
       end
     end
-   
-    def attributes
-      {
-        'id' => nil,
-        'process_id' => nil,
-        'status' => nil,
-        'started_at' => nil,
-        'ended_at' => nil,
-        'variables' => nil,
-        'parent_id' => nil,
-        'called_by_id' => nil,
-        'steps' => nil
-      }
+
+    def print_variables
+      puts
+      puts JSON.pretty_generate(variables)
     end
   end
 end

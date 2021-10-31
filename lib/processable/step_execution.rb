@@ -1,22 +1,37 @@
 module Processable
   class StepExecution
-    attr_reader :id, :status, :execution, :element, :tokens_in, :tokens_out, :variables, :attached_to, :attachments, :message_names, :expires_at
-    attr_accessor :started_at, :ended_at
+    include ActiveModel::Model
+    include ActiveModel::Serializers::JSON
 
-    delegate :evaluate_condition, :evaluate_expression, :evaluate_decision, :run_script, :call_service, :async_services?, to: :execution
+    attr_accessor :id, :element_id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :message_names, :expires_at, :attached_to_id
+    attr_accessor :execution, :element, :attached_to
 
-    def initialize(execution:, element:, token: nil, attached_to: nil)
-      @id = SecureRandom.uuid
-      @status = 'created'
-      @execution = execution
-      @element = element
-      @tokens_in = token ? [token] : []
-      @tokens_out = []
-      @variables = {}
-      @attached_to = attached_to
-      @attachments = []
-      @message_names = []
-      @expires_at = nil
+    delegate :context, :element_by_id, :evaluate_condition, :evaluate_expression, :evaluate_decision, :run_script, :call_service, :async_services?, to: :execution
+
+    def self.new_for_execution(execution:, element:, token: nil, attached_to: nil)
+      StepExecution.new(execution: execution, element_id: element.id, tokens_in: token ? [token] : [], attached_to_id: attached_to&.id)
+    end
+
+    def initialize(attributes={})
+      super
+      @id ||= SecureRandom.uuid
+      @status ||= 'initialized'
+      @variables ||= {}
+      @tokens_in ||= []
+      @tokens_out ||= []
+      @message_names ||= []
+    end
+
+    def element
+      @element ||= element_by_id(element_id)
+    end
+
+    def attached_to
+      @attached_to ||= attached_to_id ? execution.steps.find { |step| step.id == attached_to_id } : nil
+    end
+
+    def attachments
+      execution.steps.select { |step| step.attached_to_id == id }
     end
 
     def start
@@ -46,6 +61,31 @@ module Processable
       @ended_at = Time.now
       @tokens_out = element.outgoing_flows(self).map { |flow| flow.id }
       update_status('ended')
+    end
+
+    def evaluate_condition(condition)
+      evaluate_expression(condition.body) == true
+    end
+
+    def evaluate_expression(expression)
+      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: execution.variables)
+    end
+
+    def evaluate_decision(decision_ref)
+      source = context.decisions[decision_ref]
+      raise ExecutionError.new("Decision #{decision_ref} not found.") unless source
+      ProcessableServices::DecisionEvaluator.call(decision_ref, source, execution.variables)
+    end
+
+    def call_service(topic)
+      service = context.services[topic.to_sym]
+      raise ExecutionError.new("Service #{topic} not found.") unless service
+      service.call(execution.variables)
+    end
+
+    def run_script(script)
+      raise ExecutionError.new("Script #{script} can't be blank.") unless script.present?
+      ProcessableServices::ScriptRunner.call(script: script, variables: execution.variables, utils: context.utils)
     end
 
     def set_timer(expires_at)
@@ -84,25 +124,8 @@ module Processable
       execution.steps.select { |step| (step.tokens_in & tokens_out).length > 0 }
     end
 
-    #
-    # Serialization
-    #
-
-    def instance
-      StepInstance.new(
-        id: id,
-        element_id: element.id,
-        status: status, 
-        started_at: started_at, 
-        ended_at: ended_at, 
-        variables: variables, 
-        tokens_in: tokens_in, 
-        tokens_out: tokens_out,
-        message_names: message_names,
-        expires_at: expires_at,
-        attached_to_id: attached_to&.id,
-        attachment_ids: attachments.map { |attachment| attachment.id }
-      )
+    def attributes
+      { 'id': nil, 'element_id': nil, 'status': nil, 'started_at': nil, 'ended_at': nil, 'variables': nil, 'tokens_in': nil, 'tokens_out': nil, 'message_names': nil, 'expires_at': nil, 'attached_to_id': nil }
     end
 
     private
@@ -111,36 +134,6 @@ module Processable
       @status = status
       event = "step_#{status}".to_sym
       execution.send(event, self) if execution.respond_to?(event)
-    end
-  end
-
-  class StepInstance
-    include ActiveModel::Model
-    include ActiveModel::Serializers::JSON
-  
-    attr_accessor :id, :element_id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :message_names, :expires_at, :attached_to_id, :attachment_ids
-
-    def attributes=(hash)
-      hash.each do |key, value|
-        send("#{key}=", value)
-      end
-    end
-   
-    def attributes
-      {
-        'id' => nil,
-        'element_id' => nil,
-        'status' => nil,
-        'started_at' => nil,
-        'ended_at' => nil,
-        'variables' => nil,
-        'tokens_in' => nil,
-        'tokens_out' => nil,
-        'message_names' => nil,
-        'expires_at' => nil,
-        'attached_to_id' => nil,
-        'attachment_ids' => nil,
-      }
     end
   end
 end
