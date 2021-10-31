@@ -6,7 +6,7 @@ module Processable
     attr_accessor :id, :element_id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :message_names, :expires_at, :attached_to_id
     attr_accessor :execution, :element, :attached_to
 
-    delegate :context, :element_by_id, :evaluate_condition, :evaluate_expression, :evaluate_decision, :run_script, :call_service, :async_services?, to: :execution
+    delegate :context, :element_by_id, :evaluate_condition, :evaluate_expression, :evaluate_decision, :run_script, :call_service, :external_services?, to: :execution
 
     def self.new_for_execution(execution:, element:, token: nil, attached_to: nil)
       StepExecution.new(execution: execution, element_id: element.id, tokens_in: token ? [token] : [], attached_to_id: attached_to&.id)

@@ -7,7 +7,7 @@ module Processable
     attr_accessor :context, :process, :start_event
 
     delegate :element_by_id, to: :process
-    delegate :async_services?, to: :context
+    delegate :external_services?, to: :context
     delegate :print, to: :printer
 
     def self.start(context:, process_id:, start_event_id: nil, variables: {})

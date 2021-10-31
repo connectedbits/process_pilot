@@ -42,7 +42,7 @@ module Bpmn
     end
 
     def execute(step_execution)
-      if step_execution.async_services?
+      if step_execution.external_services?
         step_execution.wait 
       else
         run(step_execution)

@@ -69,8 +69,8 @@ module Bpmn
         _(service_step.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
       end
 
-      describe :async_services do
-        let(:context) { Processable::Context.new(sources: source, services: services, async_services: true) }
+      describe :external_services do
+        let(:context) { Processable::Context.new(sources: source, services: services, external_services: true) }
 
         before { @execution = Processable::Execution.start(context: context, process_id: 'ServiceTaskTest', variables: { name: "Eric" })  }
 

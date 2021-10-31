@@ -3,11 +3,11 @@ module Processable
     attr_reader :processes, :decisions
     attr_accessor :services, :listeners, :utils
 
-    def initialize(sources: nil, services: {}, listeners: {}, utils: {}, async_services: false)
+    def initialize(sources: nil, services: {}, listeners: {}, utils: {}, external_services: false)
       @services = services
       @listeners = listeners
 
-      @async_services = async_services
+      @external_services = external_services
 
       @processes = []
       @decisions = {}
@@ -29,8 +29,8 @@ module Processable
       processes.find { |p| p.id == id }
     end
 
-    def async_services?
-      @async_services
+    def external_services?
+      @external_services
     end
   end
 end
