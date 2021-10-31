@@ -26,11 +26,6 @@ module Bpmn
   end
 
   class UserTask < Task
-
-    def execute(step_execution)
-      super
-      step_execution.wait
-    end
   end
 
   class ServiceTask < Task

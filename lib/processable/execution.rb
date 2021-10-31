@@ -198,6 +198,7 @@ module Processable
     def update_status(status)
       @status = status
       event = "process_#{status}".to_sym
+      context.notify_listener({ event: event, execution: self })
     end
 
     def start_attachments(step)

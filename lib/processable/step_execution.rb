@@ -150,6 +150,8 @@ module Processable
     def update_status(status)
       @status = status
       event = "step_#{status}".to_sym
+      ap event
+      context.notify_listener({ event: event, execution: self })
       execution.send(event, self) if execution.respond_to?(event)
     end
   end

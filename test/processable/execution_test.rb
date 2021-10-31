@@ -66,7 +66,17 @@ module Processable
         },
       }
     }
-    let(:context) { Context.new(sources: [bpmn_source, dmn_source], services: services) }
+    let(:log) { @log }
+    let(:listeners) { 
+      {
+        process_started: proc { |event| log.push event },
+        step_waiting: proc { |event| log.push event },
+        step_ended: proc { |event| log.push event },
+        process_ended: proc { |event| log.push event },
+      }
+    }
+    let(:last)
+    let(:context) { Context.new(sources: [bpmn_source, dmn_source], services: services, listeners: listeners) }
     let(:process) { context.process_by_id('HelloWorld') }
 
     describe :definition do
@@ -81,11 +91,15 @@ module Processable
       let(:execution) { @execution }
       let(:user_step) { execution.step_by_id('IntroduceYourself') }
 
-      before { @execution = Execution.start(context: context, process_id: 'HelloWorld', variables: { greet: true, cookie: true }) }
+      before do 
+        @log = []
+        @execution = Execution.start(context: context, process_id: 'HelloWorld', variables: { greet: true, cookie: true })
+      end
 
       it 'should start the process' do
         _(execution.started?).must_equal true
         _(user_step.waiting?).must_equal true
+        _(log.last[:event]).must_equal :step_waiting
       end
 
       describe :invoke do

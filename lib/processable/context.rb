@@ -25,6 +25,10 @@ module Processable
       end
     end
 
+    def notify_listener(event)
+      listeners[event[:event]].call(event) if listeners[event[:event]]
+    end
+
     def process_by_id(id)
       processes.find { |p| p.id == id }
     end
