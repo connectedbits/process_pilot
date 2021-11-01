@@ -1,18 +1,6 @@
 require "test_helper"
 
 module Bpmn
-  describe ConditionalEventDefinition do
-    let(:source) { fixture_source("conditional_event_definition_test.bpmn") }
-    let(:context) { Processable::Context.new(sources: source) }
-    let(:process) { context.process_by_id("ConditionalEventDefinitionTest") }
-  end
-
-  describe EscalationEventDefinition do
-    let(:source) { fixture_source("escalation_event_definition_test.bpmn") }
-    let(:context) { Processable::Context.new(sources: source) }
-    let(:process) { context.process_by_id("EscalationEventDefinitionTest") }
-  end
-
   describe ErrorEventDefinition do
     let(:source) { fixture_source("error_event_definition_test.bpmn") }
     let(:services) { { raise_error: proc { |variables| x = x } } }
@@ -136,12 +124,6 @@ module Bpmn
         end
       end
     end
-  end
-
-  describe SignalEventDefinition do
-    let(:source) { fixture_source("signal_event_definition_test.bpmn") }
-    let(:context) { Processable::Context.new(sources: source) }
-    let(:process) { context.process_by_id("SignalEventDefinitionTest") }
   end
 
   describe TerminateEventDefinition do

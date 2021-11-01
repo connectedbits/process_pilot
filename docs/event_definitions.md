@@ -2,15 +2,9 @@
 
 Event definitions futher describe the behavior of an event.
 
-## Conditional Event Definition
-
-## Escalation Event Definition
-
 ## Error Event Definition
 
 ## Message Event Definition
-
-## Signal Event Definition
 
 ## Terminate Event Definition
 
