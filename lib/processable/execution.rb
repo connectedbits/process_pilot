@@ -93,6 +93,8 @@ module Processable
       if element.is_a?(Bpmn::Event) &&
         if element.is_a?(Bpmn::BoundaryEvent) && element.cancel_activity
           step.attached_to&.terminate
+        elsif element.is_a?(Bpmn::EndEvent) && element.is_terminate?
+          steps.each { |s| s.terminate if s.waiting? }
         else
           source = step.sources.first
           if source && source.element.is_a?(Bpmn::EventBasedGateway)

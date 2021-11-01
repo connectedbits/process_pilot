@@ -8,9 +8,7 @@ module Bpmn
       super
       @event_definitions = []
       @event_definition_ids = []
-
       @event_definition_ids = moddle["eventDefinitions"].map do |edm|
-        #Element.from_moddle(edm)
         edm["id"]
       end if moddle["eventDefinitions"]
     end

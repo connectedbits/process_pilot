@@ -75,9 +75,8 @@ module Bpmn
 
   class TerminateEventDefinition < EventDefinition
 
-    def execute(host_element, execution)
-      return unless host_element.is_a?(Bpmn:EndEvent)
-      execution.terminate
+    def execute(_host_element, execution)
+
     end
   end
 
@@ -86,9 +85,9 @@ module Bpmn
 
     def initialize(moddle)
       super
-      if moddle['timeDuration']
-        @time_duration_type = moddle['timeDuration']['$type']
-        @time_duration = moddle['timeDuration']['body']
+      if moddle["timeDuration"]
+        @time_duration_type = moddle["timeDuration"]["$type"]
+        @time_duration = moddle["timeDuration"]["body"]
       end
     end
 
