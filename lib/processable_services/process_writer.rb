@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProcessableServices
   class ProcessWriter < ApplicationService
     PROCESS_WRITER_BIN = File.expand_path(File.dirname(__FILE__)) + "/process_writer.js"

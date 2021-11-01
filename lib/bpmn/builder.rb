@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Bpmn
   class Builder
     attr_reader :id, :name, :elements, :processes, :messages, :signals, :errors
 
-    def initialize(moddle)      
+    def initialize(moddle)
       root_element = moddle["rootElement"]
       @id = root_element["id"]
       @name = root_element["name"]

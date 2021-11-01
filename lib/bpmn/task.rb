@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bpmn
   class Task < Activity
     attr_accessor :result_variable
@@ -38,7 +40,7 @@ module Bpmn
 
     def execute(step_execution)
       if step_execution.external_services?
-        step_execution.wait 
+        step_execution.wait
       else
         run(step_execution)
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bpmn
   class Event < Step
     attr_accessor :event_definitions, :event_definition_ids
@@ -7,10 +9,10 @@ module Bpmn
       @event_definitions = []
       @event_definition_ids = []
 
-      @event_definition_ids = moddle['eventDefinitions'].map do |edm|
+      @event_definition_ids = moddle["eventDefinitions"].map do |edm|
         #Element.from_moddle(edm)
         edm["id"]
-      end if moddle['eventDefinitions']
+      end if moddle["eventDefinitions"]
     end
 
     def is_catching?
@@ -54,31 +56,31 @@ module Bpmn
     end
 
     def conditional_event_definition
-      event_definitions.find {|ed| ed.is_a?(Bpmn::ConditionalEventDefinition) }
+      event_definitions.find { |ed| ed.is_a?(Bpmn::ConditionalEventDefinition) }
     end
 
     def escalation_event_definition
-      event_definitions.find {|ed| ed.is_a?(Bpmn::EscalationEventDefinition) }
+      event_definitions.find { |ed| ed.is_a?(Bpmn::EscalationEventDefinition) }
     end
 
     def error_event_definition
-      event_definitions.find {|ed| ed.is_a?(Bpmn::ErrorEventDefinition) }
+      event_definitions.find { |ed| ed.is_a?(Bpmn::ErrorEventDefinition) }
     end
 
     def message_event_definitions
-      event_definitions.select {|ed| ed.is_a?(Bpmn::MessageEventDefinition) }
+      event_definitions.select { |ed| ed.is_a?(Bpmn::MessageEventDefinition) }
     end
 
     def signal_event_definitions
-      event_definitions.select {|ed| ed.is_a?(Bpmn::SignalEventDefinition) }
+      event_definitions.select { |ed| ed.is_a?(Bpmn::SignalEventDefinition) }
     end
 
     def terminate_event_definition
-      event_definitions.find {|ed| ed.is_a?(Bpmn::TerminateEventDefinition) }
+      event_definitions.find { |ed| ed.is_a?(Bpmn::TerminateEventDefinition) }
     end
 
     def timer_event_definition
-      event_definitions.find {|ed| ed.is_a?(Bpmn::TimerEventDefinition) }
+      event_definitions.find { |ed| ed.is_a?(Bpmn::TimerEventDefinition) }
     end
 
     def execute(step_execution)
@@ -100,7 +102,7 @@ module Bpmn
   end
 
   class IntermediateThrowEvent < Event
-  
+
     def is_throwing?
       true
     end
@@ -137,13 +139,6 @@ module Bpmn
       true
     end
 
-    def initialize(moddle)
-      super
-      @attached_to_ref = moddle[:attachedToRef]
-      @cancel_activity = true
-      @cancel_activity = moddle["cancelActivity"] if moddle["cancelActivity"] != nil
-    end
-    
     def execute(step_execution)
       super
       step_execution.wait
@@ -155,7 +150,7 @@ module Bpmn
     def is_throwing?
       true
     end
-    
+
     def execute(step_execution)
       super
       step_execution.end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProcessableServices
   class FeelEvaluator < ApplicationService
     FEEL_EVALUATOR_BIN = File.expand_path(File.dirname(__FILE__)) + "/feel_evaluator.js"

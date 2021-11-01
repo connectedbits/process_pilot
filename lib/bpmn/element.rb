@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bpmn
   class Element
     attr_accessor :type, :id, :name

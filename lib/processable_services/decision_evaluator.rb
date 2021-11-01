@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProcessableServices
   class DecisionEvaluator < ApplicationService
     EVALUATE_BIN = File.expand_path(File.dirname(__FILE__)) + "/decision_evaluator.js"

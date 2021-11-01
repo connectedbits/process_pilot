@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProcessableServices
   class JsonLogicEvaluator < ApplicationService
     attr_reader :expression, :variables

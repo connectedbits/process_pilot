@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Bpmn
   class EventDefinition < Element
 
     def execute(host_element, execution)
     end
   end
-  
+
   class ConditionalEventDefinition < EventDefinition
     attr_accessor :variable_name, :variable_events, :condition
 
@@ -90,7 +92,7 @@ module Bpmn
       end
     end
 
-    def execute(host_element, step_execution)
+    def execute(_host_element, step_execution)
       step_execution.set_timer(time_due)
     end
 
@@ -101,9 +103,9 @@ module Bpmn
       if time_date
         return Date.parse(time_date)
       elsif time_duration
-        return Time.now + ActiveSupport::Duration.parse(time_duration)
+        return Time.zone.now + ActiveSupport::Duration.parse(time_duration)
       else
-        return Time.now # time_cycle not yet implemented
+        return Time.zone.now # time_cycle not yet implemented
       end
     end
   end

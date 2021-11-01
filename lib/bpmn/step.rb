@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bpmn
   class Step < Element
     attr_accessor :incoming, :outgoing, :default
@@ -19,12 +21,6 @@ module Bpmn
 
     def converging?
       incoming.length > 1
-    end
-
-    def outgoing_flows(step_execution)
-      flows = []
-      outgoing.each { |flow| flows.push flow if flow.evaluate(step_execution) }
-      return flows
     end
 
     def outgoing_flows(step_execution)

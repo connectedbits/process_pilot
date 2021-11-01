@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bpmn
   class Flow < Element
     attr_accessor :source_ref, :target_ref

@@ -11,6 +11,9 @@ end
 group :development do
   gem 'puma'
   gem 'solargraph'
+  gem "rubocop", require: false
+  gem "rubocop-performance", require: false
+  gem "rubocop-rails", require: false
 end
 
 group :test do

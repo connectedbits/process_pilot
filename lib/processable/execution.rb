@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Processable
   class Execution
     include ActiveModel::Model
@@ -33,7 +35,7 @@ module Processable
     def process
       @process ||= context.process_by_id(process_id)
     end
-    
+
     def start_event
       @start_event ||= process&.element_by_id(start_event_id)
     end

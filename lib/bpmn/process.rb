@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bpmn
   class Process < Element
     attr_accessor :is_executable

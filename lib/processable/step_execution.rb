@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Processable
   class StepExecution
     include ActiveModel::Model
@@ -15,7 +17,7 @@ module Processable
     def initialize(attributes={})
       super.tap do
         @id ||= SecureRandom.uuid
-        @status ||= 'initialized'
+        @status ||= "initialized"
         @variables ||= {}
         @tokens_in ||= []
         @tokens_out ||= []
@@ -36,12 +38,12 @@ module Processable
     end
 
     def start
-      @started_at = Time.now
-      update_status('started')
+      @started_at = Time.zone.now
+      update_status("started")
     end
 
     def wait
-      update_status('waiting')
+      update_status("waiting")
     end
 
     def invoke(variables: {})
@@ -51,7 +53,7 @@ module Processable
 
     def terminate
       @ended_at = Time.now
-      update_status('terminated')
+      update_status("terminated")
     end
 
     def continue
@@ -61,7 +63,7 @@ module Processable
     def end
       @ended_at = Time.now
       @tokens_out = element.outgoing_flows(self).map { |flow| flow.id }
-      update_status('ended')
+      update_status("ended")
     end
 
     def evaluate_condition(condition)
@@ -102,19 +104,19 @@ module Processable
     end
 
     def started?
-      status == 'started'
+      status == "started"
     end
 
     def waiting?
-      status == 'waiting'
+      status == "waiting"
     end
 
     def ended?
-      status == 'ended'
+      status == "ended"
     end
 
     def terminated?
-      status == 'terminated'
+      status == "terminated"
     end
 
     def sources
@@ -129,19 +131,19 @@ module Processable
       { 'id': nil, 'element_id': nil, 'status': nil, 'started_at': nil, 'ended_at': nil, 'variables': nil, 'tokens_in': nil, 'tokens_out': nil, 'message_names': nil, 'expires_at': nil, 'attached_to_id': nil }
     end
 
-    def as_json(options = {})
+    def as_json(_options = {})
       {
-        id: id,
-        element_id: element_id,
-        status: status,
-        started_at: started_at,
-        ended_at: ended_at,
-        variables: variables,
-        tokens_in: tokens_in,
-        tokens_out: tokens_out,
-        message_names: message_names,
-        expires_at: expires_at,
-        attached_to_id: attached_to_id
+        id:              id,
+        element_id:      element_id,
+        status:          status,
+        started_at:      started_at,
+        ended_at:        ended_at,
+        variables:       variables,
+        tokens_in:       tokens_in,
+        tokens_out:      tokens_out,
+        message_names:   message_names,
+        expires_at:      expires_at,
+        attached_to_id:  attached_to_id,
       }.compact
     end
 

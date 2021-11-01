@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bpmn
   class Expression < Element
     attr_accessor :body, :language
@@ -34,6 +36,6 @@ module Bpmn
   end
 
   class ConditionExpression < Expression
-    
+
   end
 end

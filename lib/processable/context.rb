@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Processable
   class Context
     attr_reader :processes, :decisions
@@ -14,7 +16,7 @@ module Processable
       @instances = []
 
       Array.wrap(sources).each do |source|
-        if source.include?('http://www.omg.org/spec/DMN/20180521/DC/')
+        if source.include?("http://www.omg.org/spec/DMN/20180521/DC/")
           moddle = ProcessableServices::DecisionReader.call(source)
           moddle["drgElement"].each { |d| decisions[d["id"]] = source}
         else

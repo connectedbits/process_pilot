@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProcessableServices
   class ScriptRunner < ApplicationService
     attr_reader :script, :variables, :utils

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Processable
   class ExecutionError < StandardError
     attr_reader :execution
