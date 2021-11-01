@@ -42,27 +42,27 @@ module Bpmn
   end
 
   describe ServiceTask do
-    let(:source) { fixture_source('service_task_test.bpmn') }
-    let(:services) { { do_it: proc { |variables| "👋 Hello #{variables['name']}, from ServiceTask!" } } }
+    let(:source) { fixture_source("service_task_test.bpmn") }
+    let(:services) { { do_it: proc { |step| "👋 Hello #{step.variables['name']}, from ServiceTask!" } } }
     let(:context) { Processable::Context.new(sources: source, services: services) }
-    let(:process) { context.process_by_id('ServiceTaskTest') }
+    let(:process) { context.process_by_id("ServiceTaskTest") }
 
     describe :definition do
-      let(:service_task) { process.element_by_id('ServiceTask') }
+      let(:service_task) { process.element_by_id("ServiceTask") }
 
-      it 'should parse the service task' do
+      it "should parse the service task" do
         _(service_task).wont_be_nil
-        _(service_task.topic).must_equal 'do_it'
+        _(service_task.topic).must_equal "do_it"
       end
     end
 
     describe :execution do
       let(:execution) { @execution }
-      let(:service_step) { execution.step_by_id('ServiceTask') }
+      let(:service_step) { execution.step_by_id("ServiceTask") }
 
-      before { @execution = Processable::Execution.start(context: context, process_id: 'ServiceTaskTest', variables: { name: "Eric" }) } 
+      before { @execution = Processable::Execution.start(context: context, process_id: "ServiceTaskTest", variables: { name: "Eric" }) } 
 
-      it 'should run the service task' do
+      it "should run the service task" do
         _(execution.ended?).must_equal true
         _(service_step.ended?).must_equal true
         _(execution.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"

@@ -15,8 +15,32 @@ module Bpmn
 
   describe ErrorEventDefinition do
     let(:source) { fixture_source("error_event_definition_test.bpmn") }
-    let(:context) { Processable::Context.new(sources: source) }
+    let(:services) { { raise_error: proc { |variables| x = x } } }
+    let(:context) { Processable::Context.new(sources: source, services: services) }
     let(:process) { context.process_by_id("ErrorEventDefinitionTest") }
+
+    describe :definitions do
+      let(:start_step) { process.element_by_id("Start") }
+      let(:task) { process.element_by_id("Task") }
+      let(:error_step) { process.element_by_id("Error") }
+      let(:end_step) { process.element_by_id("End") }
+      let(:end_failed_step) { process.element_by_id("EndFailed") }
+
+      it "should parse the terminate end event" do
+        _(error_step.error_event_definition.present?).must_equal true
+      end
+    end
+
+    describe :execution do
+      let(:execution) { @execution }
+      let(:start_step) { execution.step_by_id("Start") }
+      let(:task) { execution.step_by_id("Task") }
+      let(:error_step) { execution.step_by_id("Error") }
+      let(:end_step) { execution.step_by_id("End") }
+      let(:end_failed_step) { execution.step_by_id("EndFailed") }
+
+      before { @execution = Processable::Execution.start(context: context, process_id: "ErrorEventDefinitionTest") }
+    end
   end
 
   describe MessageEventDefinition do

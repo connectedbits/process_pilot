@@ -67,9 +67,17 @@ module Processable
     end
 
     def message_received(message_name, variables: {})
-      steps.each do |step|
-        if step.waiting? && step.element.is_a?(Bpmn::Event) && step.element.is_catching?
-          step.element.message_event_definitions.each { |med| step.invoke(variables: variables) if med.message.name == message_name }
+      waiting_steps.each do |step|
+        if step.element.is_a?(Bpmn::Event) && step.element.is_catching?
+          step.element.message_event_definitions.each { |message_event_definition| step.invoke(variables: variables) if message_event_definition.message.name == message_name }
+        end
+      end
+    end
+
+    def error_received(error_name, variables: {})
+      waiting_steps.each do |step|
+        if step.element.is_a?(Bpmn::Event) && step.element.is_catching?
+          step.element.error_event_definitions.each { |error_event_definition| step.invoke(variables: variables) if error_event_definition.error.name == error_name }
         end
       end
     end
@@ -125,7 +133,6 @@ module Processable
         if element.is_throwing? && element.is_message?
           element.message_event_definitions.each do |message_event_definition|
             message_received(message_event_definition.message_name, variables: step.variables)
-            context.notify_listener({ event: :message_thrown, execution: self, message_name: message_event_definition.message_name })
           end
         end
       end

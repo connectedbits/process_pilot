@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 module Processable
@@ -6,8 +8,8 @@ module Processable
     let(:dmn_source) { fixture_source("choose_greeting.dmn") }
     let(:services) {
       {
-        tell_fortune: proc { |variables|
-          raise "Fortune not found? Abort, Retry, Ignore." if variables[:error]
+        tell_fortune: proc { |step|
+          raise "Fortune not found? Abort, Retry, Ignore." if step.variables[:error]
           [
             "The fortune you seek is in another cookie.",
             "A closed mouth gathers no feet.",
@@ -80,23 +82,23 @@ module Processable
     let(:process) { context.process_by_id("HelloWorld") }
 
     describe :definition do
-      let(:user_task) { process.element_by_id('IntroduceYourself') }
+      let(:user_task) { process.element_by_id("IntroduceYourself") }
 
-      it 'should parse the process' do
+      it "should parse the process" do
         _(user_task).wont_be_nil
       end
     end
 
     describe :execution do
       let(:execution) { @execution }
-      let(:user_step) { execution.step_by_id('IntroduceYourself') }
+      let(:user_step) { execution.step_by_id("IntroduceYourself") }
 
       before do 
         @log = []
-        @execution = Execution.start(context: context, process_id: 'HelloWorld', variables: { greet: true, cookie: true })
+        @execution = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true })
       end
 
-      it 'should start the process' do
+      it "should start the process" do
         _(execution.started?).must_equal true
         _(user_step.waiting?).must_equal true
         _(log.last[:event]).must_equal :step_waiting
@@ -105,7 +107,7 @@ module Processable
       describe :invoke do
         before { user_step.invoke(variables: { name: "Eric", language: "it", formal: false }) }
 
-        it 'should end the process' do
+        it "should end the process" do
           _(execution.ended?).must_equal true
           _(user_step.ended?).must_equal true
         end
@@ -120,16 +122,16 @@ module Processable
           @new_execution = Execution.deserialize(json, context: context)
         end
 
-        it 'should be lossless' do
+        it "should be lossless" do
           _(new_execution.serialize).must_equal(json)
         end
 
         describe :execution_after_serialization do
-          let (:user_step) { new_execution.step_by_id('IntroduceYourself') }
+          let (:user_step) { new_execution.step_by_id("IntroduceYourself") }
 
           before { user_step.invoke(variables: { name: "Eric", language: "it", formal: false }) }
 
-          it 'should end the process' do
+          it "should end the process" do
             _(new_execution.ended?).must_equal true
             _(user_step.ended?).must_equal true
           end

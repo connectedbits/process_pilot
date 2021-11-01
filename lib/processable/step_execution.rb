@@ -84,7 +84,7 @@ module Processable
     def call_service(topic)
       service = context.services[topic.to_sym]
       raise ExecutionError.new("Service #{topic} not found.") unless service
-      service.call(execution.variables)
+      service.call(execution)
     end
 
     def run_script(script)
@@ -102,6 +102,12 @@ module Processable
 
     def throw_message(message_name)
       execution.message_received(message_name)
+      context.notify_listener({ event: :message_thrown, execution: self, message_name: message_name })
+    end
+
+    def throw_error(error_name)
+      execution.error_received(error_name)
+      context.notify_listener({ event: :error_thrown, execution: self, error_name: error_name })
     end
 
     def started?

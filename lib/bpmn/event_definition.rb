@@ -22,12 +22,14 @@ module Bpmn
   end
 
   class ErrorEventDefinition < EventDefinition
+    attr_accessor :error_ref, :error
     attr_accessor :error_code_variable, :error_message_variable
 
     def initialize(moddle)
       super
-      @error_code_variable = moddle[:errorCodeVariable]
-      @error_message_variable = moddle[:errorMessageVariable]
+      @error_ref = moddle["errorRef"]
+      @error_code_variable = moddle["errorCodeVariable"]
+      @error_message_variable = moddle["errorMessageVariable"]
     end
   end
 
@@ -61,7 +63,7 @@ module Bpmn
 
     def initialize(moddle)
       super
-      @signal_ref = moddle[:signalRef]
+      @signal_ref = moddle["signalRef"]
     end
 
     def signal_id
