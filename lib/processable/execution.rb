@@ -6,7 +6,8 @@ module Processable
     include ActiveModel::Serializers::JSON
 
     attr_accessor :id, :process_id, :start_event_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id, :steps
-    attr_accessor :context, :process, :start_event
+    attr_accessor :context
+    attr_writer :process, :start_event
 
     delegate :element_by_id, to: :process
     delegate :external_services?, to: :context
@@ -25,7 +26,7 @@ module Processable
         @id ||= SecureRandom.uuid
         @process_id ||= process&.id
         @start_event_id ||= start_event_id
-        @status ||= 'initialized'
+        @status ||= "initialized"
         @variables ||= {}
         @called_by_id ||= called_by_id
         @steps ||= []
@@ -45,10 +46,10 @@ module Processable
     end
 
     def called_by
-      @called_by ||= called_by_id ? parent&.steps.find { |step| step.id == called_by_id } : nil
+      @called_by ||= parent.steps.find { |step| step.id == called_by_id } if called_by_id
     end
 
-    def message_received(message_name, variables: {})
+    def message_received(message_name, _variables: {})
       steps.each do |step|
         if step.waiting? && step.element.is_a?(Bpmn::Event) && step.element.is_catching?
           step.element.message_event_definitions.each { |med| step.invoke if med.message.name == message_name }
@@ -57,23 +58,23 @@ module Processable
     end
 
     def check_expired_timers
-      steps.each { |step| step.invoke if step.expires_at.present? && Time.now > step.expires_at } 
+      steps.each { |step| step.invoke if step.expires_at.present? && Time.zone.now > step.expires_at }
     end
 
     def start
-      @started_at = Time.now
-      update_status('started')
+      @started_at = Time.zone.now
+      update_status("started")
       execute_element(start_event)
     end
 
     def terminate
-      @ended_at = Time.now
-      update_status('terminated')
+      @ended_at = Time.zone.now
+      update_status("terminated")
     end
 
     def end
-      @ended_at = Time.now
-      update_status('ended')
+      @ended_at = Time.zone.now
+      update_status("ended")
     end
 
     def step_waiting(step)
@@ -81,10 +82,10 @@ module Processable
     end
 
     def step_terminated(step)
-      terminate_attachments(step)    
+      terminate_attachments(step)
     end
 
-    def step_ended(step)      
+    def step_ended(step)
       terminate_attachments(step)
 
       # Cancel event based gateway events?
@@ -108,8 +109,8 @@ module Processable
 
       if step.tokens_out.empty?
         all_ended = true
-        steps.each { |step| all_ended = false unless step.status == 'ended' || step.status == 'terminated' }
-        update_status('ended') if all_ended
+        steps.each { |s| all_ended = false unless s.status == "ended" || s.status == "terminated" }
+        update_status("ended") if all_ended
       else
         step.tokens_out.each do |token|
           flow = process.element_by_id(token)
@@ -119,15 +120,15 @@ module Processable
     end
 
     def started?
-      status == 'started'
+      status == "started"
     end
 
     def ended?
-      status == 'ended'
+      status == "ended"
     end
 
     def terminated?
-      status == 'terminated'
+      status == "terminated"
     end
 
     def tokens
@@ -135,7 +136,7 @@ module Processable
       steps.each do |step|
         active_tokens += step.tokens_out
         active_tokens -= step.tokens_in if step.ended?
-      end   
+      end
       active_tokens.uniq
     end
 
@@ -155,17 +156,17 @@ module Processable
       { 'id': nil, 'process_id': nil, 'status': nil, 'started_at': nil, 'ended_at': nil, 'variables': nil, 'parent_id': nil, 'called_by_id': nil }
     end
 
-    def as_json(options = {})
+    def as_json(_options = {})
       {
-        id: id,
-        process_id: process_id,
-        status: status,
-        started_at: started_at,
-        ended_at: ended_at,
-        variables: variables,
-        parent_id: parent_id,
+        id:           id,
+        process_id:   process_id,
+        status:       status,
+        started_at:   started_at,
+        ended_at:     ended_at,
+        variables:    variables,
+        parent_id:    parent_id,
         called_by_id: called_by_id,
-        steps: steps.map { |step| step.as_json }
+        steps:        steps.map { |step| step.as_json },
       }.compact
     end
 
@@ -175,7 +176,7 @@ module Processable
 
     def self.deserialize(json, context:)
       attrs = JSON.parse(json)
-      steps_attrs = attrs.delete('steps')
+      steps_attrs = attrs.delete("steps")
       Execution.new(attrs.merge(context: context)).tap do |e|
         e.steps = steps_attrs.map do |sa|
           StepExecution.new(sa.merge(execution: e))
@@ -191,10 +192,10 @@ module Processable
         step.tokens_in.push token
       else
         step = StepExecution.new_for_execution(execution: self, element: element, token: token, attached_to: attached_to) 
-        attached_to&.attachments.push step if attached_to
+        attached_to.attachments.push(step) if attached_to
         steps.push step
       end
-      element.execute(step)    
+      element.execute(step)
     end
 
     def update_status(status)

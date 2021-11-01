@@ -6,7 +6,8 @@ module Processable
     include ActiveModel::Serializers::JSON
 
     attr_accessor :id, :element_id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :message_names, :expires_at, :attached_to_id
-    attr_accessor :execution, :element, :attached_to
+    attr_accessor :execution
+    attr_writer :element, :attached_to
 
     delegate :context, :element_by_id, :evaluate_condition, :evaluate_expression, :evaluate_decision, :run_script, :call_service, :external_services?, to: :execution
 
@@ -52,7 +53,7 @@ module Processable
     end
 
     def terminate
-      @ended_at = Time.now
+      @ended_at = Time.zone.now
       update_status("terminated")
     end
 
@@ -61,7 +62,7 @@ module Processable
     end
 
     def end
-      @ended_at = Time.now
+      @ended_at = Time.zone.now
       @tokens_out = element.outgoing_flows(self).map { |flow| flow.id }
       update_status("ended")
     end
@@ -87,7 +88,7 @@ module Processable
     end
 
     def run_script(script)
-      raise ExecutionError.new("Script #{script} can't be blank.") unless script.present?
+      raise ExecutionError.new("Script #{script} can't be blank.") if script.blank?
       ProcessableServices::ScriptRunner.call(script: script, variables: execution.variables, utils: context.utils)
     end
 
@@ -133,17 +134,17 @@ module Processable
 
     def as_json(_options = {})
       {
-        id:              id,
-        element_id:      element_id,
-        status:          status,
-        started_at:      started_at,
-        ended_at:        ended_at,
-        variables:       variables,
-        tokens_in:       tokens_in,
-        tokens_out:      tokens_out,
-        message_names:   message_names,
-        expires_at:      expires_at,
-        attached_to_id:  attached_to_id,
+        id:             id,
+        element_id:     element_id,
+        status:         status,
+        started_at:     started_at,
+        ended_at:       ended_at,
+        variables:      variables,
+        tokens_in:      tokens_in,
+        tokens_out:     tokens_out,
+        message_names:  message_names,
+        expires_at:     expires_at,
+        attached_to_id: attached_to_id,
       }.compact
     end
 
