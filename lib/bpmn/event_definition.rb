@@ -42,11 +42,7 @@ module Bpmn
     end
 
     def execute(host_element, execution)
-      if host_element.is_catching?
-        execution.catch_message(message_name)
-      elsif host_element.is_throwing?
-        execution.throw_message(message_name)
-      end
+      execution.throw_message(message_name) if host_element.is_throwing?
     end
 
     def message_id

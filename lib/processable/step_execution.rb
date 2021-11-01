@@ -5,7 +5,7 @@ module Processable
     include ActiveModel::Model
     include ActiveModel::Serializers::JSON
 
-    attr_accessor :id, :element_id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :message_names, :expires_at, :attached_to_id
+    attr_accessor :id, :element_id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :expires_at, :attached_to_id, :key
     attr_accessor :execution
     attr_writer :element, :attached_to
 
@@ -22,7 +22,6 @@ module Processable
         @variables ||= {}
         @tokens_in ||= []
         @tokens_out ||= []
-        @message_names ||= []
       end
     end
 
@@ -96,10 +95,6 @@ module Processable
       @expires_at = expires_at
     end
 
-    def catch_message(message_name)
-      message_names.push message_name
-    end
-
     def throw_message(message_name)
       execution.message_received(message_name)
       context.notify_listener({ event: :message_thrown, execution: self, message_name: message_name })
@@ -135,7 +130,7 @@ module Processable
     end
 
     def attributes
-      { 'id': nil, 'element_id': nil, 'status': nil, 'started_at': nil, 'ended_at': nil, 'variables': nil, 'tokens_in': nil, 'tokens_out': nil, 'message_names': nil, 'expires_at': nil, 'attached_to_id': nil }
+      { 'id': nil, 'element_id': nil, 'status': nil, 'started_at': nil, 'ended_at': nil, 'variables': nil, 'tokens_in': nil, 'tokens_out': nil, 'expires_at': nil, 'attached_to_id': nil, 'key': nil }
     end
 
     def as_json(_options = {})
@@ -148,9 +143,9 @@ module Processable
         variables:      variables,
         tokens_in:      tokens_in,
         tokens_out:     tokens_out,
-        message_names:  message_names,
         expires_at:     expires_at,
         attached_to_id: attached_to_id,
+        key:            key,
       }.compact
     end
 
