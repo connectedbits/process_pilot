@@ -21,8 +21,97 @@ module Bpmn
 
   describe MessageEventDefinition do
     let(:source) { fixture_source("message_event_definition_test.bpmn") }
-    let(:context) { Processable::Context.new(sources: source) }
+    let(:log) { @log }
+    let(:listeners) {
+      { message_thrown:  proc { |event| log.push event } }
+    }
+    let(:context) { Processable::Context.new(sources: source, listeners: listeners) }
     let(:process) { context.process_by_id("MessageEventDefinitionTest") }
+
+    before { @log = [] }
+
+    describe :definitions do
+      let(:start_step) { process.element_by_id("Start") }
+      let(:catch_step) { process.element_by_id("Catch") }
+      let(:boundary_step) { process.element_by_id("Boundary") }
+      let(:throw_step) { process.element_by_id("Throw") }
+      let(:end_step) { process.element_by_id("End") }
+
+      it "should parse the terminate end event" do
+        _(start_step.message_event_definitions.present?).must_equal true
+        _(catch_step.message_event_definitions.present?).must_equal true
+        _(boundary_step.message_event_definitions.present?).must_equal true
+        _(throw_step.message_event_definitions.present?).must_equal true
+        _(end_step.message_event_definitions.present?).must_equal true
+      end
+    end
+
+    describe :execution do
+      let(:execution) { @execution }
+      let(:start_step) { execution.step_by_id("Start") }
+      let(:catch_step) { execution.step_by_id("Catch") }
+      let(:host_step) { execution.step_by_id("HostTask") }
+      let(:boundary_step) { execution.step_by_id("Boundary") }
+      let(:throw_step) { execution.step_by_id("Throw") }
+      let(:end_step) { execution.step_by_id("End") }
+
+      describe :start do
+        let(:executions) { @executions }
+        let(:execution) { @executions.first }
+        let(:message_name) { "Message_Start" }
+
+        before { @executions = Processable::Execution.start_with_message(context: context, message_name: message_name) }
+
+        it "should return an array of matching executions" do
+          _(executions.length).must_equal 1
+          _(execution.started?).must_equal true
+          _(catch_step.waiting?).must_equal true
+        end
+
+        describe :catch do
+          before { execution.message_received("Message_Catch", variables: { "hello": "world" }) }
+
+          it "should invoke the waiting step" do
+            _(catch_step.ended?).must_equal true
+            _(execution.variables["hello"]).must_equal "world"
+            _(host_step.waiting?).must_equal true
+          end
+
+          describe :boundary do
+            before { execution.message_received("Message_Boundary", variables: { "foo": "bar" }) }
+
+            it "should terminate the host step" do
+              _(boundary_step.ended?).must_equal true
+              _(execution.variables["foo"]).must_equal "bar"
+              _(host_step.terminated?).must_equal true
+              _(end_step.ended?).must_equal true
+            end
+          end
+
+          describe :throw do
+            before { host_step.invoke }
+
+            it "should throw a message" do
+              _(execution.ended?).must_equal true
+              _(host_step.ended?).must_equal true
+              _(boundary_step.terminated?).must_equal true
+              _(end_step.ended?).must_equal true
+              _(log.length).must_equal 2
+              _(log.first[:message_name]).must_equal "Message_Throw"
+              _(log.last[:message_name]).must_equal "Message_End"
+            end
+          end
+        end
+
+        describe :no_matches do
+          let(:message_name) { "Message_NoMatch" }
+
+          it "should not start any executions" do
+            _(executions.present?).must_equal false
+          end
+        end
+      end
+    end
   end
 
   describe SignalEventDefinition do
@@ -113,7 +202,7 @@ module Bpmn
       end
 
       describe :before_timer_expiration do
-        before do 
+        before do
           Timecop.travel(15.seconds)
           execution.check_expired_timers
         end
@@ -124,7 +213,7 @@ module Bpmn
       end
 
       describe :after_timer_expiration do
-        before do 
+        before do
           Timecop.travel(35.seconds)
           execution.check_expired_timers
         end

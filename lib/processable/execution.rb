@@ -21,6 +21,23 @@ module Processable
       Execution.new(context: context, process_id: process&.id, start_event_id: start_event&.id, variables: variables).tap { |e| process.execute(e) } 
     end
 
+    def self.start_with_message(context:, message_name:, variables: {})
+      [].tap do |executions|
+        context.processes.map do |process|
+          process.start_events.map do |start_event|
+            start_event.message_event_definitions.map do |message_event_definition|
+              if message_name == message_event_definition.message_name
+                Execution.new(context: context, process_id: process&.id, start_event_id: start_event&.id, variables: variables).tap do  |execution|
+                  executions.push execution
+                  process.execute(execution)
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
     def initialize(attributes={})
       super.tap do
         @id ||= SecureRandom.uuid
@@ -49,10 +66,10 @@ module Processable
       @called_by ||= parent.steps.find { |step| step.id == called_by_id } if called_by_id
     end
 
-    def message_received(message_name, _variables: {})
+    def message_received(message_name, variables: {})
       steps.each do |step|
         if step.waiting? && step.element.is_a?(Bpmn::Event) && step.element.is_catching?
-          step.element.message_event_definitions.each { |med| step.invoke if med.message.name == message_name }
+          step.element.message_event_definitions.each { |med| step.invoke(variables: variables) if med.message.name == message_name }
         end
       end
     end
@@ -90,7 +107,7 @@ module Processable
 
       # Cancel event based gateway events?
       element = step.element
-      if element.is_a?(Bpmn::Event) &&
+      if step.element.is_a?(Bpmn::Event)
         if element.is_a?(Bpmn::BoundaryEvent) && element.cancel_activity
           step.attached_to&.terminate
         elsif element.is_a?(Bpmn::EndEvent) && element.is_terminate?
@@ -102,6 +119,13 @@ module Processable
             source.targets.each do |target_step_execution|
               target_step_execution.terminate if (target_step_execution.id != step.id) && (target_step_execution.waiting?)
             end
+          end
+        end
+
+        if element.is_throwing? && element.is_message?
+          element.message_event_definitions.each do |message_event_definition|
+            message_received(message_event_definition.message_name, variables: step.variables)
+            context.notify_listener({ event: :message_thrown, execution: self, message_name: message_event_definition.message_name })
           end
         end
       end
@@ -140,6 +164,10 @@ module Processable
         active_tokens -= step.tokens_in if step.ended?
       end
       active_tokens.uniq
+    end
+
+    def waiting_steps
+      steps.filter { |step| step.waiting? }
     end
 
     def steps_by_id(id)

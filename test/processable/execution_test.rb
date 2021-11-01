@@ -2,8 +2,8 @@ require "test_helper"
 
 module Processable
   describe Execution do
-    let(:bpmn_source) { fixture_source('hello_world.bpmn') }
-    let(:dmn_source) { fixture_source('choose_greeting.dmn') }
+    let(:bpmn_source) { fixture_source("hello_world.bpmn") }
+    let(:dmn_source) { fixture_source("choose_greeting.dmn") }
     let(:services) {
       {
         tell_fortune: proc { |variables|
@@ -67,17 +67,17 @@ module Processable
       }
     }
     let(:log) { @log }
-    let(:listeners) { 
+    let(:listeners) {
       {
-        process_started: proc { |event| log.push event },
-        step_waiting: proc { |event| log.push event },
-        step_ended: proc { |event| log.push event },
-        process_ended: proc { |event| log.push event },
+        process_started:  proc { |event| log.push event },
+        step_waiting:     proc { |event| log.push event },
+        step_ended:       proc { |event| log.push event },
+        process_ended:    proc { |event| log.push event },
       }
     }
     let(:last)
     let(:context) { Context.new(sources: [bpmn_source, dmn_source], services: services, listeners: listeners) }
-    let(:process) { context.process_by_id('HelloWorld') }
+    let(:process) { context.process_by_id("HelloWorld") }
 
     describe :definition do
       let(:user_task) { process.element_by_id('IntroduceYourself') }
