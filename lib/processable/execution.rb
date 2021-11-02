@@ -270,7 +270,7 @@ module Processable
     def print_steps
       puts
       steps.each_with_index do |step, index|
-        str = "#{index} #{step.element.type.split(':').last} #{step.element.id}: #{step.status} #{step.variables unless step.variables.empty? }".strip
+        str = "#{index} #{step.element.type.split(':').last} #{step.element.id}: #{step.status} #{JSON.pretty_generate(variables, {indent: '', object_nl: ' ' }) unless step.variables.empty? }".strip
         str = "#{str} * in: #{step.tokens_in.join(', ')}" if step.tokens_in.present?
         str = "#{str} * out: #{step.tokens_out.join(', ')}" if step.tokens_out.present?
         puts str

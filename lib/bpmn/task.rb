@@ -39,16 +39,8 @@ module Bpmn
     end
 
     def execute(step_execution)
-      if step_execution.external_services?
-        step_execution.wait
-      else
-        run(step_execution)
-      end
-    end
-
-    def run(step_execution)
-      result = step_execution.call_service(topic)
-      step_execution.invoke(variables: result_to_variables(result))
+      super
+      step_execution.run
     end
   end
 
@@ -62,12 +54,7 @@ module Bpmn
 
     def execute(step_execution)
       super
-      run(step_execution)
-    end
-
-    def run(step_execution)
-      result = step_execution.run_script(script)
-      step_execution.invoke(variables: result_to_variables(result))
+      step_execution.run
     end
   end
 
@@ -84,7 +71,7 @@ module Bpmn
 
     def execute(step_execution)
       super
-      run(step_execution)
+      step_execution.run
     end
 
     def run(step_execution)

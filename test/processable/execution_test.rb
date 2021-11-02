@@ -8,9 +8,9 @@ module Processable
     let(:dmn_source) { fixture_source("choose_greeting.dmn") }
     let(:services) {
       {
-        tell_fortune: proc { |step|
-          raise "Fortune not found? Abort, Retry, Ignore." if step.variables[:error]
-          [
+        tell_fortune: proc { |step, variables|
+          raise "Fortune not found? Abort, Retry, Ignore." if variables[:error]
+          step.complete([
             "The fortune you seek is in another cookie.",
             "A closed mouth gathers no feet.",
             "A conclusion is simply the place where you got tired of thinking.",
@@ -64,7 +64,7 @@ module Processable
             "If a turtle doesn’t have a shell, is it naked or homeless?",
             "Change is inevitable, except for vending machines.",
             "Don’t eat the paper.",
-          ].sample
+          ].sample)
         },
       }
     }

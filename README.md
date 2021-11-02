@@ -12,17 +12,20 @@ Prior to execution, a Context must be initialized with sources, services and oth
 
 ```ruby
 services = {
-  tell_fortune: proc { |variables|
-    raise "Fortune not found? Abort, Retry, Ignore." if variables[:error]
-    [
-      "The fortune you seek is in another cookie.",
-      "A cynic is only a frustrated optimist.",
-      "A foolish man listens to his heart. A wise man listens to cookies.",
-      "Avoid taking unnecessary gambles. Lucky numbers: 12, 15, 23, 28, 37",
-      "Ask your mom instead of a cookie.",
-      "Hard work pays off in the future. Laziness pays off now.",
-      "Don’t eat the paper.",
-    ].sample
+  tell_fortune: proc { |step, variables|
+    if variables[:simulate_error]
+      step.error("Error_FortuneNotFound", "Fortune not found? Abort, Retry, Ignore.")
+    else
+      step.complete([
+        "The fortune you seek is in another cookie.",
+        "A cynic is only a frustrated optimist.",
+        "A foolish man listens to his heart. A wise man listens to cookies.",
+        "Avoid taking unnecessary gambles. Lucky numbers: 12, 15, 23, 28, 37",
+        "Ask your mom instead of a cookie.",
+        "Hard work pays off in the future. Laziness pays off now.",
+        "Don’t eat the paper.",
+      ].sample)
+    end
   }
 }
 context = Processable::Context.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services)
@@ -71,10 +74,10 @@ execution = Procesable::Execution.deserialize(json, context: context)
 Execution is continued by `invoking` the `waiting` step.
 
 ```ruby
-execution.step_by_id('IntroduceYourself').invoke({ name: "Eric", language: "es", formal: true })
+execution.step_by_id('IntroduceYourself').complete({ name: "Eric", language: "es", formal: true })
 ```
 
-Once the task is invoked the process continues executing until it reaches an EndEvent.
+Once the task is completed the process continues executing until it reaches an EndEvent.
 
 ```
 HelloWorld ended * Flow_1ezhtuc

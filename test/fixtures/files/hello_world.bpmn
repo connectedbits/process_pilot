@@ -84,7 +84,7 @@ if (variables.tell_fortune) {
   parts.push(`🥠 ${variables.tell_fortune}`)
 }
         
-parts.join(' ')
+complete(parts.join(' '))
         
       </bpmn:script>
     </bpmn:scriptTask>

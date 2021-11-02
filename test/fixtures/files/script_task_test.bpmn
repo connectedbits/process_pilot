@@ -12,7 +12,7 @@
     <bpmn:scriptTask id="ScriptTask" name="Script Task" scriptFormat="javascript" camunda:resultVariable="greeting">
       <bpmn:incoming>Flow_1qhq8g6</bpmn:incoming>
       <bpmn:outgoing>Flow_1rnbtwj</bpmn:outgoing>
-      <bpmn:script>`Hello ${variables.name}`</bpmn:script>
+      <bpmn:script>complete(`Hello ${variables.name}`)</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

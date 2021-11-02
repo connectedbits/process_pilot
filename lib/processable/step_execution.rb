@@ -46,6 +46,13 @@ module Processable
       update_status("waiting")
     end
 
+    def complete(result = nil)
+      invoke(variables: result_to_variables(result))
+    end
+
+    def error(code, message)
+    end
+
     def invoke(variables: {})
       @variables = variables.merge(variables).with_indifferent_access
       continue
@@ -80,15 +87,14 @@ module Processable
       ProcessableServices::DecisionEvaluator.call(decision_ref, source, execution.variables)
     end
 
-    def call_service(topic)
-      service = context.services[topic.to_sym]
-      raise ExecutionError.new("Service #{topic} not found.") unless service
-      service.call(execution)
-    end
-
-    def run_script(script)
-      raise ExecutionError.new("Script #{script} can't be blank.") if script.blank?
-      ProcessableServices::ScriptRunner.call(script: script, variables: execution.variables, utils: context.utils)
+    def run
+      if element.is_a?(Bpmn::ServiceTask)
+        context.service_task_runner.call(self, context) if context.service_task_runner.present?
+      elsif element.is_a?(Bpmn::ScriptTask)
+        context.script_task_runner.call(self, context) if context.script_task_runner.present?
+      elsif element.is_a?(Bpmn::BusinessRuleTask)
+        context.business_rule_task_runner.call(self, context) if context.business_rule_task_runner.present?
+      end
     end
 
     def set_timer(expires_at)
@@ -101,7 +107,6 @@ module Processable
     end
 
     def throw_error(error_name)
-      execution.error_received(error_name)
       context.notify_listener({ event: :error_thrown, execution: self, error_name: error_name })
     end
 
@@ -156,6 +161,18 @@ module Processable
       event = "step_#{status}".to_sym
       context.notify_listener({ event: event, execution: self })
       execution.send(event, self) if execution.respond_to?(event)
+    end
+
+    def result_to_variables(result)
+      if element.result_variable
+        return { "#{element.result_variable}": result }
+      else
+        if result.is_a? Hash
+          result
+        else
+          {}.tap { |h| h[element.id.underscore] = result }
+        end
+      end
     end
   end
 end

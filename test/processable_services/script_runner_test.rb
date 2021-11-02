@@ -13,13 +13,14 @@ module ProcessableServices
       end
     end
 
-    describe :utils do
+    describe :complex do
       let(:script) { "`Hello ${reverse(variables.name)}`" }
-      let(:variables) { { name: "Eric" } }
-      let(:utils) {
-        { 'reverse': proc { |input| input.reverse } }
+      let(:procs) {
+        {
+          'reverse': proc { |input| input.reverse },
+        }
       }
-      let(:result) { service.call(script: script, variables: variables, utils: utils) }
+      let(:result) { service.call(script: script, variables: { name: "Eric" }, procs: procs) }
 
       it "should eval the script correctly" do
         _(result).must_equal "Hello cirE"

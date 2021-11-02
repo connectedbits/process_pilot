@@ -14,7 +14,11 @@ module ProcessableServices
     def call
       command = [EVALUATE_BIN, @decision_id, @source, @context.to_json].shelljoin
       result = `#{command}`
-      JSON.parse(result)
+      if $? == 0
+        JSON.parse(result)
+      else
+        raise result
+      end
     end
   end
 end

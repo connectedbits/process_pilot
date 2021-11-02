@@ -21,6 +21,7 @@ require "processable/context"
 require "processable/execution"
 require "processable/step_execution"
 require "processable/execution_error"
+require "processable/task_runner"
 
 require "processable_services/application_service"
 require "processable_services/decision_evaluator"

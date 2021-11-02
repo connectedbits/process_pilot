@@ -2,20 +2,20 @@
 
 module ProcessableServices
   class ScriptRunner < ApplicationService
-    attr_reader :script, :variables, :utils
+    attr_reader :script, :variables, :procs
 
-    def initialize(script:, variables: {}, utils: {})
+    def initialize(script:, variables: {}, procs: {})
       super()
       @script = script
       @variables = variables
-      @utils = utils
+      @procs = procs
     end
 
     def call
       ctx = MiniRacer::Context.new
-      utils.each do |key, value|
+      procs.each do |key, value|
         ctx.attach(key.to_s, value)
-      end if utils
+      end if procs
       ctx.eval "variables = #{variables.to_json}; #{script}"
     end
   end

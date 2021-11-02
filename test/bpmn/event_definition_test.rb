@@ -1,9 +1,21 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 module Bpmn
   describe ErrorEventDefinition do
     let(:source) { fixture_source("error_event_definition_test.bpmn") }
-    let(:services) { { raise_error: proc { |variables| x = x } } }
+    let(:services) {
+      {
+        book_reservation: proc { |step, variables|
+          if variables["sold_out"]
+            step.error("Error_Unavailable", "Sold out!")
+          else
+            step.complete({ "reserved_at": Time.zone.now })
+          end
+        },
+      }
+    }
     let(:context) { Processable::Context.new(sources: source, services: services) }
     let(:process) { context.process_by_id("ErrorEventDefinitionTest") }
 
@@ -19,16 +31,24 @@ module Bpmn
       end
     end
 
-    describe :execution do
-      let(:execution) { @execution }
-      let(:start_step) { execution.step_by_id("Start") }
-      let(:task) { execution.step_by_id("Task") }
-      let(:error_step) { execution.step_by_id("Error") }
-      let(:end_step) { execution.step_by_id("End") }
-      let(:end_failed_step) { execution.step_by_id("EndFailed") }
+    # describe :execution do
+    #   let(:execution) { @execution }
+    #   let(:start_step) { execution.step_by_id("Start") }
+    #   let(:task) { execution.step_by_id("Task") }
+    #   let(:error_step) { execution.step_by_id("Error") }
+    #   let(:end_step) { execution.step_by_id("End") }
+    #   let(:end_failed_step) { execution.step_by_id("EndFailed") }
 
-      before { @execution = Processable::Execution.start(context: context, process_id: "ErrorEventDefinitionTest") }
-    end
+    #   before { @execution = Processable::Execution.start(context: context, process_id: "ErrorEventDefinitionTest", variables: { "sold_out": true }) }
+
+    #   it "should throw and catch error" do
+    #     #skip "TODO: implement error throwing"
+    #     execution.print
+    #     _(execution.ended?).must_equal true
+    #     _(end_step.ended?).must_equal true
+    #     _(end_failed_step).wont_be_nil
+    #   end
+    # end
   end
 
   describe MessageEventDefinition do

@@ -104,7 +104,7 @@ Layout/ArrayAlignment:
   Enabled: true
 
 Layout/HashAlignment:
-  Enabled: true
+  Enabled: false
   EnforcedHashRocketStyle: table
   EnforcedColonStyle: table
 
