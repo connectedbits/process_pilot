@@ -50,7 +50,8 @@ module Processable
       invoke(variables: result_to_variables(result))
     end
 
-    def error(code, message)
+    def error(error_name, error_message = nil)
+      throw_error(error_name, error_message: error_message)
     end
 
     def invoke(variables: {})
@@ -106,8 +107,9 @@ module Processable
       context.notify_listener({ event: :message_thrown, execution: self, message_name: message_name })
     end
 
-    def throw_error(error_name)
-      context.notify_listener({ event: :error_thrown, execution: self, error_name: error_name })
+    def throw_error(error_name, error_message: nil)
+      execution.error_received(error_name, variables: { error_name: error_name, error_message: error_message })
+      context.notify_listener({ event: :error_thrown, execution: self, error_name: error_name, error_message: error_message })
     end
 
     def started?

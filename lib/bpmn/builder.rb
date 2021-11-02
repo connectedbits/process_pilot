@@ -57,7 +57,7 @@ module Bpmn
           error_event_definition = @elements[reference_json["element"]["id"]]
           if error_event_definition
             error_event_definition.error_ref = reference_json["id"]
-            error_event_definition.error = @elements[reference_json["element"]["id"]]
+            error_event_definition.error = @elements[reference_json["id"]]
           end
         else
           if reference_json["element"]["$type"] == "bpmn:BoundaryEvent"

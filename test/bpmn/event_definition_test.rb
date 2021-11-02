@@ -8,7 +8,7 @@ module Bpmn
     let(:services) {
       {
         book_reservation: proc { |step, variables|
-          if variables["sold_out"]
+          if variables["simulate_error"]
             step.error("Error_Unavailable", "Sold out!")
           else
             step.complete({ "reserved_at": Time.zone.now })
@@ -21,7 +21,7 @@ module Bpmn
 
     describe :definitions do
       let(:start_step) { process.element_by_id("Start") }
-      let(:task) { process.element_by_id("Task") }
+      let(:service_task_step) { process.element_by_id("ServiceTask") }
       let(:error_step) { process.element_by_id("Error") }
       let(:end_step) { process.element_by_id("End") }
       let(:end_failed_step) { process.element_by_id("EndFailed") }
@@ -31,24 +31,23 @@ module Bpmn
       end
     end
 
-    # describe :execution do
-    #   let(:execution) { @execution }
-    #   let(:start_step) { execution.step_by_id("Start") }
-    #   let(:task) { execution.step_by_id("Task") }
-    #   let(:error_step) { execution.step_by_id("Error") }
-    #   let(:end_step) { execution.step_by_id("End") }
-    #   let(:end_failed_step) { execution.step_by_id("EndFailed") }
+    describe :execution do
+      let(:execution) { @execution }
+      let(:start_step) { execution.step_by_id("Start") }
+      let(:service_task_step) { execution.step_by_id("ServiceTask") }
+      let(:error_step) { execution.step_by_id("Error") }
+      let(:end_step) { execution.step_by_id("End") }
+      let(:end_failed_step) { execution.step_by_id("EndFailed") }
 
-    #   before { @execution = Processable::Execution.start(context: context, process_id: "ErrorEventDefinitionTest", variables: { "sold_out": true }) }
+      before { @execution = Processable::Execution.start(context: context, process_id: "ErrorEventDefinitionTest", variables: { simulate_error: true }) }
 
-    #   it "should throw and catch error" do
-    #     #skip "TODO: implement error throwing"
-    #     execution.print
-    #     _(execution.ended?).must_equal true
-    #     _(end_step.ended?).must_equal true
-    #     _(end_failed_step).wont_be_nil
-    #   end
-    # end
+      it "should throw and catch error" do
+        _(execution.ended?).must_equal true
+        _(service_task_step.terminated?).must_equal true
+        _(end_step).must_be_nil
+        _(end_failed_step.ended?).must_equal true
+      end
+    end
   end
 
   describe MessageEventDefinition do

@@ -76,8 +76,8 @@ module Processable
 
     def error_received(error_name, variables: {})
       waiting_steps.each do |step|
-        if step.element.is_a?(Bpmn::Event) && step.element.is_catching?
-          step.element.error_event_definitions.each { |error_event_definition| step.invoke(variables: variables) if error_event_definition.error.name == error_name }
+        if step.element.is_a?(Bpmn::Event) && step.element.is_catching? && step.element.error_event_definition
+          step.invoke(variables: variables) if step.element.error_event_definition.error_name == error_name
         end
       end
     end

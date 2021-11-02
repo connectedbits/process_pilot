@@ -31,6 +31,14 @@ module Bpmn
       @error_code_variable = moddle["errorCodeVariable"]
       @error_message_variable = moddle["errorMessageVariable"]
     end
+
+    def error_id
+      error&.id
+    end
+
+    def error_name
+      error&.name
+    end
   end
 
   class MessageEventDefinition < EventDefinition
@@ -38,7 +46,7 @@ module Bpmn
 
     def initialize(moddle)
       super
-      @message_ref = moddle[:messageRef]
+      @message_ref = moddle["messageRef"]
     end
 
     def execute(host_element, execution)
