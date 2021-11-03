@@ -91,7 +91,7 @@ module Processable
 
     describe :execution do
       let(:execution) { @execution }
-      let(:user_step) { execution.step_by_id("IntroduceYourself") }
+      let(:user_step) { execution.step_by_element_id("IntroduceYourself") }
 
       before do 
         @log = []
@@ -127,7 +127,7 @@ module Processable
         end
 
         describe :execution_after_serialization do
-          let (:user_step) { new_execution.step_by_id("IntroduceYourself") }
+          let (:user_step) { new_execution.step_by_element_id("IntroduceYourself") }
 
           before { user_step.invoke(variables: { name: "Eric", language: "it", formal: false }) }
 

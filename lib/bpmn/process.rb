@@ -23,7 +23,7 @@ module Bpmn
     end
 
     def start_events
-      elements_by_type('bpmn:StartEvent')
+      elements_by_type("bpmn:StartEvent")
     end
 
     def default_start_event
@@ -36,6 +36,23 @@ module Bpmn
   end
 
   class CallActivity < Activity
+    attr_accessor :called_element, :process_ref
+
+    def initialize(moddle)
+      super
+      @called_element = moddle["calledElement"]
+      @process_ref = moddle["processRef"]
+    end
+
+    def execute(execution)
+      if Bpmn::Expression.valid?(called_element)
+        process_id = execution.evaluate_expression(expression)
+      else
+        process_id = called_element
+      end
+      execution.start_child(process_id: process_id, variables: execution.variables) if process_id
+      execution.wait
+    end
   end
 
   class SubProcess < Activity

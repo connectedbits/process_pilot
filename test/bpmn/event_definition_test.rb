@@ -33,11 +33,11 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:start_step) { execution.step_by_id("Start") }
-      let(:service_task_step) { execution.step_by_id("ServiceTask") }
-      let(:error_step) { execution.step_by_id("Error") }
-      let(:end_step) { execution.step_by_id("End") }
-      let(:end_failed_step) { execution.step_by_id("EndFailed") }
+      let(:start_step) { execution.step_by_element_id("Start") }
+      let(:service_task_step) { execution.step_by_element_id("ServiceTask") }
+      let(:error_step) { execution.step_by_element_id("Error") }
+      let(:end_step) { execution.step_by_element_id("End") }
+      let(:end_failed_step) { execution.step_by_element_id("EndFailed") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: "ErrorEventDefinitionTest", variables: { simulate_error: true }) }
 
@@ -79,12 +79,12 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:start_step) { execution.step_by_id("Start") }
-      let(:catch_step) { execution.step_by_id("Catch") }
-      let(:host_step) { execution.step_by_id("HostTask") }
-      let(:boundary_step) { execution.step_by_id("Boundary") }
-      let(:throw_step) { execution.step_by_id("Throw") }
-      let(:end_step) { execution.step_by_id("End") }
+      let(:start_step) { execution.step_by_element_id("Start") }
+      let(:catch_step) { execution.step_by_element_id("Catch") }
+      let(:host_step) { execution.step_by_element_id("HostTask") }
+      let(:boundary_step) { execution.step_by_element_id("Boundary") }
+      let(:throw_step) { execution.step_by_element_id("Throw") }
+      let(:end_step) { execution.step_by_element_id("End") }
 
       describe :start do
         let(:executions) { @executions }
@@ -160,11 +160,11 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:start_step) { execution.step_by_id("Start") }
-      let(:task_a_step) { execution.step_by_id("TaskA") }
-      let(:task_b_step) { execution.step_by_id("TaskB") }
-      let(:end_none_step) { execution.step_by_id("EndNone") }
-      let(:end_terminated_step) { execution.step_by_id("EndTerminated") }
+      let(:start_step) { execution.step_by_element_id("Start") }
+      let(:task_a_step) { execution.step_by_element_id("TaskA") }
+      let(:task_b_step) { execution.step_by_element_id("TaskB") }
+      let(:end_none_step) { execution.step_by_element_id("EndNone") }
+      let(:end_terminated_step) { execution.step_by_element_id("EndTerminated") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: "TerminateEventDefinitionTest") }
 
@@ -217,7 +217,7 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:catch_step) { execution.step_by_id("Catch") }
+      let(:catch_step) { execution.step_by_element_id("Catch") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: "TimerEventDefinitionTest") }
 

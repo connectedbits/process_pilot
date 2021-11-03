@@ -19,7 +19,7 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:task_step) { execution.step_by_id("Task") }
+      let(:task_step) { execution.step_by_element_id("Task") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: "TaskTest") }
 
@@ -60,7 +60,7 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:service_step) { execution.step_by_id("ServiceTask") }
+      let(:service_step) { execution.step_by_element_id("ServiceTask") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: "ServiceTaskTest", variables: { name: "Eric" }) }
 
@@ -100,7 +100,7 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:script_step) { execution.step_by_id("ScriptTask") }
+      let(:script_step) { execution.step_by_element_id("ScriptTask") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: "ScriptTaskTest", variables: { name: "Eric" }) }
 
@@ -131,7 +131,7 @@ module Bpmn
 
       describe :execution do
         let(:execution) { @execution }
-        let(:business_rule_step) { execution.step_by_id("ExpressionBusinessRule") }
+        let(:business_rule_step) { execution.step_by_element_id("ExpressionBusinessRule") }
 
         before { @execution = Processable::Execution.start(context: context, process_id: "BusinessRuleTaskTest", start_event_id: 'ExpressionStart', variables: { age: 57 }) }
 
@@ -155,7 +155,7 @@ module Bpmn
 
       describe :execution do
         let(:execution) { @execution }
-        let(:business_rule_step) { execution.step_by_id("DmnBusinessRule") }
+        let(:business_rule_step) { execution.step_by_element_id("DmnBusinessRule") }
 
         before { @execution = Processable::Execution.start(context: context, process_id: "BusinessRuleTaskTest", start_event_id: 'DMNStart', variables: { season: "Spring", guests: 7 }) }
 

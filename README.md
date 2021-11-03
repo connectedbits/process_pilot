@@ -74,7 +74,7 @@ execution = Procesable::Execution.deserialize(json, context: context)
 Execution is continued by `invoking` the `waiting` step.
 
 ```ruby
-execution.step_by_id('IntroduceYourself').complete({ name: "Eric", language: "es", formal: true })
+execution.step_by_element_id('IntroduceYourself').complete({ name: "Eric", language: "es", formal: true })
 ```
 
 Once the task is completed the process continues executing until it reaches an EndEvent.

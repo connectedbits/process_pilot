@@ -16,7 +16,7 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:start_step) { execution.step_by_id("Start") }
+      let(:start_step) { execution.step_by_element_id("Start") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: 'StartEventTest') }
 
@@ -38,7 +38,7 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:catch_step) { execution.step_by_id("Catch") }
+      let(:catch_step) { execution.step_by_element_id("Catch") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: 'IntermediateCatchEventTest') }
       it 'should wait at the catch event' do
@@ -68,7 +68,7 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:throw_step) { execution.step_by_id("Throw") }
+      let(:throw_step) { execution.step_by_element_id("Throw") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: 'IntermediateThrowEventTest') }
       it 'should throw then end the process' do
@@ -99,12 +99,12 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:start_step) { execution.step_by_id("Start") }
-      let(:host_task_step) { execution.step_by_id("HostTask") }
-      let(:non_interrupting_step) { execution.step_by_id("NonInterrupting") }
-      let(:interrupting_step) { execution.step_by_id("Interrupting") }
-      let(:end_step) { execution.step_by_id("End") }
-      let(:end_interrupted_step) { execution.step_by_id("EndInterrupted") }
+      let(:start_step) { execution.step_by_element_id("Start") }
+      let(:host_task_step) { execution.step_by_element_id("HostTask") }
+      let(:non_interrupting_step) { execution.step_by_element_id("NonInterrupting") }
+      let(:interrupting_step) { execution.step_by_element_id("Interrupting") }
+      let(:end_step) { execution.step_by_element_id("End") }
+      let(:end_interrupted_step) { execution.step_by_element_id("EndInterrupted") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: 'BoundaryEventTest') }
 
@@ -165,7 +165,7 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:end_step) { execution.step_by_id("End") }
+      let(:end_step) { execution.step_by_element_id("End") }
 
       before { @execution = Processable::Execution.start(context: context, process_id: 'EndEventTest') }
 

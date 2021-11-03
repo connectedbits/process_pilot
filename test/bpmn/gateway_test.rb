@@ -18,10 +18,10 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:exclusive_gateway_step) { execution.step_by_id('ExclusiveGateway') }
-      let(:end_ok_step) { execution.step_by_id('EndOK') }
-      let(:end_not_ok_step) { execution.step_by_id('EndNotOK') }
-      let(:end_default_step) { execution.step_by_id('EndDefault') }
+      let(:exclusive_gateway_step) { execution.step_by_element_id('ExclusiveGateway') }
+      let(:end_ok_step) { execution.step_by_element_id('EndOK') }
+      let(:end_not_ok_step) { execution.step_by_element_id('EndNotOK') }
+      let(:end_default_step) { execution.step_by_element_id('EndDefault') }
 
       describe :happy_path do
         before { @execution = Processable::Execution.start(context: context, process_id: 'ExclusiveGatewayTest', variables: { action: "ok" }) }
@@ -68,10 +68,10 @@ module Bpmn
 
     describe :execution do
       let(:execution) { @execution }
-      let(:split_step) { execution.step_by_id('Split') }
-      let(:join_step) { execution.step_by_id('Join') }
-      let(:task_a_step) { execution.step_by_id('TaskA') }
-      let(:task_b_step) { execution.step_by_id('TaskB') }
+      let(:split_step) { execution.step_by_element_id('Split') }
+      let(:join_step) { execution.step_by_element_id('Join') }
+      let(:task_a_step) { execution.step_by_element_id('TaskA') }
+      let(:task_b_step) { execution.step_by_element_id('TaskB') }
 
       before { @execution = Processable::Execution.start(context: context, process_id: 'ParallelGatewayTest') }
 
@@ -124,12 +124,12 @@ module Bpmn
   
       describe :execution do
         let(:execution) { @execution }
-        let(:split_step) { execution.step_by_id('Split') }
-        let(:join_step) { execution.step_by_id('Join') }
-        let(:receive_order_step) { execution.step_by_id('ReceiveOrder') }
-        let(:check_laptop_parts_step) { execution.step_by_id('CheckLaptopParts') }
-        let(:check_prices_step) { execution.step_by_id('CheckPrices') }
-        let(:check_printer_parts_step) { execution.step_by_id('CheckPrinterParts') }
+        let(:split_step) { execution.step_by_element_id('Split') }
+        let(:join_step) { execution.step_by_element_id('Join') }
+        let(:receive_order_step) { execution.step_by_element_id('ReceiveOrder') }
+        let(:check_laptop_parts_step) { execution.step_by_element_id('CheckLaptopParts') }
+        let(:check_prices_step) { execution.step_by_element_id('CheckPrices') }
+        let(:check_printer_parts_step) { execution.step_by_element_id('CheckPrinterParts') }
     
         before { @execution = Processable::Execution.start(context: context, process_id: 'InclusiveGatewayTest') }
 
@@ -221,11 +221,11 @@ module Bpmn
 
       describe :execution do
         let(:execution) { @execution }
-        let(:gateway_step) { execution.step_by_id('EventBasedGateway') }
-        let(:message_event_step) { execution.step_by_id('MessageEvent') }
-        let(:timer_event_step) { execution.step_by_id('TimerEvent') }
-        let(:end_message_step) { execution.step_by_id('EndMessage') }
-        let(:end_timer_step) { execution.step_by_id('EndTimer') }
+        let(:gateway_step) { execution.step_by_element_id('EventBasedGateway') }
+        let(:message_event_step) { execution.step_by_element_id('MessageEvent') }
+        let(:timer_event_step) { execution.step_by_element_id('TimerEvent') }
+        let(:end_message_step) { execution.step_by_element_id('EndMessage') }
+        let(:end_timer_step) { execution.step_by_element_id('EndTimer') }
         
         before { @execution = Processable::Execution.start(context: context, process_id: 'EventBasedGatewayTest') }
 

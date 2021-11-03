@@ -112,6 +112,10 @@ module Processable
       context.notify_listener({ event: :error_thrown, execution: self, error_name: error_name, error_message: error_message })
     end
 
+    def start_child(process_id:, variables: {})
+      Execution.start(context: context, process_id: process_id, variables: variables, parent: execution, called_by: self)
+    end
+
     def started?
       status == "started"
     end

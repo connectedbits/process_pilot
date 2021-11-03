@@ -29,4 +29,16 @@ module Bpmn
 
   class Error < Element
   end
+
+  class Collaboration < Element
+  end
+
+  class Participant < Element
+    attr_accessor :process_ref, :process
+
+    def initialize(moddle)
+      super
+      @process_ref = moddle["processRef"]
+    end
+  end
 end

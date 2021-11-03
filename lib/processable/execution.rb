@@ -13,12 +13,15 @@ module Processable
     delegate :external_services?, to: :context
     delegate :print, to: :printer
 
-    def self.start(context:, process_id:, start_event_id: nil, variables: {})
+    def self.start(context:, process_id:, start_event_id: nil, variables: {}, parent: nil, called_by: nil)
       process = context.process_by_id(process_id)
       raise ExecutionError.new("Process with id #{process_id} not found.") unless process
       start_event = start_event_id ? process.start_events.find { |se| se.id == start_event_id } : process.default_start_event
       raise ExecutionError.new("Start event with id #{start_event_id} not found for process #{process_id}.") unless start_event
-      Execution.new(context: context, process_id: process&.id, start_event_id: start_event&.id, variables: variables).tap { |e| process.execute(e) } 
+      Execution.new(context: context, process_id: process&.id, start_event_id: start_event&.id, variables: variables, parent_id: parent&.id, called_by_id: called_by&.id).tap do |execution|
+        context.executions.push execution
+        process.execute(execution)
+      end
     end
 
     def self.start_with_message(context:, message_name:, variables: {})
@@ -29,6 +32,7 @@ module Processable
               if message_name == message_event_definition.message_name
                 Execution.new(context: context, process_id: process&.id, start_event_id: start_event&.id, variables: variables).tap do  |execution|
                   executions.push execution
+                  context.executions.push execution
                   process.execute(execution)
                 end
               end
@@ -59,11 +63,11 @@ module Processable
     end
 
     def parent
-      @parent ||= parent_id ? context.execution_by_id(parent_id) : nil
+      @parent ||= context.execution_by_id(parent_id)
     end
 
     def called_by
-      @called_by ||= parent.steps.find { |step| step.id == called_by_id } if called_by_id
+      @called_by ||= parent.steps.find { |s| s.id == called_by_id } if parent
     end
 
     def message_received(message_name, variables: {})
@@ -143,7 +147,10 @@ module Processable
       if step.tokens_out.empty?
         all_ended = true
         steps.each { |s| all_ended = false unless s.status == "ended" || s.status == "terminated" }
-        update_status("ended") if all_ended
+        if all_ended
+          update_status("ended")
+          called_by&.invoke(variables: variables)
+        end
       else
         step.tokens_out.each do |token|
           flow = process.element_by_id(token)
@@ -177,12 +184,16 @@ module Processable
       steps.filter { |step| step.waiting? }
     end
 
-    def steps_by_id(id)
+    def step_by_id(id)
+      steps.find { |step| step.id == id }
+    end
+
+    def steps_by_element_id(id)
       steps.select { |step| step.element.id == id }
     end
 
-    def step_by_id(id, latest: true)
-      latest ? steps_by_id(id).last : steps_by_id(id).first
+    def step_by_element_id(id, latest: true)
+      latest ? steps_by_element_id(id).last : steps_by_element_id(id).first
     end
 
     def printer
@@ -228,7 +239,7 @@ module Processable
       if step
         step.tokens_in.push token
       else
-        step = StepExecution.new_for_execution(execution: self, element: element, token: token, attached_to: attached_to) 
+        step = StepExecution.new_for_execution(execution: self, element: element, token: token, attached_to: attached_to)
         attached_to.attachments.push(step) if attached_to
         steps.push step
       end

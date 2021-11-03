@@ -59,6 +59,8 @@ module Bpmn
             error_event_definition.error_ref = reference_json["id"]
             error_event_definition.error = @elements[reference_json["id"]]
           end
+        when "bpmn:processRef"
+          # TODO: process ref to participant
         else
           if reference_json["element"]["$type"] == "bpmn:BoundaryEvent"
             event = @elements[reference_json["element"]["id"]]
