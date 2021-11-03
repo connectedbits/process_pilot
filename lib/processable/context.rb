@@ -6,9 +6,9 @@ module Processable
     attr_accessor :services, :listeners, :utils
     attr_accessor :service_task_runner, :script_task_runner, :business_rule_task_runner
 
-    def initialize(sources: nil, services: {}, listeners: {}, utils: {}, service_task_runner: ServiceTaskRunner, script_task_runner: ScriptTaskRunner, business_rule_task_runner: BusinessRuleTaskRunner)    
+    def initialize(sources: nil, services: {}, listeners: [], utils: {}, service_task_runner: ServiceTaskRunner, script_task_runner: ScriptTaskRunner, business_rule_task_runner: BusinessRuleTaskRunner)    
       @services = services
-      @listeners = listeners
+      @listeners = Array.wrap(listeners)
       @utils = utils
       @service_task_runner = service_task_runner
       @script_task_runner = script_task_runner
@@ -31,7 +31,9 @@ module Processable
     end
 
     def notify_listener(event)
-      listeners[event[:event]].call(event) if listeners[event[:event]]
+      listeners.each do |listener|
+        listener[event[:event]].call(event) if listener[event[:event]]
+      end
     end
 
     def process_by_id(id)

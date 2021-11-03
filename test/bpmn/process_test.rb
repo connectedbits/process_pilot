@@ -99,15 +99,26 @@ module Bpmn
         end
       end
 
-      describe :execution do
-        it "should call the child process" do
+      # describe :execution do
+      #   let(:parent_execution) { context.execution_by_process_id("EmbeddedSubProcessParent") }
+      #   let(:child_execution) { context.execution_by_process_id("EmbeddedSubProcess") }
+      #   let(:task_step) { child.step_by_element_id("Task") }
 
-        end
+      #   before { Processable::Execution.start(context: context, process_id: "EmbeddedSubProcessParent") }
 
-        describe :child_process_completes do
+      #   it "should call the child process" do
+      #     parent_execution.print
+      #     _(parent_execution.started?).must_equal true
+      #     ap context.executions.map { |e| e.process.id }
+      #     child_execution.print
+      #     _(child_execution.started?).must_equal true
+      #     _(task_step.waiting?).must_equal true
+      #   end
 
-        end
-      end
+      #   describe :child_process_completes do
+
+      #   end
+      # end
     end
 
     describe :event do

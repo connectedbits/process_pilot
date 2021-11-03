@@ -235,7 +235,7 @@ module Processable
     private
 
     def execute_element(element, token: nil, attached_to: nil)
-      step = steps.find { |step| step.element.id == element.id && step.waiting? }
+      step = steps.find { |s| s.element.id == element.id && s.waiting? }
       if step
         step.tokens_in.push token
       else
