@@ -1,18 +1,10 @@
 # frozen_string_literal: true
 
 module Bpmn
-  class Process < Element
+  module ProcessBehavior
     attr_accessor :is_executable
-    attr_accessor :definitions, :elements, :parent
+    attr_accessor :elements, :parent
     attr_accessor :sub_processes
-
-    def initialize(moddle)
-      super
-
-      @is_executable = moddle["isExecutable"]
-      @elements = []
-      @sub_processes = []
-    end
 
     def element_by_id(id)
       elements.find { |e| e.id == id }
@@ -35,6 +27,37 @@ module Bpmn
     end
   end
 
+  class Process < Element
+    include ProcessBehavior
+
+    def initialize(moddle)
+      super
+
+      @is_executable = moddle["isExecutable"]
+      @elements = []
+      @sub_processes = []
+    end
+  end
+
+  class SubProcess < Activity
+    include ProcessBehavior
+
+    attr_accessor :triggered_by_event
+
+    def initialize(moddle)
+      super
+
+      @is_executable = false
+      @elements = []
+      @sub_processes = []
+      @triggered_by_event = moddle["triggeredByEvent"]
+    end
+  end
+
+  class AdHocSubProcess < SubProcess
+
+  end
+
   class CallActivity < Activity
     attr_accessor :called_element, :process_ref
 
@@ -52,17 +75,6 @@ module Bpmn
       end
       execution.start_child(process_id: process_id, variables: execution.variables) if process_id
       execution.wait
-    end
-  end
-
-  class SubProcess < Activity
-    attr_accessor :definitions, :elements, :parent
-    attr_accessor :is_executable, :triggered_by_event
-
-    def initialize(moddle)
-      super
-      @is_executable = false
-      @triggered_by_event = moddle["triggeredByEvent"]
     end
   end
 end

@@ -16,6 +16,7 @@ module Bpmn
         klass = "Bpmn::#{moddle["$type"].split(':').last}".constantize
         return klass.new(moddle)
       rescue # => e
+        ap "Create class for #{moddle["$type"]}"
         return Element.new(moddle)
       end
     end
@@ -31,6 +32,9 @@ module Bpmn
   end
 
   class Collaboration < Element
+  end
+
+  class LaneSet < Element
   end
 
   class Participant < Element

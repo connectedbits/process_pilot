@@ -82,7 +82,7 @@ module Bpmn
   end
 
   describe SubProcess do
-    let(:source) { fixture_source("call_activity_test.bpmn") }
+    let(:source) { fixture_source("sub_process_test.bpmn") }
     let(:context) { Processable::Context.new(sources: source) }
 
     describe :embedded do
@@ -91,7 +91,11 @@ module Bpmn
 
       describe :definitions do
         it "should create a parent child relationship" do
-
+          _(parent).wont_be_nil
+          _(parent.sub_processes.present?).must_equal true
+          _(parent.sub_processes.first.parent).must_equal parent
+          _(child).wont_be_nil
+          _(child.parent).must_equal parent
         end
       end
 

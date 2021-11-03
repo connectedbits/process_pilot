@@ -71,4 +71,13 @@ module Bpmn
       return flows
     end
   end
+
+  class Activity < Step
+    attr_accessor :attachments
+
+    def initialize(moddle)
+      super
+      @attachments = []
+    end
+  end
 end

@@ -114,18 +114,18 @@ module Bpmn
     def load_process(element_json, parent: nil)
       process = elements[element_json["id"]]
       process.parent = parent
-      element_json['flowElements'].each do |flow_element|
+      element_json["flowElements"].each do |flow_element|
         element = @elements[flow_element["id"]]
         next unless element
         process.elements.push element
-        if element.type == "SubProcess"
-          sub_process = load_process(child_element_json, parent: process)
+        if element.type == "bpmn:SubProcess"
+          sub_process = load_process(flow_element, parent: process)
           process.sub_processes.push sub_process
-        elsif element.type == "AdHocSubProcess"
-          ad_hoc_sub_process = load_process(child_element_json, parent: process)
+        elsif element.type == "bpmn:AdHocSubProcess"
+          ad_hoc_sub_process = load_process(flow_element, parent: process)
           process.sub_processes.push ad_hoc_sub_process
         end
-      end if element_json['flowElements']
+      end if element_json["flowElements"]
       @processes.push = process if process.type == "Process"
       process
     end
