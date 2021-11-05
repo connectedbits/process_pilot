@@ -37,12 +37,13 @@ module Processable
     end
 
     def process_by_id(id)
-      processes.each do |process| 
+      processes.each do |process|
         return process if process.id == id
         process.sub_processes.each do |sub_process|
           return sub_process if sub_process.id == id
         end
       end
+      nil
     end
 
     def execution_by_id(id)

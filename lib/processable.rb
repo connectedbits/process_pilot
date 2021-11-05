@@ -18,7 +18,6 @@ require "bpmn/event_definition"
 
 require "processable/context"
 require "processable/execution"
-require "processable/step_execution"
 require "processable/execution_error"
 require "processable/task_runner"
 

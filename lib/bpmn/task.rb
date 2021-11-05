@@ -9,9 +9,12 @@ module Bpmn
       @result_variable = moddle["resultVariable"]
     end
 
-    def execute(step_execution)
-      super
-      step_execution.wait
+    def execute(execution)
+      # wait
+    end
+
+    def signal(execution)
+      leave(execution)
     end
 
     def result_to_variables(result)
@@ -38,9 +41,8 @@ module Bpmn
       @topic = moddle["topic"]
     end
 
-    def execute(step_execution)
-      super
-      step_execution.run
+    def execute(execution)
+      execution.run
     end
   end
 
@@ -52,9 +54,8 @@ module Bpmn
       @script = moddle["script"]
     end
 
-    def execute(step_execution)
-      super
-      step_execution.run
+    def execute(execution)
+      execution.run
     end
   end
 
@@ -69,19 +70,8 @@ module Bpmn
       @version = moddle["version"]
     end
 
-    def execute(step_execution)
-      super
-      step_execution.run
-    end
-
-    def run(step_execution)
-      if expression
-        result = step_execution.evaluate_expression(expression)
-        step_execution.invoke(variables: result_to_variables(result))
-      elsif decision_ref
-        result = step_execution.evaluate_decision(decision_ref)
-        step_execution.invoke(variables: result_to_variables(result))
-      end
+    def execute(execution)
+      execution.run
     end
   end
 end

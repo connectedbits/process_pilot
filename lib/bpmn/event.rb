@@ -93,9 +93,13 @@ module Bpmn
       true
     end
 
-    def execute(step_execution)
-      super
-      step_execution.continue
+    # def execute(step_execution)
+    #   super
+    #   step_execution.continue
+    # end
+
+    def execute(execution)
+      leave(execution)
     end
   end
 
@@ -105,10 +109,10 @@ module Bpmn
       true
     end
 
-    def execute(step_execution)
-      super
-      step_execution.continue
-    end
+    # def execute(step_execution)
+    #   super
+    #   step_execution.continue
+    # end
   end
 
   class IntermediateCatchEvent < Event
@@ -117,10 +121,10 @@ module Bpmn
       true
     end
 
-    def execute(step_execution)
-      super
-      step_execution.wait
-    end
+    # def execute(step_execution)
+    #   super
+    #   step_execution.wait
+    # end
   end
 
   class BoundaryEvent < Event
@@ -137,10 +141,10 @@ module Bpmn
       true
     end
 
-    def execute(step_execution)
-      super
-      step_execution.wait
-    end
+    # def execute(step_execution)
+    #   super
+    #   step_execution.wait
+    # end
   end
 
   class EndEvent < Event
@@ -149,9 +153,13 @@ module Bpmn
       true
     end
 
-    def execute(step_execution)
-      super
-      step_execution.end
+    # def execute(step_execution)
+    #   super
+    #   step_execution.end
+    # end
+
+    def execute(execution)
+      execution.end(true)
     end
   end
 end

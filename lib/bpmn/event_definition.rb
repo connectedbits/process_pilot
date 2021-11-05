@@ -81,9 +81,9 @@ module Bpmn
 
   class TerminateEventDefinition < EventDefinition
 
-    def execute(_host_element, execution)
+    # def execute(_host_element, execution)
 
-    end
+    # end
   end
 
   class TimerEventDefinition < EventDefinition
@@ -97,9 +97,9 @@ module Bpmn
       end
     end
 
-    def execute(_host_element, step_execution)
-      step_execution.set_timer(time_due)
-    end
+    # def execute(_host_element, step_execution)
+    #   step_execution.set_timer(time_due)
+    # end
 
     private
 

@@ -23,7 +23,8 @@ module Bpmn
     end
 
     def execute(execution)
-      execution.start
+      raise ExecutionErrorNew.new("Process must have at least one start event.") if start_events.blank?
+      execution.execute_activities(start_events)
     end
   end
 
@@ -73,8 +74,7 @@ module Bpmn
       else
         process_id = called_element
       end
-      execution.start_child(process_id: process_id, variables: execution.variables) if process_id
-      execution.wait
+      execution.call(process_id)
     end
   end
 end

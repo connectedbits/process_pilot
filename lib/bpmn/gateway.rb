@@ -3,24 +3,22 @@
 module Bpmn
   class Gateway < Step
 
-    def execute(step_execution)
-      super
+    def execute(execution)
       if converging?
-        return step_execution.continue if is_enabled?(step_execution)
-        return step_execution.wait
+        return leave(execution) if is_enabled?(execution)
       else
-        return step_execution.continue
+        return leave(execution)
       end
     end
 
     #
     # Algorithm from https://researcher.watson.ibm.com/researcher/files/zurich-hvo/bpm2010-1.pdf
     #
-    def is_enabled?(step_execution)
+    def is_enabled?(execution)
       filled = []
       empty = []
 
-      incoming.each { |flow| step_execution.tokens_in.include?(flow.id) ? filled.push(flow) : empty.push(flow) }
+      incoming.each { |flow| execution.tokens_in.include?(flow.id) ? filled.push(flow) : empty.push(flow) }
 
       # Filled slots don't need to be searched for tokens
       index = 0
@@ -45,7 +43,7 @@ module Bpmn
       empty_ids = empty.map { |g| g.id }
 
       # If there are empty slots with tokens we need to wait
-      return false if (empty_ids & step_execution.execution.tokens).length > 0
+      return false if (empty_ids & execution.parent.tokens).length > 0
       return true
     end
   end
@@ -62,7 +60,7 @@ module Bpmn
     # RULE: All flows are taken
   end
 
-  class InclusiveGateway < Gateway 
+  class InclusiveGateway < Gateway
     # RULE: All valid flows are take
   end
 
@@ -73,9 +71,9 @@ module Bpmn
     # RULE: when an event created from an event gateway is caught,
     # all other waiting events must be canceled.
     #
-    def cancel_waiting_events(step_execution)
-      step_execution.targets.each do |target_execution|
-        target_execution.cancel if target_execution.waiting?
+    def cancel_waiting_events(execution)
+      execution.targets.each do |target_execution|
+        target_execution.terminate unless target_execution.ended?
       end
     end
   end
