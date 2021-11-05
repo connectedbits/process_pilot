@@ -10,7 +10,7 @@ module Bpmn
     end
 
     def execute(execution)
-      # wait
+      execution.wait
     end
 
     def signal(execution)
@@ -42,24 +42,21 @@ module Bpmn
     end
 
     def execute(execution)
+      execution.wait
       execution.run
     end
   end
 
-  class ScriptTask < Task
+  class ScriptTask < ServiceTask
     attr_accessor :script
 
     def initialize(moddle)
       super
       @script = moddle["script"]
     end
-
-    def execute(execution)
-      execution.run
-    end
   end
 
-  class BusinessRuleTask < Task
+  class BusinessRuleTask < ServiceTask
     attr_accessor :expression, :decision_ref, :binding, :version
 
     def initialize(moddle)
@@ -68,10 +65,6 @@ module Bpmn
       @decision_ref = moddle["decisionRef"]
       @binding = moddle["binding"]
       @version = moddle["version"]
-    end
-
-    def execute(execution)
-      execution.run
     end
   end
 end

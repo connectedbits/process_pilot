@@ -2,9 +2,6 @@
 
 module Bpmn
   class EventDefinition < Element
-
-    def execute(host_element, execution)
-    end
   end
 
   class ConditionalEventDefinition < EventDefinition
@@ -49,8 +46,12 @@ module Bpmn
       @message_ref = moddle["messageRef"]
     end
 
-    def execute(host_element, execution)
-      execution.throw_message(message_name) if host_element.is_throwing?
+    def execute(execution)
+      if execution.activity.is_throwing?
+        execution.throw_message(message_name)
+      else
+        execution.message_names.push message_name
+      end
     end
 
     def message_id
@@ -81,9 +82,9 @@ module Bpmn
 
   class TerminateEventDefinition < EventDefinition
 
-    # def execute(_host_element, execution)
-
-    # end
+    def execute(execution)
+      execution.parent&.terminate
+    end
   end
 
   class TimerEventDefinition < EventDefinition
@@ -97,9 +98,9 @@ module Bpmn
       end
     end
 
-    # def execute(_host_element, step_execution)
-    #   step_execution.set_timer(time_due)
-    # end
+    def execute(execution)
+      execution.timer_expires_at = time_due
+    end
 
     private
 

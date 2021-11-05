@@ -5,7 +5,7 @@ module Processable
     include ActiveModel::Model
     include ActiveModel::Serializers::JSON
 
-    attr_accessor :id, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id
+    attr_accessor :id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id, :timer_expires_at, :message_names
     attr_accessor :activity, :parent, :children, :context
 
     def self.start(context:, process_id:, variables: {}, start_event_id: nil, parent: nil)
@@ -34,9 +34,11 @@ module Processable
     def initialize(attributes={})
       super.tap do
         @id ||= SecureRandom.uuid
+        @status = :activated
         @variables ||= {}.with_indifferent_access
         @tokens_in ||= []
         @tokens_out ||= []
+        @message_names ||= []
         @children ||= []
       end
     end
@@ -66,25 +68,44 @@ module Processable
     end
 
     def start
+      @status = :started
       @started_at = Time.zone.now
       invoke_listeners(:started)
+      activity.attachments.each { |attachment| execute_activity(attachment) } if activity.respond_to?(:attachments)
       continue
+    end
+
+    def wait
+      @status = :waiting
     end
 
     def continue
       activity.execute(self)
     end
 
-    def terminate
+    def throw_message(message_name)
+      children.each do |child| 
+        if !child.ended? && child.message_event_definitions.any? { |message_event_definition| message_event_definition.message_name == message_name }
+          child.signal
+          break
+        end
+      end
     end
 
-    def throw(message_name)
+    def terminate
+      @status = :terminated
+      self.end
+    end
+
+    def error
     end
 
     def end(notify_parent = false)
+      @status = :completed unless status == :terminated
       parent.variables.merge!(variables) if parent && variables.present?
       @ended_at = Time.zone.now
       invoke_listeners(:ended)
+      #activity.attachments.each { |attachment| attachment.terminate unless attachment.ended? } if activity.respond_to?(:attachments)
       parent.has_ended(self) if parent && notify_parent
     end
 
@@ -157,11 +178,14 @@ module Processable
         id: id,
         activity_id: activity.id,
         activity_type: activity.type,
+        status: status,
         started_at: started_at,
         ended_at: ended_at,
         variables: variables,
         tokens_in: tokens_in,
         tokens_out: tokens_out,
+        message_name: message_names,
+        timer_expires_at: timer_expires_at,
         activities: children.map { |child| child.activity_instance },
       }.compact_blank
     end

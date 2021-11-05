@@ -62,6 +62,8 @@ module Processable
           it "should end the process" do
             _(process_instance.ended?).must_equal true
             _(sub_process_instance.ended?).must_equal true
+            skip "TODO: Why is the end event not executed?"
+            _(end_instance).wont_be_nil
           end
         end
       end

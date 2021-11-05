@@ -81,9 +81,9 @@ module Bpmn
       event_definitions.find { |ed| ed.is_a?(Bpmn::TimerEventDefinition) }
     end
 
-    # def execute(step_execution)
-    #   event_definitions.each { |ed| ed.execute(self, step_execution) }
-    # end
+    def execute(execution)
+      event_definitions.each { |event_definition| event_definition.execute(execution) }
+    end
   end
 
   class StartEvent < Event
@@ -93,6 +93,7 @@ module Bpmn
     end
 
     def execute(execution)
+      super
       leave(execution)
     end
   end
@@ -104,7 +105,7 @@ module Bpmn
     end
 
     def execute(execution)
-      execution.throw(execution.message_event_definition.message_name)
+      super
       leave(execution)
     end
   end
@@ -139,7 +140,8 @@ module Bpmn
     end
 
     def execute(execution)
-      # wait
+      super
+      execution.wait
     end
 
     def signal(execution)
@@ -155,6 +157,7 @@ module Bpmn
     end
 
     def execute(execution)
+      super
       execution.end(true)
     end
   end
