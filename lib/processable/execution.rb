@@ -5,15 +5,29 @@ module Processable
     include ActiveModel::Model
     include ActiveModel::Serializers::JSON
 
-    attr_accessor :id, :started_at, :ended_at, :variables, :tokens_in, :tokens_out
+    attr_accessor :id, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id
     attr_accessor :activity, :parent, :children, :context
 
-    def self.start(context:, process_id:, variables: {})
+    def self.start(context:, process_id:, variables: {}, start_event_id: nil, parent: nil)
       process = context.process_by_id(process_id)
       raise ExecutionError.new("Process with id #{process_id} not found.") unless process
-      Execution.new(context: context, activity: process, variables: variables).tap do |execution|
+      Execution.new(context: context, activity: process, variables: variables, start_event_id: start_event_id, parent: parent).tap do |execution|
         context.executions.push execution
         execution.start
+      end
+    end
+
+    def self.start_with_message(context:, message_name:, variables: {})
+      [].tap do |executions|
+        context.processes.map do |process|
+          process.start_events.map do |start_event|
+            start_event.message_event_definitions.map do |message_event_definition|
+              if message_name == message_event_definition.message_name
+                Execution.start(context: context, process_id: process&.id, variables: variables, start_event: start_event.id).tap { |execution| executions.push execution }
+              end
+            end
+          end
+        end
       end
     end
 
@@ -64,6 +78,9 @@ module Processable
     def terminate
     end
 
+    def throw(message_name)
+    end
+
     def end(notify_parent = false)
       parent.variables.merge!(variables) if parent && variables.present?
       @ended_at = Time.zone.now
@@ -83,38 +100,36 @@ module Processable
       parent.execute_activity(to_activity, sequence_flow)
     end
 
-    def signal(variables = {})
-      @variables.merge(variables) if variables.present?
+    def signal(result = nil)
+      @variables.merge!(result_to_variables(result)) if result.present?
       raise ExecutionError.new("Cannot signal an activity instance that has ended.") if ended?
       activity.signal(self)
     end
 
-    def run
-      result = nil
-      if activity.is_a?(Bpmn::ServiceTask)
-        result = context.service_task_runner.call(self, context) if context.service_task_runner.present?
-      elsif activity.is_a?(Bpmn::ScriptTask)
-        result = context.script_task_runner.call(self, context) if context.script_task_runner.present?
-      elsif activity.is_a?(Bpmn::BusinessRuleTask)
-        result = context.business_rule_task_runner.call(self, context) if context.business_rule_task_runner.present?
-      end
-      variables.merge!(result_to_variables(result)) if result
-    end
-
     def result_to_variables(result)
-      if element.result_variable
-        return { "#{element.result_variable}": result }
+      if activity.result_variable
+        return { "#{activity.result_variable}": result }
       else
         if result.is_a? Hash
           result
         else
-          {}.tap { |h| h[element.id.underscore] = result }
+          {}.tap { |h| h[activity.id.underscore] = result }
         end
       end
     end
 
+    def run
+      if activity.is_a?(Bpmn::ServiceTask)
+        context.service_task_runner.call(self, context) if context.service_task_runner.present?
+      elsif activity.is_a?(Bpmn::ScriptTask)
+        context.script_task_runner.call(self, context) if context.script_task_runner.present?
+      elsif activity.is_a?(Bpmn::BusinessRuleTask)
+        context.business_rule_task_runner.call(self, context) if context.business_rule_task_runner.present?
+      end
+    end
+
     def call(process_id)
-      Execution.start(context: context, process_id: process_id, variables: variables)
+      Execution.start(context: context, process_id: process_id, variables: variables, parent: self)
     end
 
     #

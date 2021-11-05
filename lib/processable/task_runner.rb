@@ -2,15 +2,15 @@
 
 module Processable
   class TaskRunner
-    attr_reader :step, :context
+    attr_reader :execution, :context
 
     def self.call(*args, &block)
       new(*args, &block).call
     end
 
-    def initialize(step, context)
+    def initialize(execution, context)
       super()
-      @step = step
+      @execution = execution
       @context = context
     end
 
@@ -18,34 +18,34 @@ module Processable
     end
 
     def variables
-      step.execution.variables
+      execution.parent.variables.with_indifferent_access
     end
   end
 
   class ServiceTaskRunner < TaskRunner
 
     def call
-      topic = step.element.topic if step.element.respond_to?(:topic)
+      topic = execution.activity.topic if execution.activity.respond_to?(:topic)
       raise ExecutionError.new("Topic required for service task") unless topic
       service = context.services[topic.to_sym]
       raise ExecutionError.new("No service found for topic #{topic}") unless service
-      service.call(step, variables)
+      service.call(execution, variables)
     end
   end
 
   class ScriptTaskRunner < TaskRunner
 
     def call
-      script = step.element.script if step.element.respond_to?(:script)
+      script = execution.activity.script if execution.activity.respond_to?(:script)
       raise ExecutionError.new("Script required for script task") unless script
-      ProcessableServices::ScriptRunner.call(script: script, variables: step.execution.variables, procs: procs)
+      ProcessableServices::ScriptRunner.call(script: script, variables: variables, procs: procs)
     end
 
     private
 
     def procs
       {
-        complete: proc { |variables| step.complete(variables) },
+        signal: proc { |variables| execution.signal(variables) },
         error: proc { |code, message = nil| },
       }
     end
@@ -54,17 +54,17 @@ module Processable
   class BusinessRuleTaskRunner < TaskRunner
 
     def call
-      expression = step.element.expression
-      decision_ref = step.element.decision_ref
+      expression = execution.activity.expression
+      decision_ref = execution.activity.decision_ref
 
       if expression
-        result = ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: step.execution.variables)
-        step.complete(result)
+        result = ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: variables)
+        execution.signal(result)
       elsif decision_ref
         source = context.decisions[decision_ref]
         raise ExecutionError.new("Source not found for decision ref #{decision_ref}") unless source
-        result = ProcessableServices::DecisionEvaluator.call(decision_ref, source, step.execution.variables)
-        step.complete(result)
+        result = ProcessableServices::DecisionEvaluator.call(decision_ref, source, variables)
+        execution.signal(result)
       end
     end
   end

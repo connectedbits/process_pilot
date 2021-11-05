@@ -81,10 +81,9 @@ module Bpmn
       event_definitions.find { |ed| ed.is_a?(Bpmn::TimerEventDefinition) }
     end
 
-    def execute(step_execution)
-      super
-      event_definitions.each { |ed| ed.execute(self, step_execution) }
-    end
+    # def execute(step_execution)
+    #   event_definitions.each { |ed| ed.execute(self, step_execution) }
+    # end
   end
 
   class StartEvent < Event
@@ -92,11 +91,6 @@ module Bpmn
     def is_catching?
       true
     end
-
-    # def execute(step_execution)
-    #   super
-    #   step_execution.continue
-    # end
 
     def execute(execution)
       leave(execution)
@@ -109,10 +103,10 @@ module Bpmn
       true
     end
 
-    # def execute(step_execution)
-    #   super
-    #   step_execution.continue
-    # end
+    def execute(execution)
+      execution.throw(execution.message_event_definition.message_name)
+      leave(execution)
+    end
   end
 
   class IntermediateCatchEvent < Event
@@ -121,10 +115,13 @@ module Bpmn
       true
     end
 
-    # def execute(step_execution)
-    #   super
-    #   step_execution.wait
-    # end
+    def execute(execution)
+      # wait
+    end
+
+    def signal(execution)
+      leave(execution)
+    end
   end
 
   class BoundaryEvent < Event
@@ -141,10 +138,14 @@ module Bpmn
       true
     end
 
-    # def execute(step_execution)
-    #   super
-    #   step_execution.wait
-    # end
+    def execute(execution)
+      # wait
+    end
+
+    def signal(execution)
+      execution.parent.terminate if cancel_activity
+      leave(execution)
+    end
   end
 
   class EndEvent < Event
@@ -152,11 +153,6 @@ module Bpmn
     def is_throwing?
       true
     end
-
-    # def execute(step_execution)
-    #   super
-    #   step_execution.end
-    # end
 
     def execute(execution)
       execution.end(true)

@@ -5,7 +5,7 @@ module Processable
     include ActiveModel::Model
     include ActiveModel::Serializers::JSON
 
-    attr_accessor :id, :process_id, :start_event_id, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id, :steps
+    attr_accessor :id, :process_id, :start_event, :status, :started_at, :ended_at, :variables, :parent_id, :called_by_id, :steps
     attr_accessor :context
     attr_writer :process, :start_event
 

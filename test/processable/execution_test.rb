@@ -8,24 +8,24 @@ module Processable
     let(:context) { Context.new(sources: source)  }
 
     describe :definition do
-      let(:process_activity) { context.process_by_id("Process") }
-      let(:start_activity) { process_activity.element_by_id("Start") }
-      let(:task_activity) { process_activity.element_by_id("Task") }
-      let(:end_activity) { process_activity.element_by_id("End") }
-      let(:sub_process_activity) { context.process_by_id("SubProcess") }
-      let(:sub_start_activity) { sub_process_activity.element_by_id("SubStart") }
-      let(:sub_task_activity) { sub_process_activity.element_by_id("SubTask") }
-      let(:sub_end_activity) { sub_process_activity.element_by_id("SubEnd") }
+      let(:process_definition) { context.process_by_id("Process") }
+      let(:start_definition) { process_definition.element_by_id("Start") }
+      let(:task_definition) { process_definition.element_by_id("Task") }
+      let(:end_definition) { process_definition.element_by_id("End") }
+      let(:sub_process_definition) { context.process_by_id("SubProcess") }
+      let(:sub_start_definition) { sub_process_definition.element_by_id("SubStart") }
+      let(:sub_task_definition) { sub_process_definition.element_by_id("SubTask") }
+      let(:sub_end_definition) { sub_process_definition.element_by_id("SubEnd") }
 
       it "should parse the process" do
-        _(process_activity).wont_be_nil
-        _(start_activity).wont_be_nil
-        _(task_activity).wont_be_nil
-        _(end_activity).wont_be_nil
-        _(sub_process_activity).wont_be_nil
-        _(sub_start_activity).wont_be_nil
-        _(sub_task_activity).wont_be_nil
-        _(sub_end_activity).wont_be_nil
+        _(process_definition).wont_be_nil
+        _(start_definition).wont_be_nil
+        _(task_definition).wont_be_nil
+        _(end_definition).wont_be_nil
+        _(sub_process_definition).wont_be_nil
+        _(sub_start_definition).wont_be_nil
+        _(sub_task_definition).wont_be_nil
+        _(sub_end_definition).wont_be_nil
       end
     end
 
