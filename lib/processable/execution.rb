@@ -185,7 +185,7 @@ module Processable
       end.uniq
     end
 
-    def activity_instance
+    def as_json
       {
         id: id,
         activity_id: activity.id,
@@ -198,7 +198,7 @@ module Processable
         tokens_out: tokens_out,
         message_name: message_names,
         timer_expires_at: timer_expires_at,
-        activities: children.map { |child| child.activity_instance },
+        activities: children.map { |child| child.as_json },
       }.compact_blank
     end
   end

@@ -86,19 +86,20 @@ module Processable
       before { @process = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true }) }
 
       it "should start the process" do
+        ap process.as_json
         _(process.ended?).must_equal false
         _(introduce_yourself.status).must_equal :waiting
       end
 
-      describe :signal do
-        before { introduce_yourself.signal(variables: { name: "Eric", language: "it", formal: false }) }
+      # describe :signal do
+      #   before { introduce_yourself.signal({ name: "Eric", language: "it", formal: false }) }
 
-        it "should end the process" do
-          ap process.activity_instance
-          _(process.ended?).must_equal true
-          _(introduce_yourself.ended?).must_equal true
-        end
-      end
+      #   it "should end the process" do
+      #     ap process.as_json
+      #     _(process.ended?).must_equal true
+      #     _(introduce_yourself.ended?).must_equal true
+      #   end
+      # end
     end
   end
 end
