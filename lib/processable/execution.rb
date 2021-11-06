@@ -70,13 +70,14 @@ module Processable
     def start
       @status = :started
       @started_at = Time.zone.now
-      invoke_listeners(:started)
+      context.notify_listener({ event: :started, execution: self })
       activity.attachments.each { |attachment| execute_activity(attachment) } if activity.respond_to?(:attachments)
       continue
     end
 
     def wait
       @status = :waiting
+      context.notify_listener({ event: :waited, execution: self })
     end
 
     def continue
@@ -84,12 +85,13 @@ module Processable
     end
 
     def throw_message(message_name)
-      children.each do |child| 
+      children.each do |child|
         if !child.ended? && child.message_event_definitions.any? { |message_event_definition| message_event_definition.message_name == message_name }
           child.signal
           break
         end
       end
+      context.notify_listener({ event: :thrown, execution: self, message_name: message_name })
     end
 
     def terminate
@@ -104,8 +106,8 @@ module Processable
       @status = :completed unless status == :terminated
       parent.variables.merge!(variables) if parent && variables.present?
       @ended_at = Time.zone.now
-      invoke_listeners(:ended)
-      #activity.attachments.each { |attachment| attachment.terminate unless attachment.ended? } if activity.respond_to?(:attachments)
+      context.notify_listener({ event: :ended, execution: self })
+      children.each { |child| child.terminate unless child.ended? }
       parent.has_ended(self) if parent && notify_parent
     end
 
@@ -117,7 +119,7 @@ module Processable
       to_activity = sequence_flow.target
       tokens_out.push sequence_flow.id
       self.end(false)
-      invoke_listeners(:taken, sequence_flow)
+      context.notify_listener({ event: :taken, execution: self, sequence_flow: sequence_flow })
       parent.execute_activity(to_activity, sequence_flow)
     end
 
@@ -125,6 +127,14 @@ module Processable
       @variables.merge!(result_to_variables(result)) if result.present?
       raise ExecutionError.new("Cannot signal an activity instance that has ended.") if ended?
       activity.signal(self)
+    end
+
+    def evaluate_condition(condition)
+      evaluate_expression(condition.body) == true
+    end
+
+    def evaluate_expression(expression)
+      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: variables)
     end
 
     def result_to_variables(result)
@@ -140,11 +150,12 @@ module Processable
     end
 
     def run
-      if activity.is_a?(Bpmn::ServiceTask)
+      case activity.type
+      when "bpmn:ServiceTask"
         context.service_task_runner.call(self, context) if context.service_task_runner.present?
-      elsif activity.is_a?(Bpmn::ScriptTask)
+      when "bpmn:ScriptTask"
         context.script_task_runner.call(self, context) if context.script_task_runner.present?
-      elsif activity.is_a?(Bpmn::BusinessRuleTask)
+      when "bpmn:BusinessRuleTask"
         context.business_rule_task_runner.call(self, context) if context.business_rule_task_runner.present?
       end
     end
@@ -157,7 +168,8 @@ module Processable
     # Called by the child activity executors when they have ended
     #
     def has_ended(_child)
-      self.end(true) if tokens.empty?
+      activity.leave(self) if activity.is_a?(Bpmn::SubProcess) || activity.is_a?(Bpmn::CallActivity)
+      self.end(true)
     end
 
     def child_by_activity_id(id)

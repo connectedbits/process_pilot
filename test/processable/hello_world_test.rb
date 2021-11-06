@@ -68,18 +68,7 @@ module Processable
         },
       }
     }
-    let(:log) { @log }
-    let(:listeners) {
-      {
-        started:    proc { |event| log.push event },
-        waited:     proc { |event| log.push event },
-        terminated: proc { |event| log.push event },
-        errored:    proc { |event| log.push event },
-        completed:  proc { |event| log.push event },
-      }
-    }
-    let(:last)
-    let(:context) { Context.new(sources: [bpmn_source, dmn_source], services: services, listeners: listeners) }
+    let(:context) { Context.new(sources: [bpmn_source, dmn_source], services: services) }
 
     describe :definition do
       let(:process) { context.process_by_id("HelloWorld") }
@@ -91,54 +80,25 @@ module Processable
     end
 
     describe :execution do
-      let(:execution) { @execution }
-      let(:introduce_yourself) { execution.child_by_activity_id("IntroduceYourself") }
+      let(:process) { @process }
+      let(:introduce_yourself) { process.child_by_activity_id("IntroduceYourself") }
 
-      before do
-        @log = []
-        @execution = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true })
-      end
+      before { @process = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true }) }
 
       it "should start the process" do
-        #ap execution.activity_instance
-        _(execution.ended?).must_equal false
+        _(process.ended?).must_equal false
         _(introduce_yourself.status).must_equal :waiting
-        #_(log.last[:event]).must_equal :waiting
       end
 
-      # describe :signal do
-      #   before { introduce_task.signal(variables: { name: "Eric", language: "it", formal: false }) }
+      describe :signal do
+        before { introduce_yourself.signal(variables: { name: "Eric", language: "it", formal: false }) }
 
-      #   it "should end the process" do
-      #     _(execution.ended?).must_equal true
-      #     _(introduce_task.ended?).must_equal true
-      #   end
-      # end
-
-      # describe :serialization do
-      #   let(:json) { @json }
-      #   let(:new_execution) { @new_execution }
-
-      #   before do
-      #     @json = execution.to_json(include: :steps)
-      #     @new_execution = Execution.deserialize(json, context: context)
-      #   end
-
-      #   it "should be lossless" do
-      #     _(new_execution.serialize).must_equal(json)
-      #   end
-
-      #   describe :execution_after_serialization do
-      #     let (:user_step) { new_execution.step_by_element_id("IntroduceYourself") }
-
-      #     before { user_step.invoke(variables: { name: "Eric", language: "it", formal: false }) }
-
-      #     it "should end the process" do
-      #       _(new_execution.ended?).must_equal true
-      #       _(user_step.ended?).must_equal true
-      #     end
-      #   end
-      # end
+        it "should end the process" do
+          ap process.activity_instance
+          _(process.ended?).must_equal true
+          _(introduce_yourself.ended?).must_equal true
+        end
+      end
     end
   end
 end

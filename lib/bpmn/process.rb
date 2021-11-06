@@ -54,6 +54,10 @@ module Bpmn
       @sub_processes = []
       @triggered_by_event = moddle["triggeredByEvent"]
     end
+
+    def execution_ended(execution)
+      leave(execution)
+    end
   end
 
   class AdHocSubProcess < SubProcess
