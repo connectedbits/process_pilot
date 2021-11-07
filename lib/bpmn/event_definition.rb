@@ -32,6 +32,14 @@ module Bpmn
       @error_message_variable = moddle["errorMessageVariable"]
     end
 
+    def execute(execution)
+      if execution.step.is_throwing?
+        execution.throw_error(error_name)
+      else
+        execution.error_names.push error_name
+      end
+    end
+
     def error_id
       error&.id
     end
@@ -102,7 +110,9 @@ module Bpmn
     end
 
     def execute(execution)
-      execution.timer_expires_at = time_due
+      if execution.step.is_catching?
+        execution.timer_expires_at = time_due
+      end
     end
 
     private

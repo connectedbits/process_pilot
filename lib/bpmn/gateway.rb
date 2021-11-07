@@ -5,7 +5,11 @@ module Bpmn
 
     def execute(execution)
       if converging?
-        return leave(execution) if is_enabled?(execution)
+        if is_enabled?(execution)
+          return leave(execution)
+        else
+          execution.wait
+        end
       else
         return leave(execution)
       end

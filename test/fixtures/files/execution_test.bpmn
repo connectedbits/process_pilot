@@ -22,6 +22,7 @@
     </bpmn:subProcess>
     <bpmn:endEvent id="End" name="End">
       <bpmn:incoming>Flow_1nxfdfo</bpmn:incoming>
+      <bpmn:incoming>Flow_15sc4po</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1nxfdfo" sourceRef="SubProcess" targetRef="End" />
     <bpmn:task id="Task" name="Task">
@@ -30,30 +31,33 @@
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_0k4yg6z" sourceRef="Task" targetRef="SubProcess" />
     <bpmn:sequenceFlow id="Flow_0v82x0v" sourceRef="Start" targetRef="Task" />
+    <bpmn:sequenceFlow id="Flow_15sc4po" sourceRef="Catch" targetRef="End" />
+    <bpmn:boundaryEvent id="Catch" attachedToRef="Task">
+      <bpmn:outgoing>Flow_15sc4po</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0zxmgov" messageRef="Message_23jdg8k" />
+    </bpmn:boundaryEvent>
   </bpmn:process>
+  <bpmn:message id="Message_23jdg8k" name="Message_Bypass" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process">
-      <bpmndi:BPMNEdge id="Flow_1nxfdfo_di" bpmnElement="Flow_1nxfdfo">
-        <di:waypoint x="790" y="180" />
-        <di:waypoint x="862" y="180" />
+      <bpmndi:BPMNEdge id="Flow_0v82x0v_di" bpmnElement="Flow_0v82x0v">
+        <di:waypoint x="188" y="180" />
+        <di:waypoint x="250" y="180" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0k4yg6z_di" bpmnElement="Flow_0k4yg6z">
         <di:waypoint x="350" y="180" />
         <di:waypoint x="415" y="180" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0v82x0v_di" bpmnElement="Flow_0v82x0v">
-        <di:waypoint x="188" y="180" />
-        <di:waypoint x="250" y="180" />
+      <bpmndi:BPMNEdge id="Flow_1nxfdfo_di" bpmnElement="Flow_1nxfdfo">
+        <di:waypoint x="790" y="180" />
+        <di:waypoint x="862" y="180" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1yphwzz_di" bpmnElement="End">
-        <dc:Bounds x="862" y="162" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="870" y="205" width="20" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_17kl8fe_di" bpmnElement="Task">
-        <dc:Bounds x="250" y="140" width="100" height="80" />
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_15sc4po_di" bpmnElement="Flow_15sc4po">
+        <di:waypoint x="300" y="238" />
+        <di:waypoint x="300" y="340" />
+        <di:waypoint x="880" y="340" />
+        <di:waypoint x="880" y="198" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="Start">
         <dc:Bounds x="152" y="162" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -63,13 +67,13 @@
       <bpmndi:BPMNShape id="Activity_1elswis_di" bpmnElement="SubProcess" isExpanded="true">
         <dc:Bounds x="415" y="80" width="375" height="200" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1pfqum7_di" bpmnElement="Flow_1pfqum7">
-        <di:waypoint x="491" y="180" />
-        <di:waypoint x="550" y="180" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0o00qhz_di" bpmnElement="Flow_0o00qhz">
         <di:waypoint x="650" y="180" />
         <di:waypoint x="712" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pfqum7_di" bpmnElement="Flow_1pfqum7">
+        <di:waypoint x="491" y="180" />
+        <di:waypoint x="550" y="180" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_14o7iqj_di" bpmnElement="SubStart">
         <dc:Bounds x="455" y="162" width="36" height="36" />
@@ -84,6 +88,21 @@
         <dc:Bounds x="712" y="162" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="709" y="205" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1yphwzz_di" bpmnElement="End">
+        <dc:Bounds x="862" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="870" y="138" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17kl8fe_di" bpmnElement="Task">
+        <dc:Bounds x="250" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1sy8zgu_di" bpmnElement="Catch">
+        <dc:Bounds x="282" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="241" y="245" width="37" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

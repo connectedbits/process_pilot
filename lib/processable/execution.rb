@@ -6,7 +6,7 @@ module Processable
     include ActiveModel::Serializers::JSON
 
     attr_accessor :id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id, :timer_expires_at, :message_names, :error_names, :condition
-    attr_accessor :step, :parent, :children, :context
+    attr_accessor :step, :parent, :children, :context, :attached_to_id
 
     def self.start(context:, process_id:, variables: {}, start_event_id: nil, parent: nil)
       process = context.process_by_id(process_id)
@@ -32,15 +32,27 @@ module Processable
     end
 
     def initialize(attributes={})
-      super.tap do
+      super(attributes).tap do
         @id ||= SecureRandom.uuid
-        @status = :activated
+        @status ||= "activated"
         @variables ||= {}.with_indifferent_access
         @tokens_in ||= []
         @tokens_out ||= []
         @message_names ||= []
+        @error_names ||= []
         @children ||= []
+        @started_at = Time.zone.parse(started_at.to_s) if started_at && started_at.is_a?(String)
+        @ended_at = Time.zone.parse(started_at.to_s) if ended_at && ended_at.is_a?(String)
+        @timer_expires_at = Time.zone.parse(timer_expires_at.to_s) if timer_expires_at && timer_expires_at.is_a?(String)
       end
+    end
+
+    def parse_date
+
+    end
+
+    def attached_to
+      @attached_to ||= parent.children.find { |child| child.id == attached_to_id } if parent
     end
 
     def started?
@@ -52,23 +64,19 @@ module Processable
     end
 
     def running?
-      status == :running
+      status == "running"
     end
 
     def waiting?
-      status == :waiting
+      status == "waiting"
     end
 
     def completed?
-      status == :completed
+      status == "completed"
     end
 
     def terminated?
-      status == :terminated
-    end
-
-    def errored?
-      status == :errored
+      status == "terminated"
     end
 
     def bind_variable_scope(scope)
@@ -80,10 +88,10 @@ module Processable
       steps.each { |step| execute_step(step) }
     end
 
-    def execute_step(step, sequence_flow = nil)
-      child_execution = Execution.new(context: context, step: step, parent: self)
-      children.push child_execution
-      child_execution.tokens_in = [sequence_flow.id] if sequence_flow
+    def execute_step(step, attached_to: nil, sequence_flow: nil)
+      child_execution = children.find { |child| child.step.id == step.id }
+      child_execution = Execution.new(context: context, step: step, parent: self, attached_to_id: attached_to&.id).tap { |ce| children.push ce } unless child_execution
+      child_execution.tokens_in += [sequence_flow.id] if sequence_flow
       child_execution.start
     end
 
@@ -92,15 +100,15 @@ module Processable
     end
 
     def start
-      @status = :running
+      @status = "running"
       @started_at = Time.zone.now
       context.notify_listener({ event: :started, execution: self })
-      step.attachments.each { |attachment| execute_step(attachment) } if step.is_a?(Bpmn::Activity)
+      step.attachments.each { |attachment| parent.execute_step(attachment, attached_to: self) } if step.is_a?(Bpmn::Activity)
       continue
     end
 
     def wait
-      @status = :waiting
+      @status = "waiting"
       context.notify_listener({ event: :waited, execution: self })
     end
 
@@ -108,30 +116,18 @@ module Processable
       step.execute(self)
     end
 
-    def throw_message(message_name)
-      children.each do |child|
-        if !child.ended? && child.message_event_definitions.any? { |message_event_definition| message_event_definition.message_name == message_name }
-          child.signal
-          break
-        end
-      end
-      context.notify_listener({ event: :thrown, execution: self, message_name: message_name })
-    end
-
     def terminate
-      @status = :terminated
+      @status = "terminated"
       self.end
     end
 
-    def error
-    end
-
     def end(notify_parent = false)
-      @status = :completed unless status == :terminated
+      @status = "completed" unless status == "terminated"
       parent.variables.merge!(variables) if parent && variables.present?
       @ended_at = Time.zone.now
       context.notify_listener({ event: :ended, execution: self })
       children.each { |child| child.terminate unless child.ended? }
+      parent.children.each { |child| child.terminate if child.attached_to == self && child.waiting? } if parent
       parent.has_ended(self) if parent && notify_parent
     end
 
@@ -142,19 +138,40 @@ module Processable
     def take(sequence_flow)
       to_step = sequence_flow.target
       tokens_out.push sequence_flow.id
-      self.end(false)
       context.notify_listener({ event: :taken, execution: self, sequence_flow: sequence_flow })
-      parent.execute_step(to_step, sequence_flow)
+      parent.execute_step(to_step, sequence_flow: sequence_flow)
     end
 
     def signal(result = nil)
       @variables.merge!(result_to_variables(result)) if result.present?
-      raise ExecutionError.new("Cannot signal a step execution that has ended.") if ended?
+      #raise ExecutionError.new("Cannot signal a step execution that has ended.") if ended?
       step.signal(self)
     end
 
+    def throw_message(message_name, variables: {})
+      waiting_children.each do |child|
+        step = child.step
+        if step.is_a?(Bpmn::Event) && step.message_event_definitions.any? { |message_event_definition| message_event_definition.message_name == message_name }
+          child.signal(variables)
+          break
+        end
+      end
+      context.notify_listener({ event: :thrown, execution: self, message_name: message_name })
+    end
+
+    def throw_error(error_name, variables: {})
+      waiting_children.each do |child|
+        step = child.step
+        if step.is_a?(Bpmn::Event) && step.error_event_definitions.any? { |error_event_definition| error_event_definition.error_name == error_name }
+          child.signal(variables)
+          break
+        end
+      end
+      context.notify_listener({ event: :thrown, execution: self, error_name: error_name })
+    end
+
     def check_expired_timers
-      children.each { |child| child.signal if child.expires_at.present? && Time.zone.now > child.expires_at }
+      waiting_children.each { |child| child.signal if child.timer_expires_at.present? && Time.zone.now > child.timer_expires_at }
     end
 
     def evaluate_condition(condition)
@@ -166,7 +183,7 @@ module Processable
     end
 
     def result_to_variables(result)
-      if step.result_variable
+      if step.respond_to?(:result_variable) && step.result_variable
         return { "#{step.result_variable}": result }
       else
         if result.is_a? Hash
@@ -189,7 +206,6 @@ module Processable
     end
 
     def call(process_id)
-      #Execution.start(context: context, process_id: process_id, variables: variables, parent: self)
       execute_step(context.process_by_id(process_id))
     end
 
@@ -205,20 +221,25 @@ module Processable
       children.find { |child| child.step.id == id }
     end
 
-    def tokens
-      [].tap do |active_tokens|
-        children.each do |child|
-          active_tokens += child.tokens_out
-          active_tokens -= child.tokens_in if child.ended?
-        end
-      end.uniq
+    def waiting_children
+      children.filter { |child| child.waiting? }
     end
 
-    def as_json
+    def tokens(active_tokens = [])
+      children.each do |child|
+        active_tokens = active_tokens + child.tokens_out
+        active_tokens = active_tokens - child.tokens_in if child.ended?
+        active_tokens = active_tokens + child.tokens(active_tokens)
+      end
+      active_tokens.uniq
+    end
+
+    def as_json(_options = {})
       {
         id: id,
-        step_id: step.id,
-        step_type: step.type,
+        step_id: step&.id,
+        step_type: step&.type,
+        attached_to_id: attached_to_id,
         status: status,
         started_at: started_at,
         ended_at: ended_at,
@@ -229,8 +250,27 @@ module Processable
         error_names: error_names,
         timer_expires_at: timer_expires_at,
         condition: condition,
-        activities: children.map { |child| child.as_json },
+        children: children.map { |child| child.as_json },
       }.compact_blank
+    end
+
+    def serialize
+      to_json
+    end
+
+    def self.deserialize(json, context:)
+      attributes = JSON.parse(json)
+      Execution.from_json(attributes, context: context)
+    end
+
+    def self.from_json(attributes, context:)
+      step_id = attributes.delete("step_id")
+      step_type = attributes.delete("step_type")
+      step = step_type == "bpmn:Process" ? context.process_by_id(step_id) : context.element_by_id(step_id)
+      child_attributes = attributes.delete("children")
+      Execution.new(attributes.merge(step: step)).tap do |execution|
+        execution.children = child_attributes.map { |ca| Execution.from_json(ca, context: context) } if child_attributes
+      end
     end
   end
 end

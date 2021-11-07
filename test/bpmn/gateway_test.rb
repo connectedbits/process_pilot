@@ -68,42 +68,42 @@ module Bpmn
       end
     end
 
-    # describe :execution do
-    #   let(:process) { @process }
-    #   let(:split) { process.child_by_step_id("Split") }
-    #   let(:join) { process.child_by_step_id("Join") }
-    #   let(:task_a) { process.child_by_step_id("TaskA") }
-    #   let(:task_b) { process.child_by_step_id("TaskB") }
+    describe :execution do
+      let(:process) { @process }
+      let(:split) { process.child_by_step_id("Split") }
+      let(:join) { process.child_by_step_id("Join") }
+      let(:task_a) { process.child_by_step_id("TaskA") }
+      let(:task_b) { process.child_by_step_id("TaskB") }
 
-    #   before { @process = Processable::Execution.start(context: context, process_id: "ParallelGatewayTest") }
+      before { @process = Processable::Execution.start(context: context, process_id: "ParallelGatewayTest") }
 
-    #   it "should diverge at the first gateway" do
-    #     _(split.ended?).must_equal true
-    #     _(join).must_be_nil
-    #     _(process.children.count).must_equal 4
-    #   end
+      it "should diverge at the first gateway" do
+        _(split.ended?).must_equal true
+        _(join).must_be_nil
+        _(process.children.count).must_equal 4
+      end
 
-    #   describe :converging do
-    #     before { task_a.signal }
+      describe :converging do
+        before { task_a.signal }
 
-    #     it "should wait when first token arrives" do
-    #       _(task_a.ended?).must_equal true
-    #       _(task_b.ended?).must_equal false
-    #       _(join.ended?).must_equal false
-    #     end
+        it "should wait when first token arrives" do
+          _(task_a.ended?).must_equal true
+          _(task_b.ended?).must_equal false
+          _(join.ended?).must_equal false
+        end
 
-    #     describe :join do
-    #       before { task_b.signal }
+        describe :join do
+          before { task_b.signal }
 
-    #       it "should continue from join gateway" do
-    #         _(execution.ended?).must_equal true
-    #         _(task_a.ended?).must_equal true
-    #         _(task_b.ended?).must_equal true
-    #         _(join.ended?).must_equal true
-    #       end
-    #     end
-    #   end
-    # end
+          it "should continue from join gateway" do
+            _(process.ended?).must_equal true
+            _(task_a.ended?).must_equal true
+            _(task_b.ended?).must_equal true
+            _(join.ended?).must_equal true
+          end
+        end
+      end
+    end
 
     describe InclusiveGateway do
       let(:source) { fixture_source("inclusive_gateway_test.bpmn") }
@@ -170,33 +170,33 @@ module Bpmn
           end
         end
 
-        # describe :multiple_paths do
-        #   before { receive_order.signal({ include_laptop_parts: true, include_printer_parts: true }) }
+        describe :multiple_paths do
+          before { receive_order.signal({ include_laptop_parts: true, include_printer_parts: true }) }
 
-        #   it "should create the correct tasks" do
-        #     _(check_laptop_parts).wont_be_nil
-        #     _(check_printer_parts).wont_be_nil
-        #     _(check_prices).must_be_nil
-        #   end
+          it "should create the correct tasks" do
+            _(check_laptop_parts).wont_be_nil
+            _(check_printer_parts).wont_be_nil
+            _(check_prices).must_be_nil
+          end
 
-        #   describe :resume_first do
-        #     before { check_laptop_parts.signal }
+          describe :resume_first do
+            before { check_laptop_parts.signal }
 
-        #     it "should wait at join gateway" do
-        #       _(check_laptop_parts.ended?).must_equal true
-        #       _(check_printer_parts.ended?).must_equal false
-        #     end
+            it "should wait at join gateway" do
+              _(check_laptop_parts.ended?).must_equal true
+              _(check_printer_parts.ended?).must_equal false
+            end
 
-        #     describe :resume_second do
-        #       before { check_printer_parts.signal }
+            describe :resume_second do
+              before { check_printer_parts.signal }
 
-        #       it "should complete the process" do
-        #         _(execution.ended?).must_equal true
-        #         _(check_printer_parts.ended?).must_equal true
-        #       end
-        #     end
-        #   end
-        # end
+              it "should complete the process" do
+                _(process.ended?).must_equal true
+                _(check_printer_parts.ended?).must_equal true
+              end
+            end
+          end
+        end
       end
     end
 

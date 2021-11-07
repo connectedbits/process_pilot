@@ -46,6 +46,14 @@ module Processable
       nil
     end
 
+    def element_by_id(id)
+      processes.each do |process|
+        element = process.element_by_id(id)
+        return element if element
+      end
+      nil
+    end
+
     def execution_by_id(id)
       executions.find { |e| e.id == id }
     end

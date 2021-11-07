@@ -61,6 +61,10 @@ module Bpmn
       event_definitions.find { |ed| ed.is_a?(Bpmn::EscalationEventDefinition) }
     end
 
+    def error_event_definitions
+      event_definitions.select { |ed| ed.is_a?(Bpmn::ErrorEventDefinition) }
+    end
+
     def error_event_definition
       event_definitions.find { |ed| ed.is_a?(Bpmn::ErrorEventDefinition) }
     end
@@ -117,7 +121,8 @@ module Bpmn
     end
 
     def execute(execution)
-      # wait
+      super
+      execution.wait
     end
 
     def signal(execution)
@@ -145,7 +150,7 @@ module Bpmn
     end
 
     def signal(execution)
-      execution.parent.terminate if cancel_activity
+      execution.attached_to.terminate if cancel_activity
       leave(execution)
     end
   end

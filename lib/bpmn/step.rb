@@ -20,6 +20,7 @@ module Bpmn
     end
 
     def leave(execution)
+      execution.end(false)
       execution.take_all(outgoing_flows(execution))
     end
 
