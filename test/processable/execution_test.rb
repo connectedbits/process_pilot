@@ -31,18 +31,18 @@ module Processable
 
     describe :execution do
       let(:process) { @process }
-      let(:start_event) { process.child_by_activity_id("Start") }
-      let(:task) { process.child_by_activity_id("Task") }
-      let(:end_event) { process.child_by_activity_id("End") }
-      let(:sub_process) { process.child_by_activity_id("SubProcess") }
-      let(:sub_start_event) { sub_process.child_by_activity_id("SubStart") }
-      let(:sub_task) { sub_process.child_by_activity_id("SubTask") }
-      let(:sub_end_event) { sub_process.child_by_activity_id("SubEnd") }
+      let(:start_event) { process.child_by_step_id("Start") }
+      let(:task) { process.child_by_step_id("Task") }
+      let(:end_event) { process.child_by_step_id("End") }
+      let(:sub_process) { process.child_by_step_id("SubProcess") }
+      let(:sub_start_event) { sub_process.child_by_step_id("SubStart") }
+      let(:sub_task) { sub_process.child_by_step_id("SubTask") }
+      let(:sub_end_event) { sub_process.child_by_step_id("SubEnd") }
 
       before { @process = Execution.start(context: context, process_id: "Process") }
 
       it "should start the process" do
-        _(process.ended?).must_equal false
+        _(process.started?).must_equal true
         _(start_event.ended?).must_equal true
       end
 
@@ -50,9 +50,8 @@ module Processable
         before { task.signal }
 
         it "should start the sub process" do
-          _(process.ended?).must_equal false
-          _(sub_process).wont_be_nil
-          _(sub_task.ended?).must_equal false
+          _(sub_process.started?).must_equal true
+          _(sub_task.waiting?).must_equal true
         end
 
         describe :signal_sub do

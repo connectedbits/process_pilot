@@ -21,16 +21,16 @@ module Bpmn
     end
 
     describe :execution do
-      let(:execution) { @execution }
-      let(:start_step) { execution.step_by_element_id("Start") }
-      let(:end_step) { execution.step_by_element_id("End") }
+      let(:process) { @process }
+      let(:start_event) { process.child_by_step_id("Start") }
+      let(:end_event) { process.child_by_step_id("End") }
 
-      before { @execution = Processable::Execution.start(context: context, process_id: "ProcessTest", start_event_id: "Start") }
+      before { @process = Processable::Execution.start(context: context, process_id: "ProcessTest", start_event_id: "Start") }
 
       it "should start and end the process" do
-        _(execution.ended?).must_equal true
-        _(start_step.ended?).must_equal true
-        _(end_step.ended?).must_equal true
+        _(process.completed?).must_equal true
+        _(start_event.completed?).must_equal true
+        _(end_event.completed?).must_equal true
       end
     end
   end
@@ -38,44 +38,39 @@ module Bpmn
   describe CallActivity do
     let(:source) { fixture_source("call_activity_test.bpmn") }
     let(:context) { Processable::Context.new(sources: source) }
-    let(:caller) { context.process_by_id("CallerProcess") }
-    let(:callee) { context.process_by_id("CalleeProcess") }
+    let(:caller_process) { context.process_by_id("CallerProcess") }
+    let(:callee_process) { context.process_by_id("CalleeProcess") }
 
     describe :definition do
-      let(:call_activity_step) { caller.element_by_id("CallActivity") }
+      let(:call_activity) { caller_process.element_by_id("CallActivity") }
 
       it "should parse the call activity" do
-        _(call_activity_step).wont_be_nil
+        _(call_activity).wont_be_nil
       end
     end
 
     describe :execution do
-      let(:caller_execution) { context.execution_by_process_id("CallerProcess") }
-      let(:callee_execution) { context.execution_by_process_id("CalleeProcess") }
-      let(:call_step) { caller_execution.step_by_element_id("CallActivity") }
-      let(:task_step) { callee_execution.step_by_element_id("Task") }
+      let(:caller_process) { context.execution_by_step_id("CallerProcess") }
+      let(:call_activity) { caller_process.child_by_step_id("CallActivity") }
+      let(:callee_process) { call_activity.children.first }
+      let(:task) { callee_process.child_by_step_id("Task") }
 
       before { Processable::Execution.start(context: context, process_id: "CallerProcess") }
 
       it "should call the process" do
-        _(caller_execution.started?).must_equal true
-        _(call_step.waiting?).must_equal true
-        _(callee_execution).wont_be_nil
-        _(task_step.waiting?).must_equal true
-        _(callee_execution.parent_id).must_equal caller_execution.id
-        _(callee_execution.called_by_id).must_equal call_step.id
-        _(context.executions.map { |e| e.id }).must_equal [caller_execution.id, callee_execution.id]
-        _(callee_execution.parent).must_equal caller_execution
-        _(callee_execution.called_by).must_equal call_step
+        _(caller_process.running?).must_equal true
+        _(call_activity.running?).must_equal true
+        _(task.waiting?).must_equal true
+        _(callee_process.parent).must_equal call_activity
       end
 
       describe :complete_called_process do
-        before { task_step.complete }
+        before { task.signal }
 
         it "should continue the calling process" do
-          _(task_step.ended?).must_equal true
-          _(callee_execution.ended?).must_equal true
-          _(caller_execution.ended?).must_equal true
+          _(task.completed?).must_equal true
+          _(callee_process.completed?).must_equal true
+          _(caller_process.completed?).must_equal true
         end
       end
     end
@@ -99,26 +94,23 @@ module Bpmn
         end
       end
 
-      # describe :execution do
-      #   let(:parent_execution) { context.execution_by_process_id("EmbeddedSubProcessParent") }
-      #   let(:child_execution) { context.execution_by_process_id("EmbeddedSubProcess") }
-      #   let(:task_step) { child.step_by_element_id("Task") }
+      describe :execution do
+        let(:parent_process) { @parent_process }
+        let(:child_process) { parent_process.child_by_step_id("EmbeddedSubProcess") }
+        let(:task) { child_process.child_by_step_id("Task") }
 
-      #   before { Processable::Execution.start(context: context, process_id: "EmbeddedSubProcessParent") }
+        before { @parent_process = Processable::Execution.start(context: context, process_id: "EmbeddedSubProcessParent") }
 
-      #   it "should call the child process" do
-      #     parent_execution.print
-      #     _(parent_execution.started?).must_equal true
-      #     ap context.executions.map { |e| e.process.id }
-      #     child_execution.print
-      #     _(child_execution.started?).must_equal true
-      #     _(task_step.waiting?).must_equal true
-      #   end
+        it "should call the child process" do
+          _(parent_process.running?).must_equal true
+          _(child_process.running?).must_equal true
+          _(task.waiting?).must_equal true
+        end
 
-      #   describe :child_process_completes do
+        describe :child_process_completes do
 
-      #   end
-      # end
+        end
+      end
     end
 
     describe :event do

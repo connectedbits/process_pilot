@@ -50,8 +50,8 @@ module Processable
       executions.find { |e| e.id == id }
     end
 
-    def execution_by_process_id(process_id)
-      executions.find { |e| e.process.id == process_id }
+    def execution_by_step_id(step_id)
+      executions.find { |e| e.step.id == step_id }
     end
   end
 end

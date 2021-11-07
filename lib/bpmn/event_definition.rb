@@ -2,6 +2,9 @@
 
 module Bpmn
   class EventDefinition < Element
+
+    def execute(execution)
+    end
   end
 
   class ConditionalEventDefinition < EventDefinition
@@ -47,7 +50,7 @@ module Bpmn
     end
 
     def execute(execution)
-      if execution.activity.is_throwing?
+      if execution.step.is_throwing?
         execution.throw_message(message_name)
       else
         execution.message_names.push message_name

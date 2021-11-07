@@ -72,34 +72,32 @@ module Processable
 
     describe :definition do
       let(:process) { context.process_by_id("HelloWorld") }
-      let(:introduce_task) { process.element_by_id("IntroduceYourself") }
+      let(:introduce_yourself) { process.element_by_id("IntroduceYourself") }
 
       it "should parse the process" do
-        _(introduce_task).wont_be_nil
+        _(introduce_yourself).wont_be_nil
       end
     end
 
     describe :execution do
       let(:process) { @process }
-      let(:introduce_yourself) { process.child_by_activity_id("IntroduceYourself") }
+      let(:introduce_yourself) { process.child_by_step_id("IntroduceYourself") }
 
       before { @process = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true }) }
 
       it "should start the process" do
-        ap process.as_json
-        _(process.ended?).must_equal false
-        _(introduce_yourself.status).must_equal :waiting
+        _(process.running?).must_equal true
+        _(introduce_yourself.waiting?).must_equal true
       end
 
-      # describe :signal do
-      #   before { introduce_yourself.signal({ name: "Eric", language: "it", formal: false }) }
+      describe :signal do
+        before { introduce_yourself.signal({ name: "Eric", language: "it", formal: false }) }
 
-      #   it "should end the process" do
-      #     ap process.as_json
-      #     _(process.ended?).must_equal true
-      #     _(introduce_yourself.ended?).must_equal true
-      #   end
-      # end
+        it "should complete the process" do
+          _(process.completed?).must_equal true
+          _(introduce_yourself.completed?).must_equal true
+        end
+      end
     end
   end
 end

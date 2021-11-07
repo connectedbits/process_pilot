@@ -5,13 +5,13 @@ module Processable
     include ActiveModel::Model
     include ActiveModel::Serializers::JSON
 
-    attr_accessor :id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id, :timer_expires_at, :message_names
-    attr_accessor :activity, :parent, :children, :context
+    attr_accessor :id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id, :timer_expires_at, :message_names, :error_names, :condition
+    attr_accessor :step, :parent, :children, :context
 
     def self.start(context:, process_id:, variables: {}, start_event_id: nil, parent: nil)
       process = context.process_by_id(process_id)
       raise ExecutionError.new("Process with id #{process_id} not found.") unless process
-      Execution.new(context: context, activity: process, variables: variables, start_event_id: start_event_id, parent: parent).tap do |execution|
+      Execution.new(context: context, step: process, variables: variables, start_event_id: start_event_id, parent: parent).tap do |execution|
         context.executions.push execution
         execution.start
       end
@@ -23,7 +23,7 @@ module Processable
           process.start_events.map do |start_event|
             start_event.message_event_definitions.map do |message_event_definition|
               if message_name == message_event_definition.message_name
-                Execution.start(context: context, process_id: process&.id, variables: variables, start_event: start_event.id).tap { |execution| executions.push execution }
+                Execution.start(context: context, process_id: process&.id, variables: variables, start_event_id: start_event.id).tap { |execution| executions.push execution }
               end
             end
           end
@@ -43,8 +43,32 @@ module Processable
       end
     end
 
+    def started?
+      started_at.present?
+    end
+
     def ended?
       ended_at.present?
+    end
+
+    def running?
+      status == :running
+    end
+
+    def waiting?
+      status == :waiting
+    end
+
+    def completed?
+      status == :completed
+    end
+
+    def terminated?
+      status == :terminated
+    end
+
+    def errored?
+      status == :errored
     end
 
     def bind_variable_scope(scope)
@@ -52,12 +76,12 @@ module Processable
       variables.keys.each { |key| scope[key] = variables[key] }
     end
 
-    def execute_activities(activities)
-      activities.each { |activity| execute_activity(activity) }
+    def execute_steps(steps)
+      steps.each { |step| execute_step(step) }
     end
 
-    def execute_activity(activity, sequence_flow = nil)
-      child_execution = Execution.new(context: context, activity: activity, parent: self)
+    def execute_step(step, sequence_flow = nil)
+      child_execution = Execution.new(context: context, step: step, parent: self)
       children.push child_execution
       child_execution.tokens_in = [sequence_flow.id] if sequence_flow
       child_execution.start
@@ -68,10 +92,10 @@ module Processable
     end
 
     def start
-      @status = :started
+      @status = :running
       @started_at = Time.zone.now
       context.notify_listener({ event: :started, execution: self })
-      activity.attachments.each { |attachment| execute_activity(attachment) } if activity.respond_to?(:attachments)
+      step.attachments.each { |attachment| execute_step(attachment) } if step.is_a?(Bpmn::Activity)
       continue
     end
 
@@ -81,7 +105,7 @@ module Processable
     end
 
     def continue
-      activity.execute(self)
+      step.execute(self)
     end
 
     def throw_message(message_name)
@@ -116,17 +140,21 @@ module Processable
     end
 
     def take(sequence_flow)
-      to_activity = sequence_flow.target
+      to_step = sequence_flow.target
       tokens_out.push sequence_flow.id
       self.end(false)
       context.notify_listener({ event: :taken, execution: self, sequence_flow: sequence_flow })
-      parent.execute_activity(to_activity, sequence_flow)
+      parent.execute_step(to_step, sequence_flow)
     end
 
     def signal(result = nil)
       @variables.merge!(result_to_variables(result)) if result.present?
-      raise ExecutionError.new("Cannot signal an activity instance that has ended.") if ended?
-      activity.signal(self)
+      raise ExecutionError.new("Cannot signal a step execution that has ended.") if ended?
+      step.signal(self)
+    end
+
+    def check_expired_timers
+      children.each { |child| child.signal if child.expires_at.present? && Time.zone.now > child.expires_at }
     end
 
     def evaluate_condition(condition)
@@ -134,23 +162,23 @@ module Processable
     end
 
     def evaluate_expression(expression)
-      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: variables)
+      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: parent.variables)
     end
 
     def result_to_variables(result)
-      if activity.result_variable
-        return { "#{activity.result_variable}": result }
+      if step.result_variable
+        return { "#{step.result_variable}": result }
       else
         if result.is_a? Hash
           result
         else
-          {}.tap { |h| h[activity.id.underscore] = result }
+          {}.tap { |h| h[step.id.underscore] = result }
         end
       end
     end
 
     def run
-      case activity.type
+      case step.type
       when "bpmn:ServiceTask"
         context.service_task_runner.call(self, context) if context.service_task_runner.present?
       when "bpmn:ScriptTask"
@@ -161,19 +189,20 @@ module Processable
     end
 
     def call(process_id)
-      Execution.start(context: context, process_id: process_id, variables: variables, parent: self)
+      #Execution.start(context: context, process_id: process_id, variables: variables, parent: self)
+      execute_step(context.process_by_id(process_id))
     end
 
     #
-    # Called by the child activity executors when they have ended
+    # Called by the child step executors when they have ended
     #
     def has_ended(_child)
-      activity.leave(self) if activity.is_a?(Bpmn::SubProcess) || activity.is_a?(Bpmn::CallActivity)
+      step.leave(self) if step.is_a?(Bpmn::SubProcess) || step.is_a?(Bpmn::CallActivity)
       self.end(true)
     end
 
-    def child_by_activity_id(id)
-      children.find { |child| child.activity.id == id }
+    def child_by_step_id(id)
+      children.find { |child| child.step.id == id }
     end
 
     def tokens
@@ -188,16 +217,18 @@ module Processable
     def as_json
       {
         id: id,
-        activity_id: activity.id,
-        activity_type: activity.type,
+        step_id: step.id,
+        step_type: step.type,
         status: status,
         started_at: started_at,
         ended_at: ended_at,
         variables: variables,
         tokens_in: tokens_in,
         tokens_out: tokens_out,
-        message_name: message_names,
+        message_names: message_names,
+        error_names: error_names,
         timer_expires_at: timer_expires_at,
+        condition: condition,
         activities: children.map { |child| child.as_json },
       }.compact_blank
     end

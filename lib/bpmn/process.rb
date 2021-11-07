@@ -25,7 +25,7 @@ module Bpmn
     def execute(execution)
       start_event = execution.start_event_id ? element_by_id(execution.start_event_id) : default_start_event
       raise ExecutionErrorNew.new("Process must have at least one start event.") if start_event.blank?
-      execution.execute_activity(start_event)
+      execution.execute_step(start_event)
     end
   end
 

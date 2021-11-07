@@ -25,7 +25,7 @@ module Processable
   class ServiceTaskRunner < TaskRunner
 
     def call
-      topic = execution.activity.topic if execution.activity.respond_to?(:topic)
+      topic = execution.step.topic if execution.step.respond_to?(:topic)
       raise ExecutionError.new("Topic required for service task") unless topic
       service = context.services[topic.to_sym]
       raise ExecutionError.new("No service found for topic #{topic}") unless service
@@ -36,7 +36,7 @@ module Processable
   class ScriptTaskRunner < TaskRunner
 
     def call
-      script = execution.activity.script if execution.activity.respond_to?(:script)
+      script = execution.step.script if execution.step.respond_to?(:script)
       raise ExecutionError.new("Script required for script task") unless script
       ProcessableServices::ScriptRunner.call(script: script, variables: variables, procs: procs)
     end
@@ -54,8 +54,8 @@ module Processable
   class BusinessRuleTaskRunner < TaskRunner
 
     def call
-      expression = execution.activity.expression
-      decision_ref = execution.activity.decision_ref
+      expression = execution.step.expression
+      decision_ref = execution.step.decision_ref
 
       if expression
         result = ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: variables)
