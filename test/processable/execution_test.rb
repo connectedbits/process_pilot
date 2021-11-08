@@ -115,9 +115,9 @@ module Processable
             _(new_process.children.length).must_equal process.children.length
           end
 
-          # it "should be lossless" do
-          #   _(new_process.serialize).must_equal process.serialize
-          # end
+          it "should be lossless" do
+            _(new_process.serialize).must_equal process.serialize
+          end
         end
       end
     end

@@ -41,9 +41,6 @@ module Processable
         @message_names ||= []
         @error_names ||= []
         @children ||= []
-        @started_at = Time.zone.parse(started_at.to_s) if started_at && started_at.is_a?(String)
-        @ended_at = Time.zone.parse(started_at.to_s) if ended_at && ended_at.is_a?(String)
-        @timer_expires_at = Time.zone.parse(timer_expires_at.to_s) if timer_expires_at && timer_expires_at.is_a?(String)
       end
     end
 
