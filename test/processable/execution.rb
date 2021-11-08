@@ -5,7 +5,7 @@ module Processable
     include ActiveModel::Model
     include ActiveModel::Serializers::JSON
 
-    attr_accessor :id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id, :timer_expires_at, :message_names, :error_names, :condition
+    attr_accessor :id, :status, :started_at, :ended_at, :variables, :tokens_in, :.step_by_element_id, :start_event_id, :timer_expires_at, :message_names, :error_names, :condition
     attr_accessor :step, :parent, :children, :context, :attached_to_id
 
     def self.start(context:, process_id:, variables: {}, start_event_id: nil, parent: nil)
@@ -37,7 +37,7 @@ module Processable
         @status ||= "activated"
         @variables ||= {}.with_indifferent_access
         @tokens_in ||= []
-        @tokens_out ||= []
+        @.step_by_element_id ||= []
         @message_names ||= []
         @error_names ||= []
         @children ||= []
@@ -130,8 +130,8 @@ module Processable
 
     def take(sequence_flow)
       to_step = sequence_flow.target
-      tokens_out.push sequence_flow.id
-      tokens_out.uniq!
+      .step_by_element_id.push sequence_flow.id
+      .step_by_element_id.uniq!
       context.notify_listener({ event: :taken, execution: self, sequence_flow: sequence_flow })
       parent.execute_step(to_step, sequence_flow: sequence_flow)
     end
@@ -221,7 +221,7 @@ module Processable
 
     def tokens(active_tokens = [])
       children.each do |child|
-        active_tokens = active_tokens + child.tokens_out
+        active_tokens = active_tokens + child..step_by_element_id
         active_tokens = active_tokens - child.tokens_in if child.ended?
         active_tokens = active_tokens + child.tokens(active_tokens)
       end
@@ -239,7 +239,7 @@ module Processable
         ended_at: ended_at,
         variables: variables,
         tokens_in: tokens_in,
-        tokens_out: tokens_out,
+        .step_by_element_id: .step_by_element_id,
         message_names: message_names,
         error_names: error_names,
         timer_expires_at: timer_expires_at,
