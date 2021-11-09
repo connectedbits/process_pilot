@@ -109,7 +109,7 @@ module Processable
 
             it "should complete the process" do
               _(process.completed?).must_equal true
-              _(process.variables['message']).wont_be_nil
+              _(process.variables["message"]).wont_be_nil
             end
           end
         end

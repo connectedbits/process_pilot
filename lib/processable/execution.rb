@@ -193,11 +193,11 @@ module Processable
     def run
       case step.type
       when "bpmn:ServiceTask"
-        context.service_task_runner.call(self, context) if context.service_task_runner.present?
+        ServiceTaskRunner.call(self, context)
       when "bpmn:ScriptTask"
-        context.script_task_runner.call(self, context) if context.script_task_runner.present?
+        ScriptTaskRunner.call(self, context)
       when "bpmn:BusinessRuleTask"
-        context.business_rule_task_runner.call(self, context) if context.business_rule_task_runner.present?
+        BusinessRuleTaskRunner.call(self, context)
       end
     end
 
@@ -308,7 +308,7 @@ module Processable
     def print_children
       puts
       execution.children.each_with_index do |child, index|
-        str = "#{index} #{child.step.type.split(':').last} #{child.step.id}: #{child.status} #{JSON.pretty_generate(execution.variables, { indent: '', object_nl: ' ' }) unless child.variables.empty? }".strip
+        str = "#{index} #{child.step.type.split(':').last} #{child.step.id}: #{child.status} #{JSON.pretty_generate(child.variables, { indent: '', object_nl: ' ' }) unless child.variables.empty? }".strip
         str = "#{str} * in: #{child.tokens_in.join(', ')}" if child.tokens_in.present?
         str = "#{str} * out: #{child.tokens_out.join(', ')}" if child.tokens_out.present?
         puts str

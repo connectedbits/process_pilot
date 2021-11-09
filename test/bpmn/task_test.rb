@@ -77,17 +77,6 @@ module Bpmn
           _(service_task.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
         end
       end
-
-      describe :external_services do
-        let(:context) { Processable::Context.new(sources: source, services: services, service_task_runner: nil) }
-
-        before { @process = Processable::Execution.start(context: context, process_id: "ServiceTaskTest", variables: { name: "Eric" })  }
-
-        it "should not run the service task" do
-          _(process.running?).must_equal true
-          _(service_task.waiting?).must_equal true
-        end
-      end
     end
   end
 

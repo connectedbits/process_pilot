@@ -4,15 +4,11 @@ module Processable
   class Context
     attr_reader :processes, :decisions, :executions
     attr_accessor :services, :listeners, :utils
-    attr_accessor :service_task_runner, :script_task_runner, :business_rule_task_runner
 
-    def initialize(sources: nil, services: {}, listeners: [], utils: {}, service_task_runner: ServiceTaskRunner, script_task_runner: ScriptTaskRunner, business_rule_task_runner: BusinessRuleTaskRunner)    
+    def initialize(sources: nil, services: {}, listeners: [], utils: {})
       @services = services
       @listeners = Array.wrap(listeners)
       @utils = utils
-      @service_task_runner = service_task_runner
-      @script_task_runner = script_task_runner
-      @business_rule_task_runner = business_rule_task_runner
 
       @processes = []
       @decisions = {}

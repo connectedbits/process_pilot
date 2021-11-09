@@ -31,33 +31,30 @@ services = {
 context = Processable::Context.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services)
 ```
 
-Then an Execution can be started.
+Then a new instance of the process can be started.
 
 ```ruby
 execution = Processable::Execution.start(context: context, process_id: 'HelloWorld', start_event_id: 'Start', variables: { greet: true, cookie: false })
 ```
 
-It is often useful to print the current state of the Execution.
+An execution tree is returned with the process as the root step. It is often useful to print the current state of the Execution.
 
 ```ruby
 execution.print
 ```
 ```
-HelloWorld started * Flow_016qg9x
+HelloWorld running * Flow_016qg9x
 
 {
   "greet": true,
   "cookie": true
 }
 
-0 StartEvent Start: ended * out: Flow_016qg9x
+0 StartEvent Start: completed * out: Flow_016qg9x
 1 UserTask IntroduceYourself: waiting * in: Flow_016qg9x
-2 BoundaryEvent Timeout: waiting * in: 
 ```
 
-This shows the process id, it's current status, and active tokens. Below it shows the processes' variables followed by a list of execution steps. Each step displays the element type, id, status, and tokens in and out.
-
-In this case the execution has stopped since the UserTask IntroduceYourself is `waiting`.
+Processable executes each step in the process until the flow reaches the end or `waits` at a Task. Here the `IntroduceYourself` UserTask is `waiting` for completion.
 
 At this point you may want to save the current state of execution in a Rails model.
 
@@ -71,16 +68,22 @@ Later, when the task has been completed, execution can be deserialized.
 execution = Procesable::Execution.deserialize(json, context: context)
 ```
 
-Execution is continued by `invoking` the `waiting` step.
+Execution is continued by `signaling` the `waiting` step.
 
 ```ruby
-execution.step_by_element_id('IntroduceYourself').complete({ name: "Eric", language: "es", formal: true })
+execution.step_by_element_id("IntroduceYourself").signal({ name: "Eric", language: "es", formal: true })
 ```
 
-Once the task is completed the process continues executing until it reaches an EndEvent.
+When execution arrives at automated (service, script, and business rule) tasks it will `wait`. Processable will `run` the tasks for you.
+
+```ruby
+execution.run_automated_tasks
+```
+
+Once the tasks are completed the process continues executing until it reaches an EndEvent.
 
 ```
-HelloWorld ended * Flow_1ezhtuc
+HelloWorld completed * 
 
 {
   "greet": true,
@@ -88,20 +91,19 @@ HelloWorld ended * Flow_1ezhtuc
   "name": "Eric",
   "language": "it",
   "formal": false,
-  "tell_fortune": "Help! I am being held prisoner in a fortune cookie factory.",
+  "tell_fortune": "You love Chinese food.",
   "greeting": "Ciao",
-  "message": "👋 Ciao Eric 🥠 Help! I am being held prisoner in a fortune cookie factory."
+  "message": "👋 Ciao Eric 🥠 You love Chinese food."
 }
 
-0 StartEvent Start: ended * out: Flow_016qg9x
-1 UserTask IntroduceYourself: ended {"name"=>"Eric", "language"=>"it", "formal"=>false} * in: Flow_016qg9x * out: Flow_0f1v8du
-2 BoundaryEvent Timeout: terminated * in: 
-3 InclusiveGateway Split: ended * in: Flow_0f1v8du * out: Flow_09yhdyi, Flow_00mppvp
-4 ServiceTask TellFortune: ended {"tell_fortune"=>"Help! I am being held prisoner in a fortune cookie factory."} * in: Flow_09yhdyi * out: Flow_1t20i0c
-5 InclusiveGateway Join: ended * in: Flow_1t20i0c, Flow_1ezhtuc * out: Flow_1xiabfq
-6 BusinessRuleTask ChooseGreeting: ended {"greeting"=>"Ciao"} * in: Flow_00mppvp * out: Flow_1ezhtuc
-7 ScriptTask SayHello: ended {"message"=>"👋 Ciao Eric 🥠 Help! I am being held prisoner in a fortune cookie factory."} * in: Flow_1xiabfq * out: Flow_15lbcry
-8 EndEvent End: ended * in: Flow_15lbcry
+0 StartEvent Start: completed * out: Flow_016qg9x
+1 UserTask IntroduceYourself: completed { "name": "Eric", "language": "it", "formal": false } * in: Flow_016qg9x * out: Flow_0f1v8du
+2 InclusiveGateway Split: completed * in: Flow_0f1v8du * out: Flow_09yhdyi, Flow_00mppvp
+3 ServiceTask TellFortune: completed { "tell_fortune": "You love Chinese food." } * in: Flow_09yhdyi * out: Flow_1t20i0c
+4 BusinessRuleTask ChooseGreeting: completed { "greeting": "Ciao" } * in: Flow_00mppvp * out: Flow_1ezhtuc
+5 InclusiveGateway Join: completed * in: Flow_1t20i0c, Flow_1ezhtuc * out: Flow_1xiabfq
+6 ScriptTask SayHello: completed { "message": "👋 Ciao Eric 🥠 You love Chinese food." } * in: Flow_1xiabfq * out: Flow_15lbcry
+7 EndEvent End: completed * in: Flow_15lbcry
 ```
 ## Documentation
 
