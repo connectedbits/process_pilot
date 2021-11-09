@@ -52,6 +52,7 @@ HelloWorld running * Flow_016qg9x
 
 0 StartEvent Start: completed * out: Flow_016qg9x
 1 UserTask IntroduceYourself: waiting * in: Flow_016qg9x
+2 BoundaryEvent Timeout: waiting
 ```
 
 Processable executes each step in the process until the flow reaches the end or `waits` at a Task. Here the `IntroduceYourself` UserTask is `waiting` for completion.
@@ -74,7 +75,7 @@ Execution is continued by `signaling` the `waiting` step.
 execution.step_by_element_id("IntroduceYourself").signal({ name: "Eric", language: "es", formal: true })
 ```
 
-When execution arrives at automated (service, script, and business rule) tasks it will `wait`. Processable will `run` the tasks for you.
+When execution arrives at automated (service, script, and business rule) tasks it will `wait`. You can run the automated tasks in a rails job and signal the execution when the task is complete or have Processable run the automated tasks.
 
 ```ruby
 execution.run_automated_tasks
@@ -91,19 +92,21 @@ HelloWorld completed *
   "name": "Eric",
   "language": "it",
   "formal": false,
-  "tell_fortune": "You love Chinese food.",
+  "tell_fortune": "This cookie contains 117 calories.",
   "greeting": "Ciao",
-  "message": "👋 Ciao Eric 🥠 You love Chinese food."
+  "message": "👋 Ciao Eric 🥠 This cookie contains 117 calories."
 }
 
 0 StartEvent Start: completed * out: Flow_016qg9x
 1 UserTask IntroduceYourself: completed { "name": "Eric", "language": "it", "formal": false } * in: Flow_016qg9x * out: Flow_0f1v8du
-2 InclusiveGateway Split: completed * in: Flow_0f1v8du * out: Flow_09yhdyi, Flow_00mppvp
-3 ServiceTask TellFortune: completed { "tell_fortune": "You love Chinese food." } * in: Flow_09yhdyi * out: Flow_1t20i0c
-4 BusinessRuleTask ChooseGreeting: completed { "greeting": "Ciao" } * in: Flow_00mppvp * out: Flow_1ezhtuc
-5 InclusiveGateway Join: completed * in: Flow_1t20i0c, Flow_1ezhtuc * out: Flow_1xiabfq
-6 ScriptTask SayHello: completed { "message": "👋 Ciao Eric 🥠 You love Chinese food." } * in: Flow_1xiabfq * out: Flow_15lbcry
-7 EndEvent End: completed * in: Flow_15lbcry
+2 BoundaryEvent Timeout: terminated
+3 InclusiveGateway Split: completed * in: Flow_0f1v8du * out: Flow_09yhdyi, Flow_00mppvp
+4 ServiceTask TellFortune: completed { "tell_fortune": "This cookie contains 117 calories." } * in: Flow_09yhdyi * out: Flow_1t20i0c
+5 BoundaryEvent Event_0c6rvx0: terminated
+6 BusinessRuleTask ChooseGreeting: completed { "greeting": "Ciao" } * in: Flow_00mppvp * out: Flow_1ezhtuc
+7 InclusiveGateway Join: completed * in: Flow_1t20i0c, Flow_1ezhtuc * out: Flow_1xiabfq
+8 ScriptTask SayHello: completed { "message": "👋 Ciao Eric 🥠 This cookie contains 117 calories." } * in: Flow_1xiabfq * out: Flow_15lbcry
+9 EndEvent End: completed * in: Flow_15lbcry
 ```
 ## Documentation
 
