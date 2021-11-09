@@ -138,7 +138,3 @@ $ gem install processable
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 Developed by [Connected Bits](http://www.connectedbits.com)
-
-## TODO
-
-- [ ] Need to async execution of automatic tasks
