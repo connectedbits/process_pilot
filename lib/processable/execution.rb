@@ -8,6 +8,8 @@ module Processable
     attr_accessor :id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id, :timer_expires_at, :message_names, :error_names, :condition
     attr_accessor :step, :parent, :children, :context, :attached_to_id
 
+    alias serialize to_json
+
     delegate :print, to: :printer
 
     def self.start(context:, process_id:, variables: {}, start_event_id: nil, parent: nil)
@@ -33,6 +35,21 @@ module Processable
       end
     end
 
+    def self.deserialize(json, context:)
+      attributes = JSON.parse(json)
+      Execution.from_json(attributes, context: context)
+    end
+
+    def self.from_json(attributes, context:)
+      step_id = attributes.delete("step_id")
+      step_type = attributes.delete("step_type")
+      step = step_type == "bpmn:Process" ? context.process_by_id(step_id) : context.element_by_id(step_id)
+      child_attributes = attributes.delete("children")
+      Execution.new(attributes.merge(step: step)).tap do |execution|
+        execution.children = child_attributes.map { |ca| Execution.from_json(ca, context: context) } if child_attributes
+      end
+    end
+
     def initialize(attributes={})
       super(attributes).tap do
         @id ||= SecureRandom.uuid
@@ -46,10 +63,6 @@ module Processable
       end
     end
 
-    def attached_to
-      @attached_to ||= parent.children.find { |child| child.id == attached_to_id } if parent
-    end
-
     def started?
       started_at.present?
     end
@@ -58,8 +71,8 @@ module Processable
       ended_at.present?
     end
 
-    def running?
-      status == "running"
+    def activated?
+      status == "activated"
     end
 
     def waiting?
@@ -72,11 +85,6 @@ module Processable
 
     def terminated?
       status == "terminated"
-    end
-
-    def bind_variable_scope(scope)
-      parent.bind_variable_scope(scope) if parent
-      variables.keys.each { |key| scope[key] = variables[key] }
     end
 
     def execute_steps(steps)
@@ -95,7 +103,7 @@ module Processable
     end
 
     def start
-      @status = "running"
+      @status = "started"
       @started_at = Time.zone.now
       context.notify_listener({ event: :started, execution: self })
       step.attachments.each { |attachment| parent.execute_step(attachment, attached_to: self) } if step.is_a?(Bpmn::Activity)
@@ -140,7 +148,7 @@ module Processable
 
     def signal(result = nil)
       @variables.merge!(result_to_variables(result)) if result.present?
-      #raise ExecutionError.new("Cannot signal a step execution that has ended.") if ended?
+      raise ExecutionError.new("Cannot signal a step execution that has ended.") if ended?
       step.signal(self)
     end
 
@@ -178,19 +186,12 @@ module Processable
       ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: parent.variables)
     end
 
-    def result_to_variables(result)
-      if step.respond_to?(:result_variable) && step.result_variable
-        return { "#{step.result_variable}": result }
-      else
-        if result.is_a? Hash
-          result
-        else
-          {}.tap { |h| h[step.id.underscore] = result }
-        end
-      end
+    def run_automated_tasks
+      waiting_automated_tasks.each { |child| child.run }
     end
 
     def run
+      return unless waiting? && step.is_automated?
       case step.type
       when "bpmn:ServiceTask"
         ServiceTaskRunner.call(self, context)
@@ -213,6 +214,10 @@ module Processable
       self.end(true)
     end
 
+    def attached_to
+      @attached_to ||= parent.children.find { |child| child.id == attached_to_id } if parent
+    end
+
     def child_by_step_id(id)
       children.find { |child| child.step.id == id }
     end
@@ -227,10 +232,6 @@ module Processable
 
     def waiting_automated_tasks
       waiting_tasks.select { |child| child.step.is_automated? }
-    end
-
-    def run_automated_tasks
-      waiting_automated_tasks.each { |child| child.run }
     end
 
     def tokens(active_tokens = [])
@@ -262,66 +263,22 @@ module Processable
       }.compact_blank
     end
 
-    def serialize
-      to_json
-    end
+    private
 
-    def self.deserialize(json, context:)
-      attributes = JSON.parse(json)
-      Execution.from_json(attributes, context: context)
-    end
-
-    def self.from_json(attributes, context:)
-      step_id = attributes.delete("step_id")
-      step_type = attributes.delete("step_type")
-      step = step_type == "bpmn:Process" ? context.process_by_id(step_id) : context.element_by_id(step_id)
-      child_attributes = attributes.delete("children")
-      Execution.new(attributes.merge(step: step)).tap do |execution|
-        execution.children = child_attributes.map { |ca| Execution.from_json(ca, context: context) } if child_attributes
+    def result_to_variables(result)
+      if step.respond_to?(:result_variable) && step.result_variable
+        return { "#{step.result_variable}": result }
+      else
+        if result.is_a? Hash
+          result
+        else
+          {}.tap { |h| h[step.id.underscore] = result }
+        end
       end
-    end
-
-    def pretty_json
-      JSON.pretty_generate(as_json)
     end
 
     def printer
-      @printer ||= Printer.new(self)
+      @printer ||= ExecutionPrinter.new(self)
     end
-  end
-
-  class Printer
-    attr_accessor :execution
-
-    def initialize(execution)
-      @execution = execution
-    end
-
-    def print
-      puts
-      puts "#{execution.step.id} #{execution.status} * #{execution.tokens.join(', ')}"
-      print_variables unless execution.variables.empty?
-      print_children
-      puts
-    end
-
-    def print_children
-      puts
-      execution.children.each_with_index do |child, index|
-        str = "#{index} #{child.step.type.split(':').last} #{child.step.id}: #{child.status} #{JSON.pretty_generate(child.variables, { indent: '', object_nl: ' ' }) unless child.variables.empty? }".strip
-        str = "#{str} * in: #{child.tokens_in.join(', ')}" if child.tokens_in.present?
-        str = "#{str} * out: #{child.tokens_out.join(', ')}" if child.tokens_out.present?
-        puts str
-      end
-    end
-
-    def print_variables
-      puts
-      puts JSON.pretty_generate(execution.variables)
-    end
-  end
-
-  class Commands
-    
   end
 end

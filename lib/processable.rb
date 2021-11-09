@@ -19,6 +19,7 @@ require "bpmn/event_definition"
 require "processable/context"
 require "processable/execution"
 require "processable/execution_error"
+require "processable/execution_printer"
 require "processable/task_runner"
 
 require "processable_services/application_service"

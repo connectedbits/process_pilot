@@ -24,7 +24,7 @@ module Bpmn
       before { @process = Processable::Execution.start(context: context, process_id: "TaskTest") }
 
       it "should start the process" do
-        _(process.running?).must_equal true
+        _(process.started?).must_equal true
         _(task.waiting?).must_equal true
       end
 

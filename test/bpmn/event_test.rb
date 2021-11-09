@@ -44,7 +44,7 @@ module Bpmn
 
       before { @process = Processable::Execution.start(context: context, process_id: "IntermediateCatchEventTest") }
       it "should wait at the catch event" do
-        _(process.running?).must_equal true
+        _(process.started?).must_equal true
         _(catch_event.waiting?).must_equal true
       end
 
@@ -112,7 +112,7 @@ module Bpmn
       before { @process = Processable::Execution.start(context: context, process_id: "BoundaryEventTest") }
 
       it "should create boundary events" do
-        _(process.running?).must_equal true
+        _(process.started?).must_equal true
         _(host_task.waiting?).must_equal true
         _(non_interrupting_event).wont_be_nil
         _(interrupting_event).wont_be_nil

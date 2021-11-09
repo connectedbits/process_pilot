@@ -58,8 +58,8 @@ module Bpmn
       before { Processable::Execution.start(context: context, process_id: "CallerProcess") }
 
       it "should call the process" do
-        _(caller_process.running?).must_equal true
-        _(call_activity.running?).must_equal true
+        _(caller_process.started?).must_equal true
+        _(call_activity.started?).must_equal true
         _(task.waiting?).must_equal true
         _(callee_process.parent).must_equal call_activity
       end
@@ -102,8 +102,8 @@ module Bpmn
         before { @parent_process = Processable::Execution.start(context: context, process_id: "EmbeddedSubProcessParent") }
 
         it "should call the child process" do
-          _(parent_process.running?).must_equal true
-          _(child_process.running?).must_equal true
+          _(parent_process.started?).must_equal true
+          _(child_process.started?).must_equal true
           _(task.waiting?).must_equal true
         end
 

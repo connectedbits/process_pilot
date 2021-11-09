@@ -91,7 +91,7 @@ module Processable
       before { @process = Execution.start(context: context, process_id: "Process") }
 
       it "should start the process" do
-        _(process.status).must_equal "running"
+        _(process.started?).must_equal true
       end
 
       describe :serialize do
