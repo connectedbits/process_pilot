@@ -41,11 +41,19 @@ module Bpmn
 
       before { @process = Processable::Execution.start(context: context, process_id: "ErrorEventDefinitionTest", variables: { simulate_error: true }) }
 
-      it "should throw and catch error" do
-        _(process.ended?).must_equal true
-        _(service_task.terminated?).must_equal true
-        _(end_event).must_be_nil
-        _(end_failed_event.ended?).must_equal true
+      it "should wait at the service task" do
+        _(service_task.waiting?).must_equal true
+      end
+
+      describe :run_service do
+        before { process.run_automated_tasks }
+
+        it "should throw and catch error" do
+          _(process.ended?).must_equal true
+          _(service_task.terminated?).must_equal true
+          _(end_event).must_be_nil
+          _(end_failed_event.ended?).must_equal true
+        end
       end
     end
   end

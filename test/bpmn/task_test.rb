@@ -63,11 +63,19 @@ module Bpmn
 
       before { @process = Processable::Execution.start(context: context, process_id: "ServiceTaskTest", variables: { name: "Eric" }) }
 
-      it "should run the service task" do
-        _(process.completed?).must_equal true
-        _(service_task.completed?).must_equal true
-        _(process.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
-        _(service_task.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
+      it "should wait at the service task" do
+        _(service_task.waiting?).must_equal true
+      end
+
+      describe :run do
+        before { process.run_automated_tasks }
+
+        it "should run the service task" do
+          _(process.completed?).must_equal true
+          _(service_task.completed?).must_equal true
+          _(process.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
+          _(service_task.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
+        end
       end
 
       describe :external_services do
@@ -102,11 +110,19 @@ module Bpmn
 
       before { @process = Processable::Execution.start(context: context, process_id: "ScriptTaskTest", variables: { name: "Eric" }) }
 
-      it "should run the script task" do
-        _(process.completed?).must_equal true
-        _(script_task.completed?).must_equal true
-        _(process.variables["greeting"]).must_equal "Hello Eric"
-        _(script_task.variables["greeting"]).must_equal "Hello Eric"
+      it "should wait at the script task" do
+        _(script_task.waiting?).must_equal true
+      end
+
+      describe :run do
+        before { process.run_automated_tasks }
+
+        it "should run the script task" do
+          _(process.completed?).must_equal true
+          _(script_task.completed?).must_equal true
+          _(process.variables["greeting"]).must_equal "Hello Eric"
+          _(script_task.variables["greeting"]).must_equal "Hello Eric"
+        end
       end
     end
   end
@@ -132,10 +148,18 @@ module Bpmn
 
         before { @process = Processable::Execution.start(context: context, process_id: "BusinessRuleTaskTest", start_event_id: "ExpressionStart", variables: { age: 57 }) }
 
-        it "should run the business rule task" do
-          _(process.completed?).must_equal true
-          _(business_rule_task.completed?).must_equal true
-          _(business_rule_task.variables["senior"]).must_equal true
+        it "should wait at the business rule task" do
+          _(business_rule_task.waiting?).must_equal true
+        end
+
+        describe :run do
+          before { process.run_automated_tasks }
+
+          it "should run the business rule task" do
+            _(process.completed?).must_equal true
+            _(business_rule_task.completed?).must_equal true
+            _(business_rule_task.variables["senior"]).must_equal true
+          end
         end
       end
     end
@@ -155,10 +179,18 @@ module Bpmn
 
         before { @process = Processable::Execution.start(context: context, process_id: "BusinessRuleTaskTest", start_event_id: "DMNStart", variables: { season: "Spring", guests: 7 }) }
 
-        it "should run the business rule task" do
-          _(process.completed?).must_equal true
-          _(business_rule_task.completed?).must_equal true
-          _(business_rule_task.variables["result"]["dish"]).must_equal "Steak"
+        it "should wait at the business rule task" do
+          _(business_rule_task.waiting?).must_equal true
+        end
+
+        describe :run do
+          before { process.run_automated_tasks }
+
+          it "should run the business rule task" do
+            _(process.completed?).must_equal true
+            _(business_rule_task.completed?).must_equal true
+            _(business_rule_task.variables["result"]["dish"]).must_equal "Steak"
+          end
         end
       end
     end

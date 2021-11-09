@@ -9,6 +9,14 @@ module Bpmn
       @result_variable = moddle["resultVariable"]
     end
 
+    def is_automated?
+      false
+    end
+
+    def is_manual?
+      true
+    end
+
     def execute(execution)
       execution.wait
     end
@@ -41,9 +49,16 @@ module Bpmn
       @topic = moddle["topic"]
     end
 
+    def is_automated?
+      true
+    end
+
+    def is_manual?
+      false
+    end
+
     def execute(execution)
       execution.wait
-      execution.run
     end
   end
 

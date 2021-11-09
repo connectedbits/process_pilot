@@ -85,17 +85,33 @@ module Processable
 
       before { @process = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true }) }
 
-      it "should start the process" do
-        _(process.running?).must_equal true
+      it "should wait at introduce yourself task" do
         _(introduce_yourself.waiting?).must_equal true
       end
 
-      describe :signal do
+      describe :complete_introduce_yourself do
         before { introduce_yourself.signal({ name: "Eric", language: "it", formal: false }) }
 
-        it "should complete the process" do
-          _(process.completed?).must_equal true
+        it "should wait at choose greeting and tell fortune tasks" do
           _(introduce_yourself.completed?).must_equal true
+          _(process.waiting_automated_tasks.length).must_equal 2
+        end
+
+        describe :run_automated_tasks do
+          before { process.run_automated_tasks }
+
+          it "should wait at the say hello task" do
+            _(process.waiting_tasks.first.step.id).must_equal "SayHello"
+          end
+
+          describe :run_say_hello_task do
+            before { process.run_automated_tasks }
+
+            it "should complete the process" do
+              _(process.completed?).must_equal true
+              _(process.variables['message']).wont_be_nil
+            end
+          end
         end
       end
     end
