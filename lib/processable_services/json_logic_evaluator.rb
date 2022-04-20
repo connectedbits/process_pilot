@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 module ProcessableServices
-  class JsonLogicEvaluator < ApplicationService
+  class JsonLogicEvaluator
     attr_reader :expression, :variables
+
+    def self.call(expression:, variables:)
+      new(expression: expression, variables: variables).call
+    end
 
     def initialize(expression:, variables: {})
       super()

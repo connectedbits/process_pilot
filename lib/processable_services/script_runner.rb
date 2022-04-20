@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 module ProcessableServices
-  class ScriptRunner < ApplicationService
+  class ScriptRunner
     attr_reader :script, :variables, :procs
+
+    def self.call(script:, variables: {}, procs: {})
+      new(script: script, variables: variables, procs: procs).call
+    end
 
     def initialize(script:, variables: {}, procs: {})
       super()
