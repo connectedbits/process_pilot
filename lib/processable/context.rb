@@ -5,7 +5,7 @@ module Processable
     attr_reader :processes, :decisions, :executions
     attr_accessor :services, :listeners, :utils
 
-    def initialize(sources: nil, services: {}, listeners: [], utils: {})
+    def initialize(sources: nil, moddles: nil, services: {}, listeners: [], utils: {})
       @services = services
       @listeners = Array.wrap(listeners)
       @utils = utils
@@ -23,7 +23,16 @@ module Processable
           builder = Bpmn::Builder.new(moddle)
           @processes = @processes + builder.processes
         end
-      end
+      end if sources
+
+      Array.wrap(moddles).each do |moddle|
+        if moddle["drgElement"]
+          moddle["drgElement"].each { |d| decisions[d["id"]] = source}
+        else
+          builder = Bpmn::Builder.new(moddle)
+          @processes = @processes + builder.processes
+        end
+      end if moddles    
     end
 
     def notify_listener(event)
