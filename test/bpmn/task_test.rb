@@ -93,27 +93,27 @@ module Bpmn
       end
     end
 
-    describe :execution do
-      let(:process) { @process }
-      let(:script_task) { process.child_by_step_id("ScriptTask") }
+    # describe :execution do
+    #   let(:process) { @process }
+    #   let(:script_task) { process.child_by_step_id("ScriptTask") }
 
-      before { @process = Processable::Execution.start(context: context, process_id: "ScriptTaskTest", variables: { name: "Eric" }) }
+    #   before { @process = Processable::Execution.start(context: context, process_id: "ScriptTaskTest", variables: { name: "Eric" }) }
 
-      it "should wait at the script task" do
-        _(script_task.waiting?).must_equal true
-      end
+    #   it "should wait at the script task" do
+    #     _(script_task.waiting?).must_equal true
+    #   end
 
-      describe :run do
-        before { process.run_automated_tasks }
+    #   describe :run do
+    #     before { process.run_automated_tasks }
 
-        it "should run the script task" do
-          _(process.completed?).must_equal true
-          _(script_task.completed?).must_equal true
-          _(process.variables["greeting"]).must_equal "Hello Eric"
-          _(script_task.variables["greeting"]).must_equal "Hello Eric"
-        end
-      end
-    end
+    #     it "should run the script task" do
+    #       _(process.completed?).must_equal true
+    #       _(script_task.completed?).must_equal true
+    #       _(process.variables["greeting"]).must_equal "Hello Eric"
+    #       _(script_task.variables["greeting"]).must_equal "Hello Eric"
+    #     end
+    #   end
+    # end
   end
 
   describe BusinessRuleTask do

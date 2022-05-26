@@ -66,6 +66,13 @@ module Processable
             "Don’t eat the paper.",
           ].sample)
         },
+        say_hello: proc { |execution, variables|
+          parts = []
+          parts.push("👋 #{variables['greeting']}") if variables['greeting']
+          parts.push(variables['name']) if variables['name']
+          parts.push("🥠 #{variables['tell_fortune']}") if variables['tell_fortune']       
+          execution.signal({ message: parts.join(' ') })
+        }
       }
     }
     let(:context) { Context.new(sources: [bpmn_source, dmn_source], services: services) }

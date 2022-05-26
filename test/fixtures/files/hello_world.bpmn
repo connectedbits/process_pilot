@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0f2pdni" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0f2pdni" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="HelloWorld" name="Hello World" isExecutable="true">
     <bpmn:startEvent id="IntroductionReceived" name="Introduction Received">
       <bpmn:outgoing>Flow_0ks31e9</bpmn:outgoing>
@@ -65,29 +65,6 @@
       <bpmn:incoming>Flow_09yhdyi</bpmn:incoming>
       <bpmn:outgoing>Flow_1t20i0c</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:scriptTask id="SayHello" name="Say Hello" scriptFormat="javascript" camunda:resultVariable="message">
-      <bpmn:incoming>Flow_1xiabfq</bpmn:incoming>
-      <bpmn:outgoing>Flow_15lbcry</bpmn:outgoing>
-      <bpmn:script>      
-
-let parts = []
-
-if (variables.greeting) {
-  parts.push(`👋 ${variables.greeting}`)
-}
-
-if (variables.name) {
-  parts.push(variables.name)
-}
-              
-if (variables.tell_fortune) {
-  parts.push(`🥠 ${variables.tell_fortune}`)
-}
-        
-signal(parts.join(' '))
-        
-      </bpmn:script>
-    </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_1xiabfq" sourceRef="Join" targetRef="SayHello" />
     <bpmn:sequenceFlow id="Flow_1t20i0c" sourceRef="TellFortune" targetRef="Join" />
     <bpmn:sequenceFlow id="Flow_09yhdyi" sourceRef="Split" targetRef="TellFortune">
@@ -120,11 +97,23 @@ signal(parts.join(' '))
       <bpmn:incoming>Flow_0dabpty</bpmn:incoming>
       <bpmn:terminateEventDefinition id="TerminateEventDefinition_0jhbxqq" />
     </bpmn:endEvent>
+    <bpmn:serviceTask id="SayHello" name="Say Hello" camunda:type="external" camunda:topic="say_hello">
+      <bpmn:incoming>Flow_1xiabfq</bpmn:incoming>
+      <bpmn:outgoing>Flow_15lbcry</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:message id="Message_0m05wlg" name="Message_IntroductionReceived" />
   <bpmn:message id="Message_0m6pmdy" name="Message_Timeout" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="HelloWorld">
+      <bpmndi:BPMNEdge id="Flow_0dabpty_di" bpmnElement="Flow_0dabpty">
+        <di:waypoint x="570" y="391" />
+        <di:waypoint x="570" y="432" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16d8mf1_di" bpmnElement="Flow_16d8mf1">
+        <di:waypoint x="458" y="100" />
+        <di:waypoint x="552" y="100" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1n35etg_di" bpmnElement="Flow_1n35etg">
         <di:waypoint x="300" y="162" />
         <di:waypoint x="300" y="100" />
@@ -170,14 +159,6 @@ signal(parts.join(' '))
         <di:waypoint x="735" y="220" />
         <di:waypoint x="790" y="220" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_16d8mf1_di" bpmnElement="Flow_16d8mf1">
-        <di:waypoint x="458" y="100" />
-        <di:waypoint x="552" y="100" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0dabpty_di" bpmnElement="Flow_0dabpty">
-        <di:waypoint x="570" y="391" />
-        <di:waypoint x="570" y="432" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_0thbsfx_di" bpmnElement="IntroductionReceived">
         <dc:Bounds x="152" y="315" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -217,9 +198,6 @@ signal(parts.join(' '))
       <bpmndi:BPMNShape id="Activity_1iohwvm_di" bpmnElement="TellFortune">
         <dc:Bounds x="520" y="293" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0lxqegn_di" bpmnElement="SayHello">
-        <dc:Bounds x="790" y="180" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1khdxg3_di" bpmnElement="Event_0ni5jx2">
         <dc:Bounds x="422" y="82" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -238,14 +216,17 @@ signal(parts.join(' '))
           <dc:Bounds x="546" y="475" width="48" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1azmedl_di" bpmnElement="SayHello">
+        <dc:Bounds x="790" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_06gfvtc_di" bpmnElement="Event_0c6rvx0">
+        <dc:Bounds x="552" y="355" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1fmfmzb_di" bpmnElement="Timeout">
         <dc:Bounds x="282" y="162" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="319" y="143" width="62" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_06gfvtc_di" bpmnElement="Event_0c6rvx0">
-        <dc:Bounds x="552" y="355" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

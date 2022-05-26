@@ -16,11 +16,12 @@ module ProcessableServices
     end
 
     def call
-      ctx = MiniRacer::Context.new
-      procs.each do |key, value|
-        ctx.attach(key.to_s, value)
-      end if procs
-      ctx.eval "variables = #{variables.to_json}; #{script}"
+      raise "Script tasks disabled until mini racer deployment is fixed."
+      # ctx = MiniRacer::Context.new
+      # procs.each do |key, value|
+      #   ctx.attach(key.to_s, value)
+      # end if procs
+      # ctx.eval "variables = #{variables.to_json}; #{script}"
     end
   end
 end

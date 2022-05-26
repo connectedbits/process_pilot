@@ -2,7 +2,7 @@ require "processable/version"
 require "processable/railtie"
 
 require "json_logic"
-require "mini_racer"
+#require "mini_racer"
 require "awesome_print"
 
 require "bpmn/element"
