@@ -11,7 +11,6 @@ require "minitest/reporters"
 require "minitest-spec-rails"
 require "mocha"
 require "pry-rails"
-require "timecop"
 require 'rails/test_unit/reporter'
 
 # ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
