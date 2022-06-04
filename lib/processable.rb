@@ -1,5 +1,6 @@
 require "processable/version"
 
+require "active_model"
 require "json_logic"
 require "mini_racer"
 require "awesome_print"
