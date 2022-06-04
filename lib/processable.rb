@@ -1,5 +1,4 @@
 require "processable/version"
-require "processable/railtie"
 
 require "json_logic"
 require "mini_racer"
