@@ -23,7 +23,7 @@ module Processable
           builder = Bpmn::Builder.new(moddle)
           @processes = @processes + builder.processes
         end
-      end if sources
+      end
 
       Array.wrap(moddles).each do |moddle|
         if moddle["drgElement"]
@@ -32,7 +32,7 @@ module Processable
           builder = Bpmn::Builder.new(moddle)
           @processes = @processes + builder.processes
         end
-      end if moddles
+      end
     end
 
     def notify_listener(event)
