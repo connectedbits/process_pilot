@@ -6,6 +6,7 @@ ENV["RAILS_ENV"] = "test"
 ROOT = File.join(File.dirname(__FILE__), "..")
 
 require_relative "../lib/processable"
+
 require "minitest/autorun"
 require "minitest/reporters"
 require "minitest-spec-rails"
