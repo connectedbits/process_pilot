@@ -3,12 +3,17 @@
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
 
-require_relative "../test/dummy/config/environment"
-require "rails/test_help"
+ROOT = File.join(File.dirname(__FILE__), "..")
+
+require_relative "../lib/processable"
+require "minitest/autorun"
 require "minitest/reporters"
 require "minitest-spec-rails"
 require "mocha"
 require 'rails/test_unit/reporter'
+require "active_support/testing/time_helpers"
+
+Time.zone_default = Time.find_zone!("UTC")
 
 # ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
 
@@ -23,6 +28,8 @@ require 'rails/test_unit/reporter'
 Rails::TestUnitReporter.executable = 'bin/test'
 
 class Minitest::Spec
+  include ActiveSupport::Testing::TimeHelpers
+
   before :each do
   end
 
@@ -37,5 +44,5 @@ Minitest::Reporters.use!(
 )
 
 def fixture_source(filename)
-  File.read("#{Rails.root}/../fixtures/files/#{filename}")
+  File.read("#{ROOT}/test/fixtures/files/#{filename}")
 end

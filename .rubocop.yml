@@ -31,11 +31,6 @@ AllCops:
     - bin/webpack
     - bin/webpack-dev-server
     - bin/yarn
-    - test/dummy/bin/*
-    - test/dummy/config/environments/*
-    - test/dummy/config/boot.rb
-    - test/dummy/config/initializers/assets.rb
-    - test/dummy/db/*
 
 ### Style Department
 
