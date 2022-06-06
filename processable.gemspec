@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/connectedbits/processable"
 
-  spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+  spec.files = Dir["{lib,doc}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
   spec.add_dependency "activemodel", ">= 7.0.2.3"
   spec.add_dependency "json_logic", "~> 0.4.7"
