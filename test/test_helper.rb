@@ -10,7 +10,7 @@ require "minitest/autorun"
 require "minitest/reporters"
 require "minitest-spec-rails"
 require "mocha"
-require 'rails/test_unit/reporter'
+require "rails/test_unit/reporter"
 require "active_support/testing/time_helpers"
 
 Time.zone_default = Time.find_zone!("UTC")
@@ -25,7 +25,7 @@ Time.zone_default = Time.find_zone!("UTC")
 #   ActiveSupport::TestCase.fixtures :all
 # end
 
-Rails::TestUnitReporter.executable = 'bin/test'
+Rails::TestUnitReporter.executable = "bin/test"
 
 class Minitest::Spec
   include ActiveSupport::Testing::TimeHelpers

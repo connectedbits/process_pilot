@@ -44,7 +44,7 @@ module Bpmn
         when "bpmn:messageRef"
           message_event_definition = @elements[reference_json["element"]["id"]]
           if message_event_definition
-            message_event_definition.message_ref = reference_json["id"] 
+            message_event_definition.message_ref = reference_json["id"]
             message_event_definition.message = @elements[reference_json["id"]]
           end
         when "bpmn:signalRef"
@@ -78,7 +78,7 @@ module Bpmn
       # Hack: wire up event definitions to event (has to be a better way)
       @elements.values.each do |element|
         if element.is_a?(Bpmn::Event) && element.event_definition_ids.present?
-          element.event_definition_ids.each { |edid| element.event_definitions.push @elements[edid] } 
+          element.event_definition_ids.each { |edid| element.event_definitions.push @elements[edid] }
         end
       end
 
