@@ -9,9 +9,11 @@ AllCops:
   Exclude:
     - bin/*
   Include:
+    - Rakefile
     - bin/test
-    - lib/**/*
-    - test/**/*
+    - bin/setup
+    - lib/**/*.rb
+    - test/**/*.rb
 
 ### Style Department
 
@@ -38,6 +40,9 @@ Style/BlockComments:
 
 Style/FrozenStringLiteralComment:
   Enabled: true
+  Exclude:
+    - Rakefile
+    - bin/*
 
 Style/RegexpLiteral:
   Enabled: false
