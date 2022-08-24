@@ -70,7 +70,7 @@ module Processable
           parts = []
           parts.push("👋 #{variables['greeting']}") if variables['greeting']
           parts.push(variables['name']) if variables['name']
-          parts.push("🥠 #{variables['tell_fortune']}") if variables['tell_fortune']       
+          parts.push("🥠 #{variables['tell_fortune']}") if variables['tell_fortune']
           execution.signal({ message: parts.join(' ') })
         }
       }
