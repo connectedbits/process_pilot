@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.summary     = "Processable"
   spec.description = "Processable is a BPMN/DMN workflow gem for Rails apps."
   spec.license     = "MIT"
-  
+
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/connectedbits/processable"
 
