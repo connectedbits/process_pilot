@@ -26,7 +26,11 @@ class Minitest::Spec
   after :each do
   end
 
+  def file_fixture(filename)
+    Pathname.new(File.join(GEM_ROOT, "/test/fixtures/files", filename))
+  end
+
   def fixture_source(filename)
-    File.read(File.join(GEM_ROOT, "/test/fixtures/files", filename))
+    file_fixture(filename).read
   end
 end

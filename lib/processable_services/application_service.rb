@@ -3,8 +3,8 @@
 module ProcessableServices
   class ApplicationService
 
-    def self.call(*args, &block)
-      new(*args, &block).call
+    def self.call(*args, **options, &block)
+      new(*args, **options, &block).call
     end
   end
 end
