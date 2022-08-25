@@ -40,5 +40,23 @@ module ProcessableServices
         end
       end
     end
+
+    describe(:builtin_functions) do
+      let(:source) { fixture_source("builtin_functions.dmn") }
+      let(:decision_name) { "output" }
+
+      describe :evaluate do
+        let(:context) {
+          {
+            name: "Elijah",
+          }
+        }
+        let(:result) { DecisionEvaluator.call(decision_name, source, context) }
+
+        it "should correctly parse and eval a dmn rule" do
+          _(result).must_equal("upper case" => "ELIJAH")
+        end
+      end
+    end
   end
 end
