@@ -54,5 +54,25 @@ module ProcessableServices
         _(result).must_equal("ABC123")
       end
     end
+
+    describe :custom_functions_as_file do
+      let(:expression) { "format datetime(date and time(point), 'YYYY-MM-DD hh:mm:ss a')" }
+      let(:variables) { { point: Time.new(2001, 2, 3, 4, 5, 11, "+00:00") } }
+      let(:result) { service.call(expression: expression, variables: variables, functions: file_fixture("custom_functions.js")) }
+
+      it "should format time" do
+        _(result).must_equal("2001-02-03 04:05:11 am")
+      end
+    end
+
+    describe :custom_functions_as_string do
+      let(:expression) { "format datetime(date and time(point), 'YYYY-MM-DD hh:mm:ss a')" }
+      let(:variables) { { point: Time.new(2001, 2, 3, 4, 5, 11, "+00:00") } }
+      let(:result) { service.call(expression: expression, variables: variables, functions: fixture_source("custom_functions.js")) }
+
+      it "should format time" do
+        _(result).must_equal("2001-02-03 04:05:11 am")
+      end
+    end
   end
 end
