@@ -5,12 +5,14 @@ module ProcessableServices
 
     def execute_process(*args, env: nil)
       command = args.shelljoin
+
       r, w = IO.pipe
-      # This redirection occurs because we want the calling
-      # process to have a chance to display any extra information
-      # emitted via STDERR
       process_env = env || {}
       process_env["PATH"] ||= ENV["PATH"]
+
+      # The redirection of err to the STDERR of the owning process is to allow the
+      # caller process to have a chance to display any extra information emitted via STDERR
+      #
       # We also specifically drop any env vars that are not indicated by the caller
       # since we likely do not want to bleed any external information into the JS process
       pid = Process.spawn(process_env, command, unsetenv_others: true, out: w, err: STDERR)
