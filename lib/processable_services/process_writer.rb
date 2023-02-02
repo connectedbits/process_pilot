@@ -4,15 +4,14 @@ module ProcessableServices
   class ProcessWriter < ApplicationService
     PROCESS_WRITER_BIN = File.expand_path(File.dirname(__FILE__)) + "/process_writer.js"
 
-    def initialize(moddle)
+    def initialize(moddle, env: nil)
       super()
       @moddle = moddle
+      @env = env
     end
 
     def call
-      command = [PROCESS_WRITER_BIN, @moddle].shelljoin
-      result = `#{command}`
-      JSON.parse(result)
+      execute_json_process(PROCESS_WRITER_BIN, @moddle, env: @env)
     end
 
     private
