@@ -4,15 +4,14 @@ module ProcessableServices
   class ProcessReader < ApplicationService
     PROCESS_READER_BIN = File.expand_path(File.dirname(__FILE__)) + "/process_reader.js"
 
-    def initialize(source)
+    def initialize(source, env: nil)
       super()
       @source = source
+      @env = env
     end
 
     def call
-      command = [PROCESS_READER_BIN, @source].shelljoin
-      result = `#{command}`
-      JSON.parse(result)
+      execute_json_process(PROCESS_READER_BIN, @source, env: @env)
     end
   end
 end
