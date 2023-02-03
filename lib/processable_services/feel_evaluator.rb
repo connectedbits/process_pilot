@@ -1,7 +1,9 @@
 # frozen_string_literal: true
-
+require_relative "./process_executor"
 module ProcessableServices
   class FeelEvaluator
+    include ProcessExecutor
+
     FEEL_EVALUATOR_BIN = File.expand_path(File.dirname(__FILE__)) + "/feel_evaluator.js"
 
     attr_reader :expression, :variables, :functions
@@ -10,16 +12,16 @@ module ProcessableServices
       new(expression: expression, variables: variables, functions: functions).call
     end
 
-    def initialize(expression:, variables: {}, functions: [])
+    def initialize(expression:, variables: {}, functions: [], env: nil)
       super()
       @expression = expression
       @variables = variables
       @functions = functions
+      @env = env
     end
 
     def call
-      command = [FEEL_EVALUATOR_BIN, expression, variables.to_json, *functions].shelljoin
-      result = `#{command}`
+      result = execute_process(FEEL_EVALUATOR_BIN, expression, variables.to_json, *functions, env: @env)
       JSON.parse(result)
     rescue JSON::ParserError
       result.strip
