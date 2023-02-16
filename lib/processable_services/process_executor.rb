@@ -9,6 +9,7 @@ module ProcessableServices
       r, w = IO.pipe
       process_env = env || {}
       process_env["PATH"] ||= ENV["PATH"]
+      process_env["NODE_PATH"] ||= ENV["NODE_PATH"]
 
       # The redirection of err to the STDERR of the owning process is to allow the
       # caller process to have a chance to display any extra information emitted via STDERR
