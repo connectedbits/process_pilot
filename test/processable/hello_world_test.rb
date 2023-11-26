@@ -10,7 +10,7 @@ module Processable
       {
         tell_fortune: proc { |execution, variables|
           raise "Fortune not found? Abort, Retry, Ignore." if variables[:error]
-          { greeting: [
+          execution.signal({ greeting: [
             "The fortune you seek is in another cookie.",
             "A closed mouth gathers no feet.",
             "A conclusion is simply the place where you got tired of thinking.",
@@ -64,7 +64,7 @@ module Processable
             "If a turtle doesn’t have a shell, is it naked or homeless?",
             "Change is inevitable, except for vending machines.",
             "Don’t eat the paper.",
-          ].sample }
+          ].sample })
         },
       }
     }
@@ -109,8 +109,9 @@ module Processable
           before { process.run_automated_tasks }
 
           it "should complete the process" do
-            # BUG: If automated tasks are not run twice, the process will not complete because another auto-task is added.
-            process.run_automated_tasks 
+            # BUG?: We have to run this a second time because the automated task spawed another
+            # automated task.
+            process.run_automated_tasks
             _(process.completed?).must_equal true
             _(process.variables["message"]).wont_be_nil
           end

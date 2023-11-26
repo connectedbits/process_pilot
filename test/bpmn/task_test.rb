@@ -45,7 +45,7 @@ module Bpmn
 
   describe ServiceTask do
     let(:source) { fixture_source("service_task_test.bpmn") }
-    let(:services) { { do_it: proc { |_execution, variables| "👋 Hello #{variables['name']}!" } } }
+    let(:services) { { do_it: proc { |execution, variables| execution.signal("👋 Hello #{variables['name']}!") } } }
     let(:context) { Processable::Context.new(sources: source, services: services) }
 
     describe :definition do
