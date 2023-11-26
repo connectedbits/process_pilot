@@ -45,7 +45,7 @@ module Bpmn
 
   describe ServiceTask do
     let(:source) { fixture_source("service_task_test.bpmn") }
-    let(:services) { { do_it: proc { |execution, variables| execution.signal("👋 Hello #{variables['name']}, from ServiceTask!") } } }
+    let(:services) { { do_it: proc { |_execution, variables| "👋 Hello #{variables['name']}!" } } }
     let(:context) { Processable::Context.new(sources: source, services: services) }
 
     describe :definition do
@@ -53,7 +53,7 @@ module Bpmn
       let(:service_task) { process.element_by_id("ServiceTask") }
 
       it "should parse the service task" do
-        _(service_task.topic).must_equal "do_it"
+        _(service_task.service_ref).must_equal "do_it"
       end
     end
 
@@ -73,8 +73,8 @@ module Bpmn
         it "should run the service task" do
           _(process.completed?).must_equal true
           _(service_task.completed?).must_equal true
-          _(process.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
-          _(service_task.variables["service_task"]).must_equal "👋 Hello Eric, from ServiceTask!"
+          _(process.variables["service_task"]).must_equal "👋 Hello Eric!"
+          _(service_task.variables["service_task"]).must_equal "👋 Hello Eric!"
         end
       end
     end
@@ -89,31 +89,31 @@ module Bpmn
       let(:script_task) { process.element_by_id("ScriptTask") }
 
       it "should parse the script task" do
-        _(script_task.script).wont_be_nil
+        _(script_task.expression).wont_be_nil
+        _(script_task.expression).must_equal "=\"👋 Hello \" + name + \" from ScriptTask!\""
       end
     end
 
-    # describe :execution do
-    #   let(:process) { @process }
-    #   let(:script_task) { process.child_by_step_id("ScriptTask") }
+    describe :execution do
+      let(:process) { @process }
+      let(:script_task) { process.child_by_step_id("ScriptTask") }
+      before { @process = Processable::Execution.start(context: context, process_id: "ScriptTaskTest", variables: { name: "Eric" }) }
 
-    #   before { @process = Processable::Execution.start(context: context, process_id: "ScriptTaskTest", variables: { name: "Eric" }) }
+      it "should wait at the script task" do
+        _(script_task.waiting?).must_equal true
+      end
 
-    #   it "should wait at the script task" do
-    #     _(script_task.waiting?).must_equal true
-    #   end
+      describe :run do
+        before { process.run_automated_tasks }
 
-    #   describe :run do
-    #     before { process.run_automated_tasks }
-
-    #     it "should run the script task" do
-    #       _(process.completed?).must_equal true
-    #       _(script_task.completed?).must_equal true
-    #       _(process.variables["greeting"]).must_equal "Hello Eric"
-    #       _(script_task.variables["greeting"]).must_equal "Hello Eric"
-    #     end
-    #   end
-    # end
+        it "should run the script task" do
+          _(process.completed?).must_equal true
+          _(script_task.completed?).must_equal true
+          _(process.variables["greeting"]).must_equal "👋 Hello Eric from ScriptTask!"
+          _(script_task.variables["greeting"]).must_equal "👋 Hello Eric from ScriptTask!"
+        end
+      end
+    end
   end
 
   describe BusinessRuleTask do
@@ -122,64 +122,32 @@ module Bpmn
     let(:context) { Processable::Context.new(sources: [bpmn_source, dmn_source]) }
     let(:process) { context.process_by_id("BusinessRuleTaskTest") }
 
-    describe :expression do
-      describe :definition do
-        let(:business_rule_task) { process.element_by_id("ExpressionBusinessRule") }
+    describe :definition do
+      let(:business_rule_task) { process.element_by_id("BusinessRuleTask") }
 
-        it "should parse the business rule task" do
-          _(business_rule_task.expression).wont_be_nil
-        end
-      end
-
-      describe :execution do
-        let(:process) { @process }
-        let(:business_rule_task) { process.child_by_step_id("ExpressionBusinessRule") }
-
-        before { @process = Processable::Execution.start(context: context, process_id: "BusinessRuleTaskTest", start_event_id: "ExpressionStart", variables: { age: 57 }) }
-
-        it "should wait at the business rule task" do
-          _(business_rule_task.waiting?).must_equal true
-        end
-
-        describe :run do
-          before { process.run_automated_tasks }
-
-          it "should run the business rule task" do
-            _(process.completed?).must_equal true
-            _(business_rule_task.completed?).must_equal true
-            _(business_rule_task.variables["senior"]).must_equal true
-          end
-        end
+      it "should parse the business rule task" do
+        _(business_rule_task.decision_ref).wont_be_nil
+        _(business_rule_task.decision_ref).must_equal "Dish"
       end
     end
 
-    describe :dmn do
-      describe :definition do
-        let(:business_rule_task) { process.element_by_id("DmnBusinessRule") }
+    describe :execution do
+      let(:process) { @process }
+      let(:business_rule_task) { process.child_by_step_id("BusinessRuleTask") }
 
-        it "should parse the business rule task" do
-          _(business_rule_task.decision_ref).wont_be_nil
-        end
+      before { @process = Processable::Execution.start(context: context, process_id: "BusinessRuleTaskTest", start_event_id: "Start", variables: { season: "Spring", guests: 7 }) }
+
+      it "should wait at the business rule task" do
+        _(business_rule_task.waiting?).must_equal true
       end
 
-      describe :execution do
-        let(:process) { @process }
-        let(:business_rule_task) { process.child_by_step_id("DmnBusinessRule") }
+      describe :run do
+        before { process.run_automated_tasks }
 
-        before { @process = Processable::Execution.start(context: context, process_id: "BusinessRuleTaskTest", start_event_id: "DMNStart", variables: { season: "Spring", guests: 7 }) }
-
-        it "should wait at the business rule task" do
-          _(business_rule_task.waiting?).must_equal true
-        end
-
-        describe :run do
-          before { process.run_automated_tasks }
-
-          it "should run the business rule task" do
-            _(process.completed?).must_equal true
-            _(business_rule_task.completed?).must_equal true
-            _(business_rule_task.variables["result"]["dish"]).must_equal "Steak"
-          end
+        it "should run the business rule task" do
+          _(process.completed?).must_equal true
+          _(business_rule_task.completed?).must_equal true
+          _(business_rule_task.variables["result"]["dish"]).must_equal "Steak"
         end
       end
     end

@@ -23,7 +23,7 @@ module Bpmn
     end
 
     def self.feel?(str)
-      str&.start_with?("${") && str&.end_with?("}")
+      str&.start_with?("=")
     end
 
     def self.json_logic?(str)

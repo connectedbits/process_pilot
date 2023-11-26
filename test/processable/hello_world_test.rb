@@ -4,13 +4,13 @@ require "test_helper"
 
 module Processable
   describe "Hello World" do
-    let(:bpmn_source) { fixture_source("hello_world.bpmn") }
+    let(:bpmn_source) { fixture_source("hello_world_new.bpmn") }
     let(:dmn_source) { fixture_source("choose_greeting.dmn") }
     let(:services) {
       {
         tell_fortune: proc { |execution, variables|
           raise "Fortune not found? Abort, Retry, Ignore." if variables[:error]
-          execution.signal([
+          { greeting: [
             "The fortune you seek is in another cookie.",
             "A closed mouth gathers no feet.",
             "A conclusion is simply the place where you got tired of thinking.",
@@ -64,15 +64,8 @@ module Processable
             "If a turtle doesn’t have a shell, is it naked or homeless?",
             "Change is inevitable, except for vending machines.",
             "Don’t eat the paper.",
-          ].sample)
+          ].sample }
         },
-        say_hello: proc { |execution, variables|
-          parts = []
-          parts.push("👋 #{variables['greeting']}") if variables['greeting']
-          parts.push(variables['name']) if variables['name']
-          parts.push("🥠 #{variables['tell_fortune']}") if variables['tell_fortune']
-          execution.signal({ message: parts.join(' ') })
-        }
       }
     }
     let(:context) { Context.new(sources: [bpmn_source, dmn_source], services: services) }
@@ -80,24 +73,32 @@ module Processable
     describe :definition do
       let(:process) { context.process_by_id("HelloWorld") }
       let(:introduce_yourself) { process.element_by_id("IntroduceYourself") }
+      let(:choose_greeting) { process.element_by_id("ChooseGreeting") }
+      let(:tell_fortune) { process.element_by_id("TellFortune") }
+      let(:author_message) { process.element_by_id("AuthorMessage") }
 
       it "should parse the process" do
         _(introduce_yourself).wont_be_nil
+        _(choose_greeting).wont_be_nil
+        _(tell_fortune).wont_be_nil
+        _(author_message).wont_be_nil
       end
     end
 
     describe :execution do
       let(:process) { @process }
       let(:introduce_yourself) { process.child_by_step_id("IntroduceYourself") }
+      let(:times_up) { process.child_by_step_id("TimesUp") }
 
       before { @process = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true }) }
 
       it "should wait at introduce yourself task" do
         _(introduce_yourself.waiting?).must_equal true
+        _(times_up.waiting?).must_equal true
       end
 
       describe :complete_introduce_yourself do
-        before { introduce_yourself.signal({ name: "Eric", language: "it", formal: false }) }
+        before { introduce_yourself.signal({ name: "Eric", language: "it", formal: false, cookie: true }) }
 
         it "should wait at choose greeting and tell fortune tasks" do
           _(introduce_yourself.completed?).must_equal true
@@ -107,17 +108,11 @@ module Processable
         describe :run_automated_tasks do
           before { process.run_automated_tasks }
 
-          it "should wait at the say hello task" do
-            _(process.waiting_tasks.first.step.id).must_equal "SayHello"
-          end
-
-          describe :run_say_hello_task do
-            before { process.run_automated_tasks }
-
-            it "should complete the process" do
-              _(process.completed?).must_equal true
-              _(process.variables["message"]).wont_be_nil
-            end
+          it "should complete the process" do
+            # BUG: If automated tasks are not run twice, the process will not complete because another auto-task is added.
+            process.run_automated_tasks 
+            _(process.completed?).must_equal true
+            _(process.variables["message"]).wont_be_nil
           end
         end
       end

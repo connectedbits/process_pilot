@@ -7,7 +7,7 @@ module ProcessableServices
 
     describe :feel do
       describe :val do
-        let(:expression) { "person.name" }
+        let(:expression) { "=person.name" }
 
         it "should evaluate expression" do
           result = service.call(expression: expression, variables: { person: { name: "Eric" } })
@@ -15,15 +15,24 @@ module ProcessableServices
         end
       end
 
+      describe :concatination do
+        let(:expression) { "=if cookie then greeting + \" \" + name + \", 🥠 \" + fortune else greeting + \" \" + name" }
+
+        it "should evaluate expression" do
+          result = service.call(expression: expression, variables: { name: "Eric", cookie: true, fortune: "The fortune you seek is in another cookie.", greeting: "Hello" })
+          _(result).must_equal "Hello Eric, 🥠 The fortune you seek is in another cookie."
+        end
+      end
+
       describe :test do
         it "should evaluate expression" do
-          result = service.call(expression: "${ action = 'ok' }", variables: { action: "ok" })
+          result = service.call(expression: "=action = 'ok'", variables: { action: "ok" })
           _(result).must_equal true
         end
       end
 
       describe :truthy do
-        let(:expression) { "person.age > 50" }
+        let(:expression) { "=person.age > 50" }
 
         it "truthy should be true" do
           result = service.call(expression: expression, variables: { person: { age: 57 } })

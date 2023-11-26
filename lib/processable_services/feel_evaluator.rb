@@ -1,5 +1,7 @@
 # frozen_string_literal: true
+
 require_relative "./process_executor"
+
 module ProcessableServices
   class FeelEvaluator
     include ProcessExecutor

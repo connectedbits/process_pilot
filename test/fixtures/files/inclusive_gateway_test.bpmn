@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_13kxjgo" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_13kxjgo" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="InclusiveGatewayTest" name="Inclusive Gateway Test" isExecutable="true">
     <bpmn:startEvent id="Start">
       <bpmn:outgoing>Flow_1</bpmn:outgoing>
@@ -26,14 +26,14 @@
       <bpmn:outgoing>Flow_8</bpmn:outgoing>
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_4" sourceRef="Split" targetRef="CheckPrinterParts">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ include_printer_parts = true }</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">include_printer_parts = true</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:task id="CheckLaptopParts" name="Check Laptop Parts">
       <bpmn:incoming>Flow_5</bpmn:incoming>
       <bpmn:outgoing>Flow_6</bpmn:outgoing>
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_5" sourceRef="Split" targetRef="CheckLaptopParts">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ include_laptop_parts = true }</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">include_laptop_parts = true</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_7" sourceRef="CheckPrices" targetRef="Join" />
     <bpmn:inclusiveGateway id="Join" name="Join">
@@ -51,46 +51,6 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="InclusiveGatewayTest">
-      <bpmndi:BPMNEdge id="Flow_1768e3f_di" bpmnElement="Flow_9">
-        <di:waypoint x="735" y="237" />
-        <di:waypoint x="792" y="237" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1upr21j_di" bpmnElement="Flow_6">
-        <di:waypoint x="630" y="120" />
-        <di:waypoint x="710" y="120" />
-        <di:waypoint x="710" y="212" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0zylyd6_di" bpmnElement="Flow_8">
-        <di:waypoint x="630" y="350" />
-        <di:waypoint x="710" y="350" />
-        <di:waypoint x="710" y="262" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1r0qclo_di" bpmnElement="Flow_7">
-        <di:waypoint x="630" y="237" />
-        <di:waypoint x="685" y="237" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1dfglfy_di" bpmnElement="Flow_5">
-        <di:waypoint x="450" y="212" />
-        <di:waypoint x="450" y="120" />
-        <di:waypoint x="530" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_14bo77j_di" bpmnElement="Flow_4">
-        <di:waypoint x="450" y="262" />
-        <di:waypoint x="450" y="350" />
-        <di:waypoint x="530" y="350" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0qfilf4_di" bpmnElement="Flow_3">
-        <di:waypoint x="475" y="237" />
-        <di:waypoint x="530" y="237" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_181215r_di" bpmnElement="Flow_2">
-        <di:waypoint x="370" y="237" />
-        <di:waypoint x="425" y="237" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1c00i7d_di" bpmnElement="Flow_1">
-        <di:waypoint x="215" y="237" />
-        <di:waypoint x="270" y="237" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="Start">
         <dc:Bounds x="179" y="219" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -121,6 +81,46 @@
       <bpmndi:BPMNShape id="Event_1hzdocs_di" bpmnElement="End">
         <dc:Bounds x="792" y="219" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1c00i7d_di" bpmnElement="Flow_1">
+        <di:waypoint x="215" y="237" />
+        <di:waypoint x="270" y="237" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_181215r_di" bpmnElement="Flow_2">
+        <di:waypoint x="370" y="237" />
+        <di:waypoint x="425" y="237" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qfilf4_di" bpmnElement="Flow_3">
+        <di:waypoint x="475" y="237" />
+        <di:waypoint x="530" y="237" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14bo77j_di" bpmnElement="Flow_4">
+        <di:waypoint x="450" y="262" />
+        <di:waypoint x="450" y="350" />
+        <di:waypoint x="530" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dfglfy_di" bpmnElement="Flow_5">
+        <di:waypoint x="450" y="212" />
+        <di:waypoint x="450" y="120" />
+        <di:waypoint x="530" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1r0qclo_di" bpmnElement="Flow_7">
+        <di:waypoint x="630" y="237" />
+        <di:waypoint x="685" y="237" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zylyd6_di" bpmnElement="Flow_8">
+        <di:waypoint x="630" y="350" />
+        <di:waypoint x="710" y="350" />
+        <di:waypoint x="710" y="262" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1upr21j_di" bpmnElement="Flow_6">
+        <di:waypoint x="630" y="120" />
+        <di:waypoint x="710" y="120" />
+        <di:waypoint x="710" y="212" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1768e3f_di" bpmnElement="Flow_9">
+        <di:waypoint x="735" y="237" />
+        <di:waypoint x="792" y="237" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

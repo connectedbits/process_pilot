@@ -20,7 +20,7 @@ module ProcessableServices
     end
 
     def call_feel
-      FeelEvaluator.call(expression: expression.delete_prefix("${").delete_suffix("}").strip, variables: variables)
+      FeelEvaluator.call(expression: expression.delete_prefix("=").strip, variables: variables)
     end
 
     def call_json_logic

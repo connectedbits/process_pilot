@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "@connectedbits/dmn-eval-js": "https://github.com/connectedbits/dmn-eval-js.git",
-    "bpmn-moddle": "^7.1.2",
-    "camunda-bpmn-moddle": "^6.1.2",
+    "bpmn-moddle": "^8.0.1",
+    "zeebe-bpmn-moddle": "^1.0.0",
     "dmn-moddle": "^10.0.0",
     "js-feel": "^1.4.7"
   },
