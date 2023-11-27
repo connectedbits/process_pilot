@@ -25,10 +25,10 @@ module Processable
   class ServiceTaskRunner < TaskRunner
 
     def call
-      service_ref = execution.step.service_ref
-      raise ExecutionError.new("A service ref required for Service Task") unless service_ref
-      service = context.services[service_ref.to_sym]
-      raise ExecutionError.new("No service found with service reference #{service_ref}") unless service
+      service_key = execution.step.service_key
+      raise ExecutionError.new("A service key is required for a Service Task") unless service_key
+      service = context.services[service_key.to_sym]
+      raise ExecutionError.new("No service found with type #{service_key}") unless service
       service.call(execution, variables)
     end
   end
@@ -36,9 +36,9 @@ module Processable
   class ScriptTaskRunner < ServiceTaskRunner
 
     def call
-      expression = execution.step.expression
-      raise ExecutionError.new("An expression is required for a Script Task") unless expression
-      result = ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: variables)
+      script = execution.step.script
+      raise ExecutionError.new("A script is required for a Script Task") unless script
+      result = ProcessableServices::ExpressionEvaluator.call(expression: script, variables: variables)
       execution.signal(result)
     end
   end
@@ -46,13 +46,13 @@ module Processable
   class BusinessRuleTaskRunner < TaskRunner
 
     def call
-      decision_ref = execution.step.decision_ref
-      raise ExecutionError.new("A decision ref is required for a Business Rule Task") unless decision_ref
+      decision_id = execution.step.decision_id
+      raise ExecutionError.new("A decision id is required for a Business Rule Task") unless decision_id
 
-      source = context.decisions[decision_ref]
-      raise ExecutionError.new("Source not found for decision ref #{decision_ref}") unless source
+      source = context.decisions[decision_id]
+      raise ExecutionError.new("No source found for decision is #{decision_id}") unless source
 
-      result = ProcessableServices::DecisionEvaluator.call(decision_ref, source, variables)
+      result = ProcessableServices::DecisionEvaluator.call(decision_id, source, variables)
       execution.signal(result)
     end
   end

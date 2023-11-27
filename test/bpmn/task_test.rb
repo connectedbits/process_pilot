@@ -53,7 +53,7 @@ module Bpmn
       let(:service_task) { process.element_by_id("ServiceTask") }
 
       it "should parse the service task" do
-        _(service_task.service_ref).must_equal "do_it"
+        _(service_task.service_key).must_equal "do_it"
       end
     end
 
@@ -89,8 +89,8 @@ module Bpmn
       let(:script_task) { process.element_by_id("ScriptTask") }
 
       it "should parse the script task" do
-        _(script_task.expression).wont_be_nil
-        _(script_task.expression).must_equal "=\"👋 Hello \" + name + \" from ScriptTask!\""
+        _(script_task.script).wont_be_nil
+        _(script_task.script).must_equal "=\"👋 Hello \" + name + \" from ScriptTask!\""
       end
     end
 
@@ -126,8 +126,8 @@ module Bpmn
       let(:business_rule_task) { process.element_by_id("BusinessRuleTask") }
 
       it "should parse the business rule task" do
-        _(business_rule_task.decision_ref).wont_be_nil
-        _(business_rule_task.decision_ref).must_equal "Dish"
+        _(business_rule_task.decision_id).wont_be_nil
+        _(business_rule_task.decision_id).must_equal "Dish"
       end
     end
 

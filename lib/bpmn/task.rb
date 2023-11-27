@@ -2,12 +2,6 @@
 
 module Bpmn
   class Task < Activity
-    attr_accessor :result_variable, :service_ref, :script
-
-    def initialize(moddle)
-      super
-      @result_variable = moddle["resultVariable"]
-    end
 
     def is_automated?
       false
@@ -42,15 +36,7 @@ module Bpmn
   end
 
   class ServiceTask < Task
-    attr_accessor :service_ref
-
-    def initialize(moddle)
-      super
-      extension_by_type("zeebe:TaskDefinition")&.tap do |extension|
-        @service_ref = extension.moddle["type"]
-        @result_variable = extension.moddle["resultVariable"] if extension.moddle["resultVariable"].present?
-      end
-    end
+    attr_accessor :service
 
     def is_automated?
       true
@@ -63,29 +49,31 @@ module Bpmn
     def execute(execution)
       execution.wait
     end
+
+    def service_key
+      extension_elements&.task_definition&.type
+    end
   end
 
   class ScriptTask < ServiceTask
-    attr_accessor :expression # Scripts are FEEL expressions
 
-    def initialize(moddle)
-      super
-      extension_by_type("zeebe:Script")&.tap do |extension|
-        @expression = extension.moddle["expression"]
-        @result_variable = extension.moddle["resultVariable"] if extension.moddle["resultVariable"].present?
-      end
+    def script
+      extension_elements&.script&.expression
+    end
+
+    def result_variable
+      extension_elements&.script&.result_variable
     end
   end
 
   class BusinessRuleTask < ServiceTask
-    attr_accessor :decision_ref # Name of a DMN table
 
-    def initialize(moddle)
-      super
-      extension_by_type("zeebe:CalledDecision")&.tap do |extension|
-        @decision_ref = extension.moddle["decisionId"]
-        @result_variable = extension.moddle["resultVariable"] if extension.moddle["resultVariable"].present?
-      end
+    def decision_id
+      extension_elements&.called_decision&.decision_id
+    end
+
+    def result_variable
+      extension_elements&.called_decision&.result_variable
     end
   end
 end

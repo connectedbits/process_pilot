@@ -2,18 +2,13 @@
 
 module Bpmn
   class Element
-    attr_accessor :type, :id, :name, :extensions
+    attr_accessor :type, :id, :name, :extension_elements
 
     def initialize(moddle)
       @type = moddle["$type"]
       @id = moddle["id"]
       @name = moddle["name"]
-      @extensions = moddle["extensionElements"]["values"].map { |v| Bpmn::Extension.new(v) } if moddle["extensionElements"].present?
-    end
-
-    def extension_by_type(type)
-      return nil unless extensions.present?
-      extensions.find { |extension| extension.type == type }
+      @extension_elements = ExtensionElements.new(moddle["extensionElements"]) if moddle["extensionElements"].present?
     end
 
     def self.from_moddle(moddle)
@@ -22,7 +17,7 @@ module Bpmn
         klass = "Bpmn::#{moddle["$type"].split(':').last}".constantize
         return klass.new(moddle)
       rescue # => e
-        ap "Create class for #{moddle["$type"]}"
+        ap "Error creating instance of #{moddle["$type"]}"
         return Element.new(moddle)
       end
     end
