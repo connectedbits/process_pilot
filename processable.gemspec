@@ -19,8 +19,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport", ">= 7.0.2.3"
   spec.add_dependency "json_logic", "~> 0.4.7"
   spec.add_dependency "awesome_print", "~> 1.9"
-  # spec.add_dependency "libv8-node", "16.10.0.0"
-  # spec.add_dependency "mini_racer", "~> 0.6.0"
 
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-minitest"

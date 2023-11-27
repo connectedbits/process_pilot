@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module Zeebe
-  class FormDefinition < Bpmn::Extension
+  class FormDefinition
     attr_accessor :form_key
 
     def initialize(moddle)
-      super(moddle)
       @form_key = moddle["formKey"]
     end
   end

@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module Zeebe
-  class Script < Bpmn::Extension
+  class Script
     attr_accessor :expression, :result_variable
 
     def initialize(moddle)
-      super(moddle)
       @expression = moddle["expression"]
       @result_variable = moddle["resultVariable"]
     end

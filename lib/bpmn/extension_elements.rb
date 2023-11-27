@@ -2,25 +2,24 @@
 
 module Bpmn
   class ExtensionElements
-    VALID_EXTENSIONS = %w[assignment_definition called_decision form_definition io_mapping properties script task_definition task_schedule].freeze
+    VALID_EXTENSIONS = %w[zeebe:AssignmentDefinition zeebe:CalledDecision zeebe:FormDefinition zeebe:IoMapping zeebe:Properties zeebe:Script zeebe:TaskDefinition zeebe:TaskSchedule].freeze
 
     attr_accessor :assignment_definition, :called_decision, :form_definition, :io_mapping, :properties, :script, :task_definition, :task_schedule
 
     def initialize(moddle)
-      @extensions = {}
-      @extensions = moddle["values"].map do |moddle_extension|
-        attr_name = moddle_extension["$type"].split(":").last.underscore
-        if VALID_EXTENSIONS.include?(attr_name)
-          extension_class = extension_class(moddle_extension["$type"])
-          self.send("#{attr_name}=", extension_class.new(moddle_extension))
+      moddle["values"].each do |moddle_value|
+        extension_type = moddle_value["$type"]
+        if extension_type == "zeebe:Properties"
+          @properties = {}
+          moddle_value["properties"].each { |property_moddle| @properties[property_moddle["name"]] = property_moddle["value"] } 
+        elsif VALID_EXTENSIONS.include?(extension_type)
+          extension_parts = extension_type.split(":")
+          klass = "#{extension_parts.first.capitalize}::#{extension_parts.last}".constantize
+          self.send("#{extension_parts.last.underscore}=", klass.new(moddle_value))
+        else
+          raise "Unknown extension type: #{extension_type}"
         end
       end
-    end
-
-    private
-
-    def extension_class(type)
-      "Zeebe::#{type.split(':').last}".constantize
     end
   end
 end

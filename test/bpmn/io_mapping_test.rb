@@ -25,13 +25,6 @@ module Bpmn
 
     describe :execution do
 
-      describe :output_mapping do
-
-      end
-
-      describe :input_mapping do
-
-      end
     end
   end
 end

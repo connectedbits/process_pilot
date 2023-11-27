@@ -33,6 +33,10 @@ module Bpmn
   end
 
   class UserTask < Task
+
+    def form_key
+      extension_elements&.form_definition&.form_key
+    end
   end
 
   class ServiceTask < Task

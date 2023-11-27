@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module Zeebe
-  class TaskDefinition < Bpmn::Extension
+  class TaskDefinition
     attr_accessor :type, :retries
 
     def initialize(moddle)
-      super(moddle)
       @type = moddle["type"]
       @retries = moddle["retries"]
     end

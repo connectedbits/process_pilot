@@ -4,7 +4,7 @@ Processable is a workflow gem for Rails applications based on the [bpmn](https:/
 
 ## Usage
 
-Processable executes business processes like [this one](/test/fixtures/files/hello_world.bpmn). 
+Processable executes business processes like [this one](/test/fixtures/files/hello_world.bpmn).
 
 ![Example](test/fixtures/files/hello_world.png)
 
@@ -42,6 +42,7 @@ An execution tree is returned with the process as the root step. It is often use
 ```ruby
 execution.print
 ```
+
 ```
 HelloWorld running * Flow_016qg9x
 
@@ -84,7 +85,7 @@ execution.run_automated_tasks
 Once the tasks are completed the process continues executing until it reaches an EndEvent.
 
 ```
-HelloWorld completed * 
+HelloWorld completed *
 
 {
   "greet": true,
@@ -108,24 +109,28 @@ HelloWorld completed *
 8 ScriptTask SayHello: completed { "message": "👋 Ciao Eric 🥠 This cookie contains 117 calories." } * in: Flow_1xiabfq * out: Flow_15lbcry
 9 EndEvent End: completed * in: Flow_15lbcry
 ```
+
 ## Documentation
 
-* [Processes](/docs/processes.md)
-* [Tasks](/docs/tasks.md)
-* [Events](/docs/events.md)
-* [Event Definitions](/docs/event_definitions.md)
-* [Gateways](/docs/gateways.md)
-* [Expressions](/docs/expressions.md)
-* [Execution](/docs/execution.md)
+- [Processes](/docs/processes.md)
+- [Tasks](/docs/tasks.md)
+- [Events](/docs/events.md)
+- [Event Definitions](/docs/event_definitions.md)
+- [Gateways](/docs/gateways.md)
+- [Expressions](/docs/expressions.md)
+- [Data Flow](/docs/data_flow.md)
+- [Execution](/docs/execution.md)
 
 ## Installation
 
 Execute:
+
 ```bash
 $ bundle add "processable"
 ```
 
 Or install it directly:
+
 ```bash
 $ gem install processable
 ```

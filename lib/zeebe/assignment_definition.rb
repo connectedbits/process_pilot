@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module Zeebe
-  class AssignmentDefinition < Bpmn::Extension
-    attr_accessor :decision_id, :result_variable
+  class AssignmentDefinition
+    attr_accessor :assignee, :candidate_groups, :candidate_users
 
     def initialize(moddle)
-      super(moddle)
-      @decision_id = moddle["decisionId"]
-      @result_variable = moddle["resultVariable"]
+      @assignee = moddle["assignee"]
+      @candidate_groups = moddle["candidateGroups"]
+      @candidate_users = moddle["candidateUsers"]
     end
   end
 end

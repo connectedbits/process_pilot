@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 module Zeebe
-  class IoMapping < Bpmn::Extension
-    attr_accessor :source, :target
+  class IoMapping
+    attr_accessor :inputs, :outputs
 
     def initialize(moddle)
-      super(moddle)
-      @source = moddle["source"]
-      @target = moddle["target"]
+      @inputs = moddle["inputParameters"].map { |parameter_moddle| Parameter.new(parameter_moddle) }
+      @outputs = moddle["outputParameters"].map { |parameter_moddle| Parameter.new(parameter_moddle) }
     end
   end
 end
