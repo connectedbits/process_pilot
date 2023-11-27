@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    processable (0.1.0)
+    processable (0.2.0)
       activemodel (>= 7.0.2.3)
       activesupport (>= 7.0.2.3)
       awesome_print (~> 1.9)

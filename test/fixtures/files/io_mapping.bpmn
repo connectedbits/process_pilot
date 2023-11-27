@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0wrzdd9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
+  <bpmn:process id="IOMapping" name="IO Mapping" isExecutable="true">
+    <bpmn:startEvent id="Start" name="Start">
+      <bpmn:outgoing>Flow_1663yj7</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1663yj7" sourceRef="Start" targetRef="CheckInventory" />
+    <bpmn:endEvent id="End" name="End">
+      <bpmn:incoming>Flow_1yhpfwq</bpmn:incoming>
+      <bpmn:incoming>Flow_17b1pa2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ympmv0" sourceRef="CheckInventory" targetRef="Gateway_0pzaa1a" />
+    <bpmn:serviceTask id="CheckInventory" name="Check Inventory">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{ &#34;response&#34;: { &#34;body&#34;: { &#34;inventory&#34;: 15 } } }" />
+        </zeebe:properties>
+        <zeebe:taskDefinition type="check_inventory" />
+        <zeebe:ioMapping>
+          <zeebe:output source="=response.body.inventory" target="inventory" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1663yj7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ympmv0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_0pzaa1a">
+      <bpmn:incoming>Flow_1ympmv0</bpmn:incoming>
+      <bpmn:outgoing>Flow_18dj683</bpmn:outgoing>
+      <bpmn:outgoing>Flow_17b1pa2</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_18dj683" sourceRef="Gateway_0pzaa1a" targetRef="OrderProduct">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=inventory &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1yhpfwq" sourceRef="OrderProduct" targetRef="End" />
+    <bpmn:sequenceFlow id="Flow_17b1pa2" sourceRef="Gateway_0pzaa1a" targetRef="End">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=inventory &lt;= 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="OrderProduct" name="Order Product">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="order_product" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_18dj683</bpmn:incoming>
+      <bpmn:outgoing>Flow_1yhpfwq</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IOMapping">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="Start">
+        <dc:Bounds x="179" y="109" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="152" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02ve2j0_di" bpmnElement="CheckInventory">
+        <dc:Bounds x="270" y="87" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0pzaa1a_di" bpmnElement="Gateway_0pzaa1a" isMarkerVisible="true">
+        <dc:Bounds x="425" y="102" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0n87xw5_di" bpmnElement="End">
+        <dc:Bounds x="692" y="109" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="700" y="79" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1d98d4a_di" bpmnElement="OrderProduct">
+        <dc:Bounds x="530" y="87" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1663yj7_di" bpmnElement="Flow_1663yj7">
+        <di:waypoint x="215" y="127" />
+        <di:waypoint x="270" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ympmv0_di" bpmnElement="Flow_1ympmv0">
+        <di:waypoint x="370" y="127" />
+        <di:waypoint x="425" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18dj683_di" bpmnElement="Flow_18dj683">
+        <di:waypoint x="475" y="127" />
+        <di:waypoint x="530" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17b1pa2_di" bpmnElement="Flow_17b1pa2">
+        <di:waypoint x="450" y="152" />
+        <di:waypoint x="450" y="220" />
+        <di:waypoint x="710" y="220" />
+        <di:waypoint x="710" y="145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1yhpfwq_di" bpmnElement="Flow_1yhpfwq">
+        <di:waypoint x="630" y="127" />
+        <di:waypoint x="692" y="127" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
