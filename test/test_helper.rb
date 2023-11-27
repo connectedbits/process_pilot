@@ -33,8 +33,4 @@ class Minitest::Spec
   def fixture_source(filename)
     file_fixture(filename).read
   end
-
-  def print_execution(execution)
-    puts Processable::ExecutionPrinter.new(execution).print
-  end
 end

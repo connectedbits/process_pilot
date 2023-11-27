@@ -2,9 +2,9 @@
 
 module Bpmn
   class ExtensionElements
-    VALID_EXTENSIONS = %w[zeebe:AssignmentDefinition zeebe:CalledDecision zeebe:FormDefinition zeebe:IoMapping zeebe:Properties zeebe:Script zeebe:TaskDefinition zeebe:TaskSchedule].freeze
+    VALID_EXTENSIONS = %w[zeebe:AssignmentDefinition zeebe:CalledDecision zeebe:FormDefinition zeebe:IoMapping zeebe:Properties zeebe:Script zeebe:Subscription zeebe:TaskDefinition zeebe:TaskSchedule].freeze
 
-    attr_accessor :assignment_definition, :called_decision, :form_definition, :io_mapping, :properties, :script, :task_definition, :task_schedule
+    attr_accessor :assignment_definition, :called_decision, :form_definition, :io_mapping, :properties, :script, :subscription, :task_definition, :task_schedule
 
     def initialize(moddle)
       moddle["values"].each do |moddle_value|

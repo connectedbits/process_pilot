@@ -10,6 +10,8 @@ Input and output mappings are useful to transform data between process steps. Fo
 
 FEEL is a critical component of this engine. It's used to evaluate expressions and conditions. It's also used to evaluate DMN decisions. Currently, the engine uses a third-party library to evaluate FEEL expressions. This library is not actively maintained and has some limitations. It would be better to have a native implementation of FEEL and DMN logic.
 
+https://github.com/hlubek/rubel
+
 ## Complimentary modeling tool for BPMN, FEEL, and DMN
 
 The BPMN, FEEL, and DMN modeling tools are all separate. It would be nice to have a single tool that can model all three. This would allow for a more seamless experience when modeling processes. Additionally, we can limit the BPMN modeling tool to only support the features that are supported by the engine. This would make it easier to model processes that can be executed by the engine.

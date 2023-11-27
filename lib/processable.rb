@@ -42,6 +42,7 @@ require "zeebe/form_definition"
 require "zeebe/io_mapping"
 require "zeebe/parameter"
 require "zeebe/script"
+require "zeebe/subscription"
 require "zeebe/task_definition"
 require "zeebe/task_schedule"
 
