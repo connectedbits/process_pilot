@@ -33,6 +33,14 @@ module Bpmn
       flows = [default] if flows.empty? && default
       return flows
     end
+
+    def input_mappings
+      extension_elements&.io_mapping&.inputs || []
+    end
+
+    def output_mappings
+      extension_elements&.io_mapping&.outputs || []
+    end
   end
 
   class Activity < Step

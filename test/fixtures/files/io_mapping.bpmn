@@ -1,77 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0wrzdd9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
-  <bpmn:process id="IOMapping" name="IO Mapping" isExecutable="true">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1c20rt0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
+  <bpmn:process id="IOMapping" name="IO Mapping Test" isExecutable="true">
+    <bpmn:extensionElements>
+      <zeebe:properties />
+    </bpmn:extensionElements>
     <bpmn:startEvent id="Start" name="Start">
-      <bpmn:outgoing>Flow_1663yj7</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#10;  &#34;order_id&#34;: &#34;order-123&#34;,&#10;  &#34;total_price&#34;: 25.0,&#10;  &#34;customer&#34;: {&#10;    &#34;name&#34;: &#34;John&#34;,&#10;    &#34;iban&#34;: &#34;DE456&#34;&#10;  }&#10;}" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1r5rywt</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_1663yj7" sourceRef="Start" targetRef="EnterName" />
-    <bpmn:endEvent id="End" name="End">
+    <bpmn:sequenceFlow id="Flow_1r5rywt" sourceRef="Start" targetRef="CollectMoney" />
+    <bpmn:serviceTask id="CollectMoney" name="Collect Money">
       <bpmn:extensionElements>
+        <zeebe:taskDefinition type="CollectMoneyJob" />
         <zeebe:ioMapping>
-          <zeebe:output source="=&#34;👋 Hello &#34; + name + &#34; 🥠 &#34; + fortune" target="greeting" />
+          <zeebe:input source="=customer.name" target="sender" />
+          <zeebe:input source="=customer.iban" target="iban" />
+          <zeebe:input source="=total_price" target="price" />
+          <zeebe:input source="=order_id" target="reference" />
+          <zeebe:output source="=payment_status" target="status" />
         </zeebe:ioMapping>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1czo3ku</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:serviceTask id="AuthorGreeting" name="Author Greeting">
-      <bpmn:extensionElements>
-        <zeebe:properties>
-          <zeebe:property name="camundaModeler:exampleOutputJson" value="{ &#34;response&#34;: { &#34;body&#34;: { &#34;greeting&#34;: &#34;Hi Eric Carlson!&#34; } } }" />
-        </zeebe:properties>
-        <zeebe:taskDefinition type="fortune" />
-        <zeebe:ioMapping>
-          <zeebe:input source="=first_name + &#34; &#34; + last_name" target="name" />
-          <zeebe:output source="=response.body.greeting" target="greeting" />
-        </zeebe:ioMapping>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_18fjjxe</bpmn:incoming>
-      <bpmn:outgoing>Flow_1czo3ku</bpmn:outgoing>
+      <bpmn:incoming>Flow_1r5rywt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0f8zw6x</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_18fjjxe" sourceRef="EnterName" targetRef="AuthorGreeting" />
-    <bpmn:userTask id="EnterName" name="Enter Name">
-      <bpmn:extensionElements>
-        <zeebe:properties>
-          <zeebe:property name="camundaModeler:exampleOutputJson" value="{ &#34;first_name&#34;: &#34;John&#34;, &#34;last_name&#34;: &#34;Doe&#34; }" />
-        </zeebe:properties>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1663yj7</bpmn:incoming>
-      <bpmn:outgoing>Flow_18fjjxe</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_1czo3ku" sourceRef="AuthorGreeting" targetRef="End" />
+    <bpmn:endEvent id="End" name="End">
+      <bpmn:incoming>Flow_0f8zw6x</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0f8zw6x" sourceRef="CollectMoney" targetRef="End" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IOMapping">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="Start">
-        <dc:Bounds x="152" y="109" width="36" height="36" />
+        <dc:Bounds x="179" y="99" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="158" y="152" width="24" height="14" />
+          <dc:Bounds x="185" y="142" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_15d01v9_di" bpmnElement="EnterName">
-        <dc:Bounds x="230" y="87" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_1i2s1vh_di" bpmnElement="CollectMoney">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_02ve2j0_di" bpmnElement="AuthorGreeting">
-        <dc:Bounds x="380" y="87" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0n87xw5_di" bpmnElement="End">
-        <dc:Bounds x="522" y="109" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_0nek6au_di" bpmnElement="End">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="530" y="79" width="20" height="14" />
+          <dc:Bounds x="440" y="142" width="20" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1663yj7_di" bpmnElement="Flow_1663yj7">
-        <di:waypoint x="188" y="127" />
-        <di:waypoint x="230" y="127" />
+      <bpmndi:BPMNEdge id="Flow_1r5rywt_di" bpmnElement="Flow_1r5rywt">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_18fjjxe_di" bpmnElement="Flow_18fjjxe">
-        <di:waypoint x="330" y="127" />
-        <di:waypoint x="380" y="127" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1czo3ku_di" bpmnElement="Flow_1czo3ku">
-        <di:waypoint x="480" y="127" />
-        <di:waypoint x="522" y="127" />
+      <bpmndi:BPMNEdge id="Flow_0f8zw6x_di" bpmnElement="Flow_0f8zw6x">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -105,6 +105,7 @@ module Processable
     def start
       @status = "started"
       @started_at = Time.zone.now
+      map_input_variables if step&.input_mappings&.present?
       context.notify_listener({ event: :started, execution: self })
       step.attachments.each { |attachment| parent.execute_step(attachment, attached_to: self) } if step.is_a?(Bpmn::Activity)
       continue
@@ -126,6 +127,7 @@ module Processable
 
     def end(notify_parent = false)
       @status = "completed" unless status == "terminated"
+      map_output_variables if step&.output_mappings&.present?
       parent.variables.merge!(variables) if parent && variables.present?
       @ended_at = Time.zone.now
       context.notify_listener({ event: :ended, execution: self })
@@ -182,8 +184,8 @@ module Processable
       evaluate_expression(condition.body) == true
     end
 
-    def evaluate_expression(expression)
-      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: parent.variables)
+    def evaluate_expression(expression, vars: parent.variables)
+      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: vars)
     end
 
     def run_automated_tasks
@@ -264,6 +266,20 @@ module Processable
     end
 
     private
+
+    def map_input_variables
+      return unless step&.input_mappings&.present?
+      step.input_mappings.each do |parameter|
+        variables[parameter.target] = evaluate_expression(parameter.source)
+      end
+    end
+
+    def map_output_variables
+      return unless step&.output_mappings&.present?
+      step.output_mappings.each do |parameter|
+        variables[parameter.target] = evaluate_expression(parameter.source)
+      end
+    end
 
     def result_to_variables(result)
       if step.respond_to?(:result_variable) && step.result_variable

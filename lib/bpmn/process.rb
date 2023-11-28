@@ -29,7 +29,7 @@ module Bpmn
     end
   end
 
-  class Process < Element
+  class Process < Step
     include ProcessBehavior
 
     def initialize(moddle)

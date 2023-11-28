@@ -28,7 +28,7 @@ module ProcessableServices
     end
 
     def feel?
-      expression.start_with?("${") && expression.end_with?("}")
+      expression.start_with?("=")
     end
 
     def json_logic?

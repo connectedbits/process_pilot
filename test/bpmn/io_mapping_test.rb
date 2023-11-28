@@ -9,8 +9,8 @@ module Processable
     let(:context) { Processable::Context.new(sources: source) }
     let(:services) {
       {
-        greeti: proc { |_execution, variables|
-          { response: { body: { greeting: "👋 Hello #{variables[:name]}!" } } }
+        CollectMoney: proc { |_execution, variables|
+          variables
         },
       }
     }
@@ -18,44 +18,40 @@ module Processable
     describe :definition do
       let(:process) { context.process_by_id("IOMapping") }
       let(:start_event) { process.element_by_id("Start") }
-      let(:enter_name_task) { process.element_by_id("EnterName") }
-      let(:author_greeting_task) { process.element_by_id("AuthorGreeting") }
+      let(:collect_money) { process.element_by_id("CollectMoney") }
       let(:end_event) { process.element_by_id("End") }
 
-      it "should parse the task" do
-        _(start_event).wont_be_nil
-        _(enter_name_task).wont_be_nil
-        _(author_greeting_task).wont_be_nil
-        _(end_event).wont_be_nil
+      it "should parse the task with io mappings" do
+        _(collect_money).wont_be_nil
+        _(collect_money.input_mappings.present?).must_equal true
+        _(collect_money.input_mappings.length).must_equal 4
+        _(collect_money.output_mappings.present?).must_equal true
+        _(collect_money.output_mappings.length).must_equal 1
       end
     end
 
     describe :execution do
       let(:process) { @process }
       let(:start_event) { process.child_by_step_id("Start") }
-      let(:enter_name_task) { process.child_by_step_id("EnterName") }
-      let(:author_greeting_task) { process.child_by_step_id("AuthorGreeting") }
+      let(:collect_money) { process.child_by_step_id("CollectMoney") }
       let(:end_event) { process.child_by_step_id("End") }
 
-      before { @process = Execution.start(context: context, process_id: "IOMapping"); }
+      before { @process = Execution.start(context: context, process_id: "IOMapping", variables: { order_id: "order-123", total_price: 25.0, customer: { name: "John", iban: "DE456" } }); }
 
-      describe :mapping do
-        before { enter_name_task.signal({ first_name: "John", last_name: "Doe" }) }
+      describe :input_mapping do
+        it "should map input variables" do
+          _(collect_money.variables["sender"]).must_equal "John"
+          _(collect_money.variables["iban"]).must_equal "DE456"
+          _(collect_money.variables["price"]).must_equal 25
+          _(collect_money.variables["reference"]).must_equal "order-123"
+        end
 
-        describe :inputs do
-          it "should map the input" do
-            skip "TODO: implement io mapping in execution"
-            print_execution(process)
-            #_(enter_name_task.output[:name]).must_equal "John Doe"
+        describe :output_mapping do
+          before { collect_money.signal({ payment_status: "OK" }) }
+
+          it "should map output variables" do
+            _(process.variables["payment_status"]).must_equal "OK"
           end
-
-          # describe :outputs do
-          #   before { author_greeting_task.signal({}) }
-
-          #   it "should map the output" do
-          #     #_(author_greeting_task.output[:greeting]).must_equal "👋 Hello John Doe!"
-          #   end
-          # end
         end
       end
     end

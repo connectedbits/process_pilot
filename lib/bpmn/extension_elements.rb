@@ -11,7 +11,7 @@ module Bpmn
         extension_type = moddle_value["$type"]
         if extension_type == "zeebe:Properties"
           @properties = {}
-          moddle_value["properties"].each { |property_moddle| @properties[property_moddle["name"]] = property_moddle["value"] } 
+          moddle_value["properties"].each { |property_moddle| @properties[property_moddle["name"]] = property_moddle["value"] } if moddle_value["properties"].present?
         elsif VALID_EXTENSIONS.include?(extension_type)
           extension_parts = extension_type.split(":")
           klass = "#{extension_parts.first.capitalize}::#{extension_parts.last}".constantize
