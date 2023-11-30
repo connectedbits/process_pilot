@@ -26,8 +26,6 @@ require "process_pilot/bpmn/text_annotation"
 
 require "process_pilot//context"
 require "process_pilot//execution"
-require "process_pilot//execution_error"
-require "process_pilot//execution_printer"
 require "process_pilot//task_runner"
 
 require "process_pilot/services/application_service"
