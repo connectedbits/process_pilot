@@ -184,8 +184,8 @@ module Processable
       evaluate_expression(condition.body) == true
     end
 
-    def evaluate_expression(expression, vars: parent.variables)
-      ProcessableServices::ExpressionEvaluator.call(expression: expression, variables: vars)
+    def evaluate_expression(expression, variables: parent.variables)
+      ProcessableServices::ExpressionEvaluator.call(expression:, variables:)
     end
 
     def run_automated_tasks
