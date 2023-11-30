@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "json_logic", "~> 0.4.7"
   spec.add_dependency "awesome_print", "~> 1.9"
 
+  spec.add_development_dependency "rake"
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-minitest"
   spec.add_development_dependency("minitest-spec")
