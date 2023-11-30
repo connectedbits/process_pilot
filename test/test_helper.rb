@@ -6,7 +6,7 @@ require_relative "../lib/processable"
 
 require "minitest/autorun"
 require "minitest/reporters"
-require "minitest-spec-rails"
+require "minitest/spec"
 require "active_support/testing/time_helpers"
 
 Time.zone_default = Time.find_zone!("UTC")
