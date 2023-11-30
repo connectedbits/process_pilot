@@ -95,6 +95,7 @@ module ProcessPilot
       before { @process = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true }) }
 
       it "should wait at introduce yourself task" do
+        process.print
         _(introduce_yourself_step.waiting?).must_equal true
       end
 
@@ -110,6 +111,7 @@ module ProcessPilot
           before { process.run_automated_tasks; process.run_automated_tasks; }
 
           it "should complete the process" do
+            process.print
             _(process.completed?).must_equal true
           end
         end

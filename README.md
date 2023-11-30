@@ -70,9 +70,19 @@ HelloWorld completed *
   "result": {
     "greeting": "Ciao"
   },
-  "fortune": "Help! I am being held prisoner in a fortune cookie factory.",
-  "message": "Ciao Eric, 🥠 Help! I am being held prisoner in a fortune cookie factory."
+  "fortune": "Don’t eat the paper.",
+  "message": "Ciao Eric, 🥠 Don’t eat the paper."
 }
+
+0 StartEvent Start: completed * out: Flow_0e3d1ag
+1 UserTask IntroduceYourself: completed { "name": "Eric", "language": "it", "formal": false, "cookie": true } * in: Flow_0e3d1ag * out: Flow_0pge325
+2 ParallelGateway Split: completed * in: Flow_0pge325 * out: Flow_126yot3, Flow_1qpp7uk
+3 BusinessRuleTask ChooseGreeting: completed { "result": { "greeting": "Ciao" } } * in: Flow_126yot3 * out: Flow_0da38um
+4 ExclusiveGateway Gateway_021j6sk: completed * in: Flow_1qpp7uk * out: Flow_09ldbp6
+5 ServiceTask GenerateFortune: completed { "fortune": "Don’t eat the paper." } * in: Flow_09ldbp6 * out: Flow_09gfixi
+6 ParallelGateway Join: completed * in: Flow_0da38um, Flow_09gfixi * out: Flow_0hsz6vh
+7 ScriptTask SayHello: completed { "message": "Ciao Eric, 🥠 Don’t eat the paper." } * in: Flow_0hsz6vh * out: Flow_0quhxye
+8 EndEvent End: completed * in: Flow_0quhxye
 ```
 
 ## Documentation
