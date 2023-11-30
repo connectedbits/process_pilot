@@ -1,10 +1,10 @@
-# Processable
+# Process Pilot
 
-Processable is a workflow gem for Rails applications based on the [bpmn](https://www.bpmn.org) standard. It executes business processes and rules defined in a [modeler](https://camunda.com/download/modeler/).
+Process Pilot is a workflow gem for Rails applications based on the [bpmn](https://www.bpmn.org) standard. It executes business processes and rules defined in a [modeler](https://camunda.com/download/modeler/).
 
 ## Usage
 
-Processable executes business processes like [this one](/test/fixtures/files/hello_world.bpmn).
+Process Pilot executes business processes like [this one](/test/fixtures/files/hello_world.bpmn).
 
 ![Example](test/fixtures/files/hello_world.png)
 
@@ -28,13 +28,13 @@ services = {
     end
   }
 }
-context = Processable::Context.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services)
+context = ProcessPilot::Context.new(sources: [File.read('hello_world.bpmn'), File.read('choose_greeting.dmn')], services: services)
 ```
 
 Then a new instance of the process can be started.
 
 ```ruby
-execution = Processable::Execution.start(context: context, process_id: 'HelloWorld', start_event_id: 'Start', variables: { greet: true, cookie: false })
+execution = ProcessPilot::Execution.start(context: context, process_id: 'HelloWorld', start_event_id: 'Start', variables: { greet: true, cookie: false })
 ```
 
 An execution tree is returned with the process as the root step. It is often useful to print the current state of the Execution.
@@ -56,7 +56,7 @@ HelloWorld running * Flow_016qg9x
 2 BoundaryEvent Timeout: waiting
 ```
 
-Processable executes each step in the process until the flow reaches the end or `waits` at a Task. Here the `IntroduceYourself` UserTask is `waiting` for completion.
+Process Pilot executes each step in the process until the flow reaches the end or `waits` at a Task. Here the `IntroduceYourself` UserTask is `waiting` for completion.
 
 At this point you may want to save the current state of execution in a Rails model.
 
@@ -67,7 +67,7 @@ json = execution.serialize
 Later, when the task has been completed, execution can be deserialized.
 
 ```ruby
-execution = Procesable::Execution.deserialize(json, context: context)
+execution = ProcessPilot::Execution.deserialize(json, context: context)
 ```
 
 Execution is continued by `signaling` the `waiting` step.
@@ -76,7 +76,7 @@ Execution is continued by `signaling` the `waiting` step.
 execution.step_by_element_id("IntroduceYourself").signal({ name: "Eric", language: "es", formal: true })
 ```
 
-When execution arrives at automated (service, script, and business rule) tasks it will `wait`. You can run the automated tasks in a rails job and signal the execution when the task is complete or have Processable run the automated tasks.
+When execution arrives at automated (service, script, and business rule) tasks it will `wait`. You can run the automated tasks in a rails job and signal the execution when the task is complete or have Process Pilot run the automated tasks.
 
 ```ruby
 execution.run_automated_tasks
@@ -126,13 +126,13 @@ HelloWorld completed *
 Execute:
 
 ```bash
-$ bundle add "processable"
+$ bundle add "process_pilot"
 ```
 
 Or install it directly:
 
 ```bash
-$ gem install processable
+$ gem install process_pilot
 ```
 
 ## Development

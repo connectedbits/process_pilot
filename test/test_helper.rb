@@ -15,10 +15,10 @@ SimpleCov.start do
 
   add_filter %r{^/test/}
 
-  add_group "Processable",          ["processable/"]
-  add_group "Processable Services", ["processable_services/"]
-  add_group "BPMN",                 ["bpmn/"]
-  add_group "Zeebe",                ["zeebe/"]
+  add_group "Process Pilot",                  ["process_pilot/"]
+  add_group "Process Pilot Services",         ["process_pilot/services/"]
+  add_group "Process Pilot BPMN",             ["process_pilot/bpmn/"]
+  add_group "Process Pilot Zeebe Extensions", ["process_pilot/zeebe/"]
 end
 
 Time.zone_default = Time.find_zone!("UTC")
@@ -29,7 +29,7 @@ Minitest::Reporters.use!(
     Minitest.backtrace_filter,
 )
 
-require_relative "../lib/processable"
+require_relative "../lib/process_pilot"
 
 class Minitest::Spec
   include ActiveSupport::Testing::TimeHelpers
