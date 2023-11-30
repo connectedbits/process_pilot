@@ -8,9 +8,9 @@ module ProcessPilot
     let(:dmn_source) { fixture_source("choose_greeting.dmn") }
     let(:services) {
       {
-        tell_fortune: proc { |execution, variables|
+        generate_fortune: proc { |execution, variables|
           raise "Fortune not found? Abort, Retry, Ignore." if variables[:error]
-          execution.signal({ greeting: [
+          execution.signal({ fortune: [
             "The fortune you seek is in another cookie.",
             "A closed mouth gathers no feet.",
             "A conclusion is simply the place where you got tired of thinking.",
@@ -72,48 +72,45 @@ module ProcessPilot
 
     describe :definition do
       let(:process) { context.process_by_id("HelloWorld") }
-      let(:introduce_yourself) { process.element_by_id("IntroduceYourself") }
-      let(:choose_greeting) { process.element_by_id("ChooseGreeting") }
-      let(:tell_fortune) { process.element_by_id("TellFortune") }
-      let(:author_message) { process.element_by_id("AuthorMessage") }
+      let(:introduce_yourself_task) { process.element_by_id("IntroduceYourself") }
+      let(:choose_greeting_task) { process.element_by_id("ChooseGreeting") }
+      let(:generate_fortune_task) { process.element_by_id("GenerateFortune") }
+      let(:say_hello_task) { process.element_by_id("SayHello") }
 
       it "should parse the process" do
-        _(introduce_yourself).wont_be_nil
-        _(choose_greeting).wont_be_nil
-        _(tell_fortune).wont_be_nil
-        _(author_message).wont_be_nil
+        _(introduce_yourself_task).wont_be_nil
+        _(choose_greeting_task).wont_be_nil
+        _(generate_fortune_task).wont_be_nil
+        _(say_hello_task).wont_be_nil
       end
     end
 
     describe :execution do
       let(:process) { @process }
-      let(:introduce_yourself) { process.child_by_step_id("IntroduceYourself") }
-      let(:times_up) { process.child_by_step_id("TimesUp") }
+      let(:introduce_yourself_step) { process.child_by_step_id("IntroduceYourself") }
+      let(:choose_greeting_step) { process.child_by_step_id("ChooseGreeting") }
+      let(:generate_fortune_step) { process.child_by_step_id("GenerateFortune") }
+      let(:say_hello_step) { process.child_by_step_id("SayHello") }
 
       before { @process = Execution.start(context: context, process_id: "HelloWorld", variables: { greet: true, cookie: true }) }
 
       it "should wait at introduce yourself task" do
-        _(introduce_yourself.waiting?).must_equal true
-        _(times_up.waiting?).must_equal true
+        _(introduce_yourself_step.waiting?).must_equal true
       end
 
       describe :complete_introduce_yourself do
-        before { introduce_yourself.signal({ name: "Eric", language: "it", formal: false, cookie: true }) }
+        before { introduce_yourself_step.signal({ name: "Eric", language: "it", formal: false, cookie: true }) }
 
         it "should wait at choose greeting and tell fortune tasks" do
-          _(introduce_yourself.completed?).must_equal true
+          _(introduce_yourself_step.completed?).must_equal true
           _(process.waiting_automated_tasks.length).must_equal 2
         end
 
         describe :run_automated_tasks do
-          before { process.run_automated_tasks }
+          before { process.run_automated_tasks; process.run_automated_tasks; }
 
           it "should complete the process" do
-            # BUG?: We have to run this a second time because the automated task spawed another
-            # automated task.
-            # process.run_automated_tasks
-            # _(process.completed?).must_equal true
-            # _(process.variables["message"]).wont_be_nil
+            _(process.completed?).must_equal true
           end
         end
       end

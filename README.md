@@ -16,19 +16,20 @@ execution = ProcessPilot.new(sources: "hello_world.bpmn").start(process: "Hello 
 
 The process begins executing at the Start Event and continues until it reaches a task or the end of the process. It's often useful to print the current state of the Execution.
 
-```
+```ruby
 execution.print
+```
 
-HelloWorld running * Flow_016qg9x
+```
+HelloWorld started * Flow_0e3d1ag
 
 {
   "greet": true,
   "cookie": true
 }
 
-0 StartEvent Start: completed * out: Flow_016qg9x
-1 UserTask IntroduceYourself: waiting * in: Flow_016qg9x
-2 BoundaryEvent Timeout: waiting
+0 StartEvent Start: completed * out: Flow_0e3d1ag
+1 UserTask IntroduceYourself: waiting * in: Flow_0e3d1ag
 ```
 
 Here the `IntroduceYourself` User Task is `waiting` for completion. Since we can't continue the process until the user completes the task, we can serialize the current state of execution and save it in a Rails model.
@@ -65,21 +66,13 @@ HelloWorld completed *
   "name": "Eric",
   "language": "it",
   "formal": false,
-  "tell_fortune": "This cookie contains 117 calories.",
-  "greeting": "Ciao",
-  "message": "👋 Ciao Eric 🥠 This cookie contains 117 calories."
+  "cookie": true,
+  "result": {
+    "greeting": "Ciao"
+  },
+  "fortune": "Help! I am being held prisoner in a fortune cookie factory.",
+  "message": "Ciao Eric, 🥠 Help! I am being held prisoner in a fortune cookie factory."
 }
-
-0 StartEvent Start: completed * out: Flow_016qg9x
-1 UserTask IntroduceYourself: completed { "name": "Eric", "language": "it", "formal": false } * in: Flow_016qg9x * out: Flow_0f1v8du
-2 BoundaryEvent Timeout: terminated
-3 InclusiveGateway Split: completed * in: Flow_0f1v8du * out: Flow_09yhdyi, Flow_00mppvp
-4 ServiceTask TellFortune: completed { "tell_fortune": "This cookie contains 117 calories." } * in: Flow_09yhdyi * out: Flow_1t20i0c
-5 BoundaryEvent Event_0c6rvx0: terminated
-6 BusinessRuleTask ChooseGreeting: completed { "greeting": "Ciao" } * in: Flow_00mppvp * out: Flow_1ezhtuc
-7 InclusiveGateway Join: completed * in: Flow_1t20i0c, Flow_1ezhtuc * out: Flow_1xiabfq
-8 ScriptTask SayHello: completed { "message": "👋 Ciao Eric 🥠 This cookie contains 117 calories." } * in: Flow_1xiabfq * out: Flow_15lbcry
-9 EndEvent End: completed * in: Flow_15lbcry
 ```
 
 ## Documentation
