@@ -2,13 +2,8 @@
 
 module Processable
   class Execution
-    include ActiveModel::Model
-    include ActiveModel::Serializers::JSON
-
     attr_accessor :id, :status, :started_at, :ended_at, :variables, :tokens_in, :tokens_out, :start_event_id, :timer_expires_at, :message_names, :error_names, :condition
     attr_accessor :step, :parent, :children, :context, :attached_to_id
-
-    alias serialize to_json
 
     delegate :print, to: :printer
 
@@ -51,17 +46,19 @@ module Processable
     end
 
     def initialize(attributes={})
-      super(attributes).tap do
-        @id ||= SecureRandom.uuid
-        @status ||= "activated"
-        @variables ||= {}.with_indifferent_access
-        @tokens_in ||= []
-        @tokens_out ||= []
-        @message_names ||= []
-        @error_names ||= []
-        @children ||= []
+      attributes.each do |k, v|
+        send("#{k}=", v)
       end
+      @id ||= SecureRandom.uuid
+      @status ||= "activated"
+      @variables ||= {}.with_indifferent_access
+      @tokens_in ||= []
+      @tokens_out ||= []
+      @message_names ||= []
+      @error_names ||= []
+      @children ||= []
     end
+
 
     def started?
       started_at.present?
@@ -245,6 +242,10 @@ module Processable
       active_tokens.uniq
     end
 
+    def serialize(...)
+      to_json(...)
+    end
+
     def as_json(_options = {})
       {
         id: id,
@@ -262,7 +263,7 @@ module Processable
         timer_expires_at: timer_expires_at,
         condition: condition,
         children: children.map { |child| child.as_json },
-      }.compact_blank
+      }.transform_values(&:presence).compact
     end
 
     private

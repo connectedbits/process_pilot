@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 require "processable/version"
 
-require "active_model"
+require "active_support"
 require "active_support/time"
 require "active_support/core_ext/hash"
+require "active_support/core_ext/object/json"
 require "json_logic"
 require "awesome_print"
 
