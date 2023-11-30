@@ -2,13 +2,24 @@
 
 GEM_ROOT = File.join(File.dirname(__FILE__), "..")
 
-require_relative "../lib/processable"
-
 require "minitest/autorun"
 require "minitest/reporters"
 require "minitest/spec"
 require "minitest/focus"
+require "active_support"
 require "active_support/testing/time_helpers"
+
+require "simplecov"
+SimpleCov.start do
+  enable_coverage :branch
+
+  add_filter %r{^/test/}
+
+  add_group "Processable",          ["processable/"]
+  add_group "Processable Services", ["processable_services/"]
+  add_group "BPMN",                 ["bpmn/"]
+  add_group "Zeebe",                ["zeebe/"]
+end
 
 Time.zone_default = Time.find_zone!("UTC")
 
@@ -17,6 +28,8 @@ Minitest::Reporters.use!(
     ENV,
     Minitest.backtrace_filter,
 )
+
+require_relative "../lib/processable"
 
 class Minitest::Spec
   include ActiveSupport::Testing::TimeHelpers
