@@ -15,7 +15,8 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir["{lib,doc}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
-  spec.add_dependency "activemodel", ">= 7.0.2.3"
+  spec.required_ruby_version = '>= 3.1'
+
   spec.add_dependency "activesupport", ">= 7.0.2.3"
   spec.add_dependency "json_logic", "~> 0.4.7"
   spec.add_dependency "awesome_print", "~> 1.9"
