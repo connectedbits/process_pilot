@@ -48,7 +48,7 @@ class Minitest::Spec
     file_fixture(filename).read
   end
 
-  def generate_fortune_cookie
+  def generate_fortune
     [
       "The fortune you seek is in another cookie.",
       "A closed mouth gathers no feet.",
