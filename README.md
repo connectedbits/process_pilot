@@ -14,7 +14,7 @@ To start the process, initialize Process Pilot with the BPMN source, then call `
 process = ProcessPilot.new(File.read("hello_world.bpmn")).start
 ```
 
-The 'HelloWorld' process begins at the 'Start' event and **_waits_** at the 'SayHello' service task. It's often useful to print the process state to the console.
+The 'HelloWorld' process begins at the 'Start' event and waits when it reaches the 'SayHello' service task. It's often useful to print the process state to the console.
 
 ```ruby
 process.print
@@ -26,8 +26,6 @@ HelloWorld started * Flow_0zlro9p
 0 StartEvent Start: completed * out: Flow_0zlro9p
 1 ServiceTask SayHello: waiting * in: Flow_0zlro9p
 ```
-
-Now the process is **waiting** at the 'SayHello' task.
 
 It's common to save the state the process until a task is complete. For example, a user task might be waiting for a person to complete a form, or a service task might run in a background job. Calling `serialize` on a process will return the execution state so it can be continued later.
 
@@ -46,7 +44,7 @@ step = process.step_by_element_id("SayHello")
 step.signal({ message: "Hello World!" })
 ```
 
-Now the 'SayHello' task is completed and the process continues to the 'End' event.
+Now the 'SayHello' task is completed, it's result is merged into the process variables, and the process continues to the 'End' event.
 
 ````bash
 HelloWorld completed *
@@ -62,7 +60,7 @@ HelloWorld completed *
 
 ### Kitchen Sink
 
-The previous example is a simple process with a single task, but BPMN processes can express much more.
+The previous example is a simple process with a single task, but BPMN can express more complex workflows.
 
 TODO: Add a kitchen sink example.
 
