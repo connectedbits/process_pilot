@@ -5,10 +5,9 @@ module ProcessPilot
     attr_reader :processes, :decisions, :executions
     attr_accessor :services, :listeners, :utils
 
-    def initialize(sources: nil, moddles: nil, services: {}, listeners: [], utils: {})
+    def initialize(sources: nil, moddles: nil, services: {}, listeners: [])
       @services = services
       @listeners = Array.wrap(listeners)
-      @utils = utils
 
       @processes = []
       @decisions = {}
@@ -35,10 +34,42 @@ module ProcessPilot
       end
     end
 
+    def start(process_id: nil, start_event_id: nil, variables: {})
+      process = process_id ? process_by_id(process_id) : default_process
+      raise ExecutionError.new(process_id ? "Process #{process_id} not found." : "No default process found.") if process.blank?
+      execution = Execution.start(context: self, process: process, start_event_id: start_event_id, variables: variables)
+      executions << execution
+      execution
+    end
+
+    def start_with_message(message_name:, variables: {})
+      [].tap do |executions|
+        processes.map do |process|
+          process.start_events.map do |start_event|
+            start_event.message_event_definitions.map do |message_event_definition|
+              if message_name == message_event_definition.message_name
+                Execution.start(context: context, process_id: process&.id, variables: variables, start_event_id: start_event.id).tap { |execution| executions.push execution }
+              end
+            end
+          end
+        end
+      end
+    end
+
+    def restore(execution_state)
+      Execution.deserialize(execution_state, context: self).tap do |execution|
+        executions << execution
+      end
+    end
+
     def notify_listener(event)
       listeners.each do |listener|
         listener[event[:event]].call(event) if listener[event[:event]]
-      end
+      end if listeners.present?
+    end
+
+    def default_process
+      processes.first
     end
 
     def process_by_id(id)

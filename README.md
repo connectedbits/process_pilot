@@ -8,82 +8,91 @@ Process Pilot executes business processes like [this one](/test/fixtures/files/h
 
 ![Example](test/fixtures/files/hello_world.png)
 
-To start a process, initialize Process Pilot with your BPMN source; then call start.
+To start a process, initialize Process Pilot with your BPMN source and call `start`.
 
 ```ruby
-execution = ProcessPilot.new(sources: "hello_world.bpmn").start(process: "Hello World", event: "Start", variables: { greet: true, cookie: false })
+process = ProcessPilot.new(File.read("hello_world.bpmn")).start
 ```
 
-The process begins executing at the Start Event and continues until it reaches a task or the end of the process. It's often useful to print the current state of the Execution.
+The 'HelloWorld' process begins at the 'Start' event and _waits_ at the 'SayHello' service task. It's often useful to print the process state to the console.
 
 ```ruby
-execution.print
+process.print
 ```
 
-```
-HelloWorld started * Flow_0e3d1ag
+```bash
+HelloWorld started * Flow_0zlro9p
 
-{
-  "greet": true,
-  "cookie": true
-}
-
-0 StartEvent Start: completed * out: Flow_0e3d1ag
-1 UserTask IntroduceYourself: waiting * in: Flow_0e3d1ag
+0 StartEvent Start: completed * out: Flow_0zlro9p
+1 ServiceTask SayHello: waiting * in: Flow_0zlro9p
 ```
 
-Here the `IntroduceYourself` User Task is `waiting` for completion. Since we can't continue the process until the user completes the task, we can serialize the current state of execution and save it in a Rails model.
+In order to continue the process, you must _signal_ the waiting 'SayHello' task. The signal includes a hash of variables that are merged with the processes variables.
 
 ```ruby
-json = execution.serialize
+waiting_task = process.step_by_element_id("SayHello") // or process.waiting_steps.first
+waiting_task.signal({ message: "Hello World!" })
 ```
 
-Later, when the task has been completed, execution can be deserialized.
+The signal completes the task and continues the process. The process ends at the 'End' event.
 
-```ruby
-execution = ProcessPilot.deserialize(json)
-```
-
-Now we can continue execution by signaling the `waiting` step.
-
-```ruby
-step = execution.step_by_element_id("IntroduceYourself")
-step.signal({ name: "Eric", language: "it", formal: false, cookie: true })
-```
-
-When execution reaches an End Event the process is complete.
-
-```ruby
-execution.print
-```
-
-```
+````bash
 HelloWorld completed *
 
 {
-  "greet": true,
-  "cookie": true,
-  "name": "Eric",
-  "language": "it",
-  "formal": false,
-  "cookie": true,
-  "result": {
-    "greeting": "Ciao"
-  },
-  "fortune": "Don’t eat the paper.",
-  "message": "Ciao Eric, 🥠 Don’t eat the paper."
+  "message": "Hello World!"
 }
 
-0 StartEvent Start: completed * out: Flow_0e3d1ag
-1 UserTask IntroduceYourself: completed { "name": "Eric", "language": "it", "formal": false, "cookie": true } * in: Flow_0e3d1ag * out: Flow_0pge325
-2 ParallelGateway Split: completed * in: Flow_0pge325 * out: Flow_126yot3, Flow_1qpp7uk
-3 BusinessRuleTask ChooseGreeting: completed { "result": { "greeting": "Ciao" } } * in: Flow_126yot3 * out: Flow_0da38um
-4 ExclusiveGateway Gateway_021j6sk: completed * in: Flow_1qpp7uk * out: Flow_09ldbp6
-5 ServiceTask GenerateFortune: completed { "fortune": "Don’t eat the paper." } * in: Flow_09ldbp6 * out: Flow_09gfixi
-6 ParallelGateway Join: completed * in: Flow_0da38um, Flow_09gfixi * out: Flow_0hsz6vh
-7 ScriptTask SayHello: completed { "message": "Ciao Eric, 🥠 Don’t eat the paper." } * in: Flow_0hsz6vh * out: Flow_0quhxye
-8 EndEvent End: completed * in: Flow_0quhxye
+0 StartEvent Start: completed * out: Flow_0zlro9p
+1 ServiceTask SayHello: completed { "message": "Hello World!" } * in: Flow_0zlro9p * out: Flow_1doumjv
+2 EndEvent End: completed * in: Flow_1doumjv```
+````
+
+### Serialization
+
+It's common to save the state of a process until a task is complete. For example, a User Task might be waiting for a person to complete a form or a Service Task might run in a background job. Process Pilot provides a `serialize` method that returns a hash of the process state that can be saved.
+
+```ruby
+serialized_state = process.serialize
 ```
+
+Later, when the task is complete, deserialize the process state and call `continue`.
+
+```ruby
+process = ProcessPilot.new(File.read("hello_world.bpmn")).continue(serialized_state)
+process.step_by_element_id("SayHello").signal({ message: "Hello World!" })
+```
+
+### Service Handlers
+
+Sometime you want Process Pilot to handle a Service Task automatically. To do this, define a service handler and pass it to Process Pilot.
+
+```ruby
+services = {
+  say_hello: -> (variables, properties) {
+    { message: "Hello #{variables[:name]}!" }
+  }
+}
+process = ProcessPilot.new(File.read("hello_world.bpmn", services: services)).start(variables: { name: "Eric" })
+process.print
+```
+
+```bash
+HelloWorld completed *
+
+{
+  "name": "Eric",
+  "message": "Hello Eric!"
+}
+
+0 StartEvent Start: completed * out: Flow_0zlro9p
+1 ServiceTask SayHello: completed { "message": "Hello Eric!" } * in: Flow_0zlro9p * out: Flow_1doumjv
+2 EndEvent End: completed * in: Flow_1doumjv
+```
+
+### Kitchen Sink
+
+TODO: Add a kitchen sink example.
 
 ## Documentation
 

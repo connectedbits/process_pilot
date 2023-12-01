@@ -28,8 +28,10 @@ module ProcessPilot
       service_key = execution.step.service_key
       raise ExecutionError.new("A service key is required for a Service Task") unless service_key
       service = context.services[service_key.to_sym]
-      raise ExecutionError.new("No service found with type #{service_key}") unless service
-      service.call(execution, variables)
+      if service.present?
+        result = service.call(execution, variables)
+        execution.signal(result)
+      end
     end
   end
 

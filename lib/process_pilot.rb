@@ -38,4 +38,13 @@ require "process_pilot/services/process_reader"
 require "process_pilot/services/script_runner"
 
 module ProcessPilot
+  #
+  # Entry point for starting a process execution.
+  #
+  # sources: Single or array of BPMN or DMN XML sources
+  # services: Hash of procs to be injected into the context
+  #
+  def self.new(sources, services: {}, listeners: [])
+    Context.new(sources: Array.wrap(sources), services: services, listeners: listeners)
+  end
 end
