@@ -20,7 +20,7 @@ The 'HelloWorld' process begins at the 'Start' event and waits when it reaches t
 process.print
 ```
 
-```bash
+```
 HelloWorld started * Flow_0zlro9p
 
 0 StartEvent Start: completed * out: Flow_0zlro9p
@@ -46,7 +46,7 @@ step.signal(message: "Hello World!")
 
 Now the 'SayHello' task is completed, it's result is merged into the process variables, and the process continues to the 'End' event.
 
-````bash
+```
 HelloWorld completed *
 
 {
@@ -55,8 +55,8 @@ HelloWorld completed *
 
 0 StartEvent Start: completed * out: Flow_0zlro9p
 1 ServiceTask SayHello: completed { "message": "Hello World!" } * in: Flow_0zlro9p * out: Flow_1doumjv
-2 EndEvent End: completed * in: Flow_1doumjv```
-````
+2 EndEvent End: completed * in: Flow_1doumjv
+```
 
 ### Kitchen Sink
 
