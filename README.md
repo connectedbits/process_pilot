@@ -41,7 +41,7 @@ After the task is completed, the waiting step is sent a `signal` with result.
 
 ```ruby
 step = process.step_by_element_id("SayHello")
-step.signal({ message: "Hello World!" })
+step.signal(message: "Hello World!")
 ```
 
 Now the 'SayHello' task is completed, it's result is merged into the process variables, and the process continues to the 'End' event.
