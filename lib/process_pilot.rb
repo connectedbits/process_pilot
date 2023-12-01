@@ -24,9 +24,9 @@ require "process_pilot/bpmn/expression"
 require "process_pilot/bpmn/event_definition"
 require "process_pilot/bpmn/text_annotation"
 
-require "process_pilot//context"
-require "process_pilot//execution"
-require "process_pilot//task_runner"
+require "process_pilot/context"
+require "process_pilot/execution"
+require "process_pilot/task_runner"
 
 require "process_pilot/services/application_service"
 require "process_pilot/services/decision_evaluator"
