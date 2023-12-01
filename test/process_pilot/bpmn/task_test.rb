@@ -7,9 +7,9 @@ module ProcessPilot
 
     describe Task do
       let(:source) { fixture_source("task_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
 
       describe :definition do
+        let(:context) { ProcessPilot.new(source) }
         let(:process) { context.process_by_id("TaskTest") }
         let(:task) { process.element_by_id("Task") }
 
@@ -22,7 +22,7 @@ module ProcessPilot
         let(:process) { @process }
         let(:task) { process.child_by_step_id("Task") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "TaskTest") }
+        before { @process = ProcessPilot.new(source).start }
 
         it "should start the process" do
           _(process.started?).must_equal true
@@ -46,8 +46,7 @@ module ProcessPilot
 
     describe ServiceTask do
       let(:source) { fixture_source("service_task_test.bpmn") }
-      let(:services) { { do_it: proc { |execution, variables| execution.signal("👋 Hello #{variables['name']}!") } } }
-      let(:context) { ProcessPilot::Context.new(sources: source, services: services) }
+      let(:context) { ProcessPilot.new(source) }
 
       describe :definition do
         let(:process) { context.process_by_id("ServiceTaskTest") }
@@ -60,22 +59,22 @@ module ProcessPilot
 
       describe :execution do
         let(:process) { @process }
-        let(:service_task) { process.child_by_step_id("ServiceTask") }
+        let(:service_step) { process.child_by_step_id("ServiceTask") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "ServiceTaskTest", variables: { name: "Eric" }) }
+        before { @process = ProcessPilot.new(source).start(variables: { name: "Eric" }) }
 
         it "should wait at the service task" do
-          _(service_task.waiting?).must_equal true
+          _(service_step.waiting?).must_equal true
         end
 
         describe :run do
-          before { process.run_automated_tasks }
+          before { service_step.signal({ "service_task": "👋 Hello Eric!" }) }
 
           it "should run the service task" do
             _(process.completed?).must_equal true
-            _(service_task.completed?).must_equal true
+            _(service_step.completed?).must_equal true
             _(process.variables["service_task"]).must_equal "👋 Hello Eric!"
-            _(service_task.variables["service_task"]).must_equal "👋 Hello Eric!"
+            _(service_step.variables["service_task"]).must_equal "👋 Hello Eric!"
           end
         end
       end
@@ -83,7 +82,7 @@ module ProcessPilot
 
     describe ScriptTask do
       let(:source) { fixture_source("script_task_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
 
       describe :definition do
         let(:process) { context.process_by_id("ScriptTaskTest") }
@@ -98,7 +97,7 @@ module ProcessPilot
       describe :execution do
         let(:process) { @process }
         let(:script_task) { process.child_by_step_id("ScriptTask") }
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "ScriptTaskTest", variables: { name: "Eric" }) }
+        before { @process = ProcessPilot.new(source).start(variables: { name: "Eric" }) }
 
         it "should wait at the script task" do
           _(script_task.waiting?).must_equal true
@@ -120,7 +119,7 @@ module ProcessPilot
     describe BusinessRuleTask do
       let(:bpmn_source) { fixture_source("business_rule_task_test.bpmn") }
       let(:dmn_source) { fixture_source("dish.dmn") }
-      let(:context) { ProcessPilot::Context.new(sources: [bpmn_source, dmn_source]) }
+      let(:context) { ProcessPilot.new([bpmn_source, dmn_source]) }
       let(:process) { context.process_by_id("BusinessRuleTaskTest") }
 
       describe :definition do
@@ -136,7 +135,7 @@ module ProcessPilot
         let(:process) { @process }
         let(:business_rule_task) { process.child_by_step_id("BusinessRuleTask") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "BusinessRuleTaskTest", start_event_id: "Start", variables: { season: "Spring", guests: 7 }) }
+        before { @process = ProcessPilot.new([bpmn_source, dmn_source]).start(variables: { season: "Spring", guests: 7 }) }
 
         it "should wait at the business rule task" do
           _(business_rule_task.waiting?).must_equal true

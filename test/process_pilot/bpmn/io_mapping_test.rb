@@ -6,14 +6,7 @@ module ProcessPilot
 
   describe "IO Mapping" do
     let(:source) { fixture_source("io_mapping.bpmn") }
-    let(:context) { ProcessPilot::Context.new(sources: source) }
-    let(:services) {
-      {
-        CollectMoney: proc { |_execution, variables|
-          variables
-        },
-      }
-    }
+    let(:context) { ProcessPilot.new(source) }
 
     describe :definition do
       let(:process) { context.process_by_id("IOMapping") }
@@ -36,7 +29,7 @@ module ProcessPilot
       let(:collect_money) { process.child_by_step_id("CollectMoney") }
       let(:end_event) { process.child_by_step_id("End") }
 
-      before { @process = Execution.start(context: context, process_id: "IOMapping", variables: { order_id: "order-123", total_price: 25.0, customer: { name: "John", iban: "DE456" } }); }
+      before { @process = ProcessPilot.new(source).start(variables: { order_id: "order-123", total_price: 25.0, customer: { name: "John", iban: "DE456" } }); }
 
       describe :input_mapping do
         it "should map input variables" do

@@ -7,9 +7,7 @@ module ProcessPilot
 
     delegate :print, to: :printer
 
-    def self.start(context:, process_id:, variables: {}, start_event_id: nil, parent: nil)
-      process = context.process_by_id(process_id)
-      raise ExecutionError.new("Process with id #{process_id} not found.") unless process
+    def self.start(context:, process:, variables: {}, start_event_id: nil, parent: nil)
       Execution.new(context: context, step: process, variables: variables, start_event_id: start_event_id, parent: parent).tap do |execution|
         context.executions.push execution
         execution.start
@@ -22,7 +20,9 @@ module ProcessPilot
           process.start_events.map do |start_event|
             start_event.message_event_definitions.map do |message_event_definition|
               if message_name == message_event_definition.message_name
-                Execution.start(context: context, process_id: process&.id, variables: variables, start_event_id: start_event.id).tap { |execution| executions.push execution }
+                Execution.start(context:, process:, variables:, start_event_id: start_event.id).tap do |execution|
+                  executions.push execution 
+                end
               end
             end
           end

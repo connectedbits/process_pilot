@@ -4,10 +4,6 @@ require "test_helper"
 
 module ProcessPilot
   describe Context do
-    describe :services do
-
-    end
-
     describe :listeners do
       let(:source) { fixture_source("execution_test.bpmn") }
       let(:listeners) {
@@ -25,7 +21,7 @@ module ProcessPilot
 
       before do
         @log = []
-        @process = Execution.start(context: context, process_id: "Process")
+        @process = ProcessPilot.new(fixture_source("execution_test.bpmn"), listeners: listeners).start
       end
 
       it "should call the listener" do

@@ -8,82 +8,61 @@ Process Pilot executes business processes like [this one](/test/fixtures/files/h
 
 ![Example](test/fixtures/files/hello_world.png)
 
-To start a process, initialize Process Pilot with your BPMN source; then call start.
+To start the process, initialize Process Pilot with the BPMN source, then call `start`.
 
 ```ruby
-execution = ProcessPilot.new(sources: "hello_world.bpmn").start(process: "Hello World", event: "Start", variables: { greet: true, cookie: false })
+process = ProcessPilot.new(File.read("hello_world.bpmn")).start
 ```
 
-The process begins executing at the Start Event and continues until it reaches a task or the end of the process. It's often useful to print the current state of the Execution.
+The 'HelloWorld' process begins at the 'Start' event and waits when it reaches the 'SayHello' service task. It's often useful to print the process state to the console.
 
 ```ruby
-execution.print
+process.print
 ```
 
 ```
-HelloWorld started * Flow_0e3d1ag
+HelloWorld started * Flow_0zlro9p
 
-{
-  "greet": true,
-  "cookie": true
-}
-
-0 StartEvent Start: completed * out: Flow_0e3d1ag
-1 UserTask IntroduceYourself: waiting * in: Flow_0e3d1ag
+0 StartEvent Start: completed * out: Flow_0zlro9p
+1 ServiceTask SayHello: waiting * in: Flow_0zlro9p
 ```
 
-Here the `IntroduceYourself` User Task is `waiting` for completion. Since we can't continue the process until the user completes the task, we can serialize the current state of execution and save it in a Rails model.
+It's common to save the state the process until a task is complete. For example, a user task might be waiting for a person to complete a form, or a service task might run in a background job. Calling `serialize` on a process will return the execution state so it can be continued later.
 
 ```ruby
-json = execution.serialize
+# Returns a hash of the process state for saving in a database.
+execution_state = process.serialize
+
+# Restores the process from the execution state.
+process = ProcessPilot.new(File.read("hello_world.bpmn")).restore(execution_state)
 ```
 
-Later, when the task has been completed, execution can be deserialized.
+After the task is completed, the waiting step is sent a `signal` with result.
 
 ```ruby
-execution = ProcessPilot.deserialize(json)
+step = process.step_by_element_id("SayHello")
+step.signal(message: "Hello World!")
 ```
 
-Now we can continue execution by signaling the `waiting` step.
-
-```ruby
-step = execution.step_by_element_id("IntroduceYourself")
-step.signal({ name: "Eric", language: "it", formal: false, cookie: true })
-```
-
-When execution reaches an End Event the process is complete.
-
-```ruby
-execution.print
-```
+Now the 'SayHello' task is completed, it's result is merged into the process variables, and the process continues to the 'End' event.
 
 ```
 HelloWorld completed *
 
 {
-  "greet": true,
-  "cookie": true,
-  "name": "Eric",
-  "language": "it",
-  "formal": false,
-  "cookie": true,
-  "result": {
-    "greeting": "Ciao"
-  },
-  "fortune": "Don’t eat the paper.",
-  "message": "Ciao Eric, 🥠 Don’t eat the paper."
+  "message": "Hello World!"
 }
 
-0 StartEvent Start: completed * out: Flow_0e3d1ag
-1 UserTask IntroduceYourself: completed { "name": "Eric", "language": "it", "formal": false, "cookie": true } * in: Flow_0e3d1ag * out: Flow_0pge325
-2 ParallelGateway Split: completed * in: Flow_0pge325 * out: Flow_126yot3, Flow_1qpp7uk
-3 BusinessRuleTask ChooseGreeting: completed { "result": { "greeting": "Ciao" } } * in: Flow_126yot3 * out: Flow_0da38um
-4 ExclusiveGateway Gateway_021j6sk: completed * in: Flow_1qpp7uk * out: Flow_09ldbp6
-5 ServiceTask GenerateFortune: completed { "fortune": "Don’t eat the paper." } * in: Flow_09ldbp6 * out: Flow_09gfixi
-6 ParallelGateway Join: completed * in: Flow_0da38um, Flow_09gfixi * out: Flow_0hsz6vh
-7 ScriptTask SayHello: completed { "message": "Ciao Eric, 🥠 Don’t eat the paper." } * in: Flow_0hsz6vh * out: Flow_0quhxye
-8 EndEvent End: completed * in: Flow_0quhxye
+0 StartEvent Start: completed * out: Flow_0zlro9p
+1 ServiceTask SayHello: completed { "message": "Hello World!" } * in: Flow_0zlro9p * out: Flow_1doumjv
+2 EndEvent End: completed * in: Flow_1doumjv
 ```
+
+### Kitchen Sink
+
+The previous example is a simple process with a single task, but BPMN can express more complex workflows.
+
+TODO: Add a kitchen sink example.
 
 ## Documentation
 

@@ -6,7 +6,7 @@ module ProcessPilot
   module Bpmn
     describe StartEvent do
       let(:source) { fixture_source("start_event_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
 
       describe :definitions do
         let(:process) { context.process_by_id("StartEventTest") }
@@ -21,7 +21,7 @@ module ProcessPilot
         let(:process) { @process }
         let(:start_event) { process.child_by_step_id("Start") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "StartEventTest") }
+        before { @process = ProcessPilot.new(source).start }
 
         it "should start the process" do
           _(process.completed?).must_equal true
@@ -32,7 +32,7 @@ module ProcessPilot
 
     describe IntermediateCatchEvent do
       let(:source) { fixture_source("intermediate_catch_event_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
 
       describe :definitions do
         let(:process) { context.process_by_id("IntermediateCatchEventTest") }
@@ -43,7 +43,7 @@ module ProcessPilot
         let(:process) { @process }
         let(:catch_event) { process.child_by_step_id("Catch") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "IntermediateCatchEventTest") }
+        before { @process = ProcessPilot.new(source).start }
         it "should wait at the catch event" do
           _(process.started?).must_equal true
           _(catch_event.waiting?).must_equal true
@@ -62,7 +62,7 @@ module ProcessPilot
 
     describe IntermediateThrowEvent do
       let(:source) { fixture_source("intermediate_throw_event_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
 
       describe :definitions do
         let(:process) { context.process_by_id("IntermediateThrowEventTest") }
@@ -73,7 +73,7 @@ module ProcessPilot
         let(:process) { @process }
         let(:throw_event) { process.child_by_step_id("Throw") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "IntermediateThrowEventTest") }
+        before { @process = ProcessPilot.new(source).start }
 
         it "should throw then end the process" do
           _(process.completed?).must_equal true
@@ -84,7 +84,7 @@ module ProcessPilot
 
     describe BoundaryEvent do
       let(:source) { fixture_source("boundary_event_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
 
       describe :definition do
         let(:process) { context.process_by_id("BoundaryEventTest") }
@@ -110,7 +110,7 @@ module ProcessPilot
         let(:end_event) { process.child_by_step_id("End") }
         let(:end_interrupted_event) { process.child_by_step_id("EndInterrupted") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "BoundaryEventTest") }
+        before { @process = ProcessPilot.new(source).start }
 
         it "should create boundary events" do
           _(process.started?).must_equal true
@@ -155,7 +155,7 @@ module ProcessPilot
 
     describe EndEvent do
       let(:source) { fixture_source("end_event_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
 
       describe :definitions do
         let(:process) { context.process_by_id("EndEventTest") }
@@ -170,7 +170,7 @@ module ProcessPilot
         let(:process) { @process }
         let(:end_event) { process.child_by_step_id("End") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "EndEventTest") }
+        before { @process = ProcessPilot.new(source).start }
 
         it "should end the process" do
           _(process.completed?).must_equal true
