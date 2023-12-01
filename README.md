@@ -29,7 +29,7 @@ HelloWorld started * Flow_0zlro9p
 
 Now the process is **waiting** at the 'SayHello' task.
 
-It's common to save the state the process until a task is complete. For example, a User Task might be waiting for a person to complete a form or a Service Task might run in a background job. Calling `serialize` on a process will return the execution state so it can be continued later.
+It's common to save the state the process until a task is complete. For example, a user task might be waiting for a person to complete a form, or a service task might run in a background job. Calling `serialize` on a process will return the execution state so it can be continued later.
 
 ```ruby
 # Returns a hash of the process state for saving in a database.
@@ -39,14 +39,14 @@ execution_state = process.serialize
 process = ProcessPilot.new(File.read("hello_world.bpmn")).continue(execution_state)
 ```
 
-After the task is completed, we the waiting step and call `signal` with result.
+After the task is completed, the waiting step is sent a `signal` with result.
 
 ```ruby
 step = process.step_by_element_id("SayHello")
 step.signal({ message: "Hello World!" })
 ```
 
-After receiving the signal the process executed until it reaches the 'End' event.
+Now the 'SayHello' task is completed and the process continues to the 'End' event.
 
 ````bash
 HelloWorld completed *
@@ -62,7 +62,7 @@ HelloWorld completed *
 
 ### Kitchen Sink
 
-The previous example is a simple process with a single task, but BPMN supports much richer processes.
+The previous example is a simple process with a single task, but BPMN processes can express much more.
 
 TODO: Add a kitchen sink example.
 

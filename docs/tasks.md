@@ -1,6 +1,6 @@
 # Tasks
 
-A task has no internal parts, it represents a single unit of work. A task can be automated (Service, Script, or BusinessRule) or require manual completion (Task, UserTask).
+A task has no internal parts, it represents a single unit of work. A task can be run automatically (Script, or BusinessRule) or require completion (Task, ServiceTask, and UserTask) outside of the engine.
 
 ## Task
 
@@ -16,7 +16,7 @@ This task represents work done by a ruby service proc when supplied to the conte
 
 ## Script Task
 
-This task represents work done by the execution process engine written in Javascript.
+This task represents work done by the execution process engine written in FEEL.
 
 ## Business Rule Task
 
