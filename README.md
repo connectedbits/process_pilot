@@ -8,13 +8,13 @@ Process Pilot executes business processes like [this one](/test/fixtures/files/h
 
 ![Example](test/fixtures/files/hello_world.png)
 
-To start a process, initialize Process Pilot with your BPMN source and call `start`.
+To start the process, initialize Process Pilot with the BPMN source, then call `start`.
 
 ```ruby
 process = ProcessPilot.new(File.read("hello_world.bpmn")).start
 ```
 
-The 'HelloWorld' process begins at the 'Start' event and _waits_ at the 'SayHello' service task. It's often useful to print the process state to the console.
+The 'HelloWorld' process begins at the 'Start' event and **_waits_** at the 'SayHello' service task. It's often useful to print the process state to the console.
 
 ```ruby
 process.print
@@ -27,21 +27,26 @@ HelloWorld started * Flow_0zlro9p
 1 ServiceTask SayHello: waiting * in: Flow_0zlro9p
 ```
 
-It's common to save the state of a process until a task is complete. For example, a User Task might be waiting for a person to complete a form or a Service Task might run in a background job. Calling `serialize` on a process will return the execution state so it can be resumed later.
+Now the process is **waiting** at the 'SayHello' task.
+
+It's common to save the state the process until a task is complete. For example, a User Task might be waiting for a person to complete a form or a Service Task might run in a background job. Calling `serialize` on a process will return the execution state so it can be continued later.
 
 ```ruby
-execution_state = process.serialize # returns a JSON hash for storage in a database
-process = ProcessPilot.new(File.read("hello_world.bpmn")).continue(execution_state) # restores the process from the execution state
+# Returns a hash of the process state for saving in a database.
+execution_state = process.serialize
+
+# Restores the process from the execution state.
+process = ProcessPilot.new(File.read("hello_world.bpmn")).continue(execution_state)
 ```
 
-After the task is completed, we find the step to be signaled and call `signal` with the task result.
+After the task is completed, we the waiting step and call `signal` with result.
 
 ```ruby
 step = process.step_by_element_id("SayHello")
 step.signal({ message: "Hello World!" })
 ```
 
-The signal continues the process until it reaches ends at the 'End' event.
+After receiving the signal the process executed until it reaches the 'End' event.
 
 ````bash
 HelloWorld completed *
