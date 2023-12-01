@@ -42,7 +42,7 @@ module ProcessPilot
       let(:sub_task) { sub_process.child_by_step_id("SubTask") }
       let(:sub_end_event) { sub_process.child_by_step_id("SubEnd") }
 
-      before { @process = Execution.start(context: context, process_id: "Process") }
+      before { @process = ProcessPilot.new(source).start }
 
       it "should start the process" do
         _(process.started?).must_equal true
@@ -88,7 +88,7 @@ module ProcessPilot
       let(:context) { Context.new(sources: source) }
       let(:process) { @process }
 
-      before { @process = Execution.start(context: context, process_id: "Process") }
+      before { @process = ProcessPilot.new(source).start }
 
       it "should start the process" do
         _(process.started?).must_equal true
@@ -106,7 +106,7 @@ module ProcessPilot
         describe :deserialize do
           let(:new_process) { @new_process }
 
-          before { @new_process = Execution.deserialize(json, context: context) }
+          before { @new_process = ProcessPilot.new(source).restore(json) }
 
           it "should deserialize the execution tree" do
             _(new_process.id).must_equal process.id

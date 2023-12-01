@@ -7,7 +7,7 @@ module ProcessPilot
 
     describe ExclusiveGateway do
       let(:source) { fixture_source("exclusive_gateway_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
       let(:process) { context.process_by_id("ExclusiveGatewayTest") }
 
       describe :definition do
@@ -33,7 +33,7 @@ module ProcessPilot
         let(:end_default) { process.child_by_step_id("EndDefault") }
 
         describe :happy_path do
-          before { @process = ProcessPilot::Execution.start(context: context, process_id: "ExclusiveGatewayTest", variables: { action: "ok" }) }
+          before { @process = ProcessPilot.new(source).start(variables: { action: "ok" }) }
 
           it "should complete ok" do
             _(process.ended?).must_equal true
@@ -44,7 +44,7 @@ module ProcessPilot
         end
 
         describe :default_path do
-          before { @process = ProcessPilot::Execution.start(context: context, process_id: "ExclusiveGatewayTest", variables: { action: "¯\_(ツ)_/¯" }) }
+          before { @process = ProcessPilot.new(source).start(variables: { action: "¯\_(ツ)_/¯" }) }
 
           it "should complete ok" do
             _(process.ended?).must_equal true
@@ -58,7 +58,7 @@ module ProcessPilot
 
     describe ParallelGateway do
       let(:source) { fixture_source("parallel_gateway_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
       let(:process) { context.process_by_id("ParallelGatewayTest") }
 
       describe :definition do
@@ -82,7 +82,7 @@ module ProcessPilot
         let(:task_a) { process.child_by_step_id("TaskA") }
         let(:task_b) { process.child_by_step_id("TaskB") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "ParallelGatewayTest") }
+        before { @process = ProcessPilot.new(source).start }
 
         it "should diverge at the first gateway" do
           _(split.ended?).must_equal true
@@ -115,7 +115,7 @@ module ProcessPilot
 
     describe EventBasedGateway do
       let(:source) { fixture_source("event_based_gateway_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
       let(:process) { context.process_by_id("EventBasedGatewayTest") }
 
       describe :definition do
@@ -142,7 +142,7 @@ module ProcessPilot
         let(:end_message) { process.child_by_step_id("EndMessage") }
         let(:end_timer) { process.child_by_step_id("EndTimer") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "EventBasedGatewayTest") }
+        before { @process = ProcessPilot.new(source).start }
 
         it "should diverge at the event gateway" do
           _(gateway.ended?).must_equal true
@@ -166,7 +166,7 @@ module ProcessPilot
 
     describe InclusiveGateway do
       let(:source) { fixture_source("inclusive_gateway_test.bpmn") }
-      let(:context) { ProcessPilot::Context.new(sources: source) }
+      let(:context) { ProcessPilot.new(source) }
       let(:process) { context.process_by_id("InclusiveGatewayTest") }
 
       describe :definition do
@@ -192,7 +192,7 @@ module ProcessPilot
         let(:check_prices) { process.child_by_step_id("CheckPrices") }
         let(:check_printer_parts) { process.child_by_step_id("CheckPrinterParts") }
 
-        before { @process = ProcessPilot::Execution.start(context: context, process_id: "InclusiveGatewayTest") }
+        before { @process = ProcessPilot.new(source).start }
 
         it "should wait at receive order task" do
           _(receive_order.ended?).must_equal false
