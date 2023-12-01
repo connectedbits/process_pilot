@@ -69,6 +69,7 @@ module ProcessPilot
     end
 
     def default_process
+      raise "Multiple processes defined, must identify process" if processes.size > 1
       processes.first
     end
 
