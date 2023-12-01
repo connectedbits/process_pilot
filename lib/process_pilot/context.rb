@@ -65,7 +65,7 @@ module ProcessPilot
     def notify_listener(event)
       listeners.each do |listener|
         listener[event[:event]].call(event) if listener[event[:event]]
-      end if listeners.present?
+      end
     end
 
     def default_process
