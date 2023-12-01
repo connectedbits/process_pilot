@@ -36,7 +36,7 @@ It's common to save the state the process until a task is complete. For example,
 execution_state = process.serialize
 
 # Restores the process from the execution state.
-process = ProcessPilot.new(File.read("hello_world.bpmn")).continue(execution_state)
+process = ProcessPilot.new(File.read("hello_world.bpmn")).restore(execution_state)
 ```
 
 After the task is completed, the waiting step is sent a `signal` with result.
