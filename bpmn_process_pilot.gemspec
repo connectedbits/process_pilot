@@ -1,17 +1,17 @@
-require_relative "lib/process_pilot/version"
+require_relative "lib/bpmn_process_pilot/version"
 
 Gem::Specification.new do |spec|
-  spec.name        = "process_pilot"
-  spec.version     = ProcessPilot::VERSION
+  spec.name        = "bpmn_process_pilot"
+  spec.version     = BpmnProcessPilot::VERSION
   spec.authors     = ["Connected Bits"]
   spec.email       = ["info@connectedbits.com"]
   spec.homepage    = "https://www.connectedbits.com"
-  spec.summary     = "Process Pilot"
-  spec.description = "Process Pilot is a BPMN/DMN workflow gem for Rails apps."
+  spec.summary     = "BPMN Process Pilot"
+  spec.description = "BPMN Process Pilot is a BPMN/DMN workflow gem for Rails apps."
   spec.license     = "MIT"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/connectedbits/process_pilot"
+  spec.metadata["source_code_uri"] = "https://github.com/connectedbits/bpmn_process_pilot"
 
   spec.files = Dir["{lib,doc}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 

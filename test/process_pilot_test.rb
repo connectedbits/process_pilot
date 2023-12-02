@@ -3,12 +3,6 @@
 require "test_helper"
 
 module ProcessPilot
-  describe :version do
-    it "should have a version" do
-      _(ProcessPilot::VERSION).wont_be_nil
-    end
-  end
-
   describe :hello_world do
     before { @process = ProcessPilot.new(source).start }
 

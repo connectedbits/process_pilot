@@ -29,7 +29,7 @@ Minitest::Reporters.use!(
     Minitest.backtrace_filter,
 )
 
-require_relative "../lib/process_pilot"
+require_relative "../lib/bpmn_process_pilot"
 
 class Minitest::Spec
   include ActiveSupport::Testing::TimeHelpers
