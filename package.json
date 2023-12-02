@@ -1,6 +1,6 @@
 {
-  "name": "process_pilot",
-  "description": "Process Pilot is a BPMN/DMN workflow gem for Rails apps.",
+  "name": "next_step",
+  "description": "NextStep is a BPMN/DMN workflow gem for Rails apps.",
   "private": true,
   "dependencies": {
     "@connectedbits/dmn-eval-js": "https://github.com/connectedbits/dmn-eval-js.git",

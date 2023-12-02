@@ -1,17 +1,17 @@
-# Process Pilot
+# Next Step
 
-Process Pilot is a workflow gem for Rails applications based on the [bpmn](https://www.bpmn.org) standard. It executes business processes and rules defined in a [modeler](https://camunda.com/download/modeler/).
+Next Step is a workflow gem for Rails applications based on the [bpmn](https://www.bpmn.org) standard. It executes business processes and rules defined in a [modeler](https://camunda.com/download/modeler/).
 
 ## Usage
 
-Process Pilot executes business processes like [this one](/test/fixtures/files/hello_world.bpmn).
+Next Step executes business processes like [this one](/test/fixtures/files/hello_world.bpmn).
 
 ![Example](test/fixtures/files/hello_world.png)
 
-To start the process, initialize Process Pilot with the BPMN source, then call `start`.
+To start the process, initialize Next Step with the BPMN source, then call `start`.
 
 ```ruby
-process = ProcessPilot.new(File.read("hello_world.bpmn")).start
+process = NextStep.new(File.read("hello_world.bpmn")).start
 ```
 
 The 'HelloWorld' process begins at the 'Start' event and waits when it reaches the 'SayHello' service task. It's often useful to print the process state to the console.
@@ -34,7 +34,7 @@ It's common to save the state the process until a task is complete. For example,
 execution_state = process.serialize
 
 # Restores the process from the execution state.
-process = ProcessPilot.new(File.read("hello_world.bpmn")).restore(execution_state)
+process = NextStep.new(File.read("hello_world.bpmn")).restore(execution_state)
 ```
 
 After the task is completed, the waiting step is sent a `signal` with result.
@@ -80,13 +80,13 @@ TODO: Add a kitchen sink example.
 Execute:
 
 ```bash
-$ bundle add "process_pilot"
+$ bundle add "next_step"
 ```
 
 Or install it directly:
 
 ```bash
-$ gem install process_pilot
+$ gem install next_step
 ```
 
 ## Development

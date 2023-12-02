@@ -2,15 +2,15 @@
 
 require "test_helper"
 
-module ProcessPilot
+module NextStep
   describe :version do
     it "should have a version" do
-      _(ProcessPilot::VERSION).wont_be_nil
+      _(NextStep::VERSION).wont_be_nil
     end
   end
 
   describe :hello_world do
-    before { @process = ProcessPilot.new(source).start }
+    before { @process = NextStep.new(source).start }
 
     let(:process) { @process }
     let(:source) { fixture_source("hello_world.bpmn") }
@@ -32,7 +32,7 @@ module ProcessPilot
       end
 
       describe :deserialization do
-        before { @process = ProcessPilot.new(fixture_source("hello_world.bpmn")).restore(serialized_state); }
+        before { @process = NextStep.new(fixture_source("hello_world.bpmn")).restore(serialized_state); }
 
         it "process should be restored to waiting state" do
           _(process.completed?).must_equal false
