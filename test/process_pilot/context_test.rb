@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-module ProcessPilot
+module Orchestr8
   describe Context do
     describe :listeners do
       let(:source) { fixture_source("execution_test.bpmn") }
@@ -21,7 +21,7 @@ module ProcessPilot
 
       before do
         @log = []
-        @process = ProcessPilot.new(fixture_source("execution_test.bpmn"), listeners: listeners).start
+        @process = Orchestr8.new(fixture_source("execution_test.bpmn"), listeners: listeners).start
       end
 
       it "should call the listener" do

@@ -11,7 +11,7 @@ Process Pilot executes business processes like [this one](/test/fixtures/files/h
 To start the process, initialize Process Pilot with the BPMN source, then call `start`.
 
 ```ruby
-process = ProcessPilot.new(File.read("hello_world.bpmn")).start
+process = Orchestr8.new(File.read("hello_world.bpmn")).start
 ```
 
 The 'HelloWorld' process begins at the 'Start' event and waits when it reaches the 'SayHello' service task. It's often useful to print the process state to the console.
@@ -34,7 +34,7 @@ It's common to save the state the process until a task is complete. For example,
 execution_state = process.serialize
 
 # Restores the process from the execution state.
-process = ProcessPilot.new(File.read("hello_world.bpmn")).restore(execution_state)
+process = Orchestr8.new(File.read("hello_world.bpmn")).restore(execution_state)
 ```
 
 After the task is completed, the waiting step is sent a `signal` with result.
@@ -80,13 +80,13 @@ TODO: Add a kitchen sink example.
 Execute:
 
 ```bash
-$ bundle add "process_pilot"
+$ bundle add "Orchestr8::"
 ```
 
 Or install it directly:
 
 ```bash
-$ gem install process_pilot
+$ gem install Orchestr8::
 ```
 
 ## Development

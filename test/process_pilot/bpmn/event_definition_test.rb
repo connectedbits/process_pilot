@@ -2,11 +2,11 @@
 
 require "test_helper"
 
-module ProcessPilot
+module Orchestr8
   module Bpmn
     describe ErrorEventDefinition do
       let(:source) { fixture_source("error_event_definition_test.bpmn") }
-      let(:context) { ProcessPilot.new(source) }
+      let(:context) { Orchestr8.new(source) }
       let(:process) { context.process_by_id("ErrorEventDefinitionTest") }
 
       describe :definitions do
@@ -29,7 +29,7 @@ module ProcessPilot
         let(:end_event) { process.child_by_step_id("End") }
         let(:end_failed_event) { process.child_by_step_id("EndFailed") }
 
-        before { @process = ProcessPilot.new(source).start(variables: { simulate_error: true }) }
+        before { @process = Orchestr8.new(source).start(variables: { simulate_error: true }) }
 
         it "should wait at the service task" do
           _(service_task.waiting?).must_equal true
@@ -50,7 +50,7 @@ module ProcessPilot
 
     describe MessageEventDefinition do
       let(:source) { fixture_source("message_event_definition_test.bpmn") }
-      let(:context) { ProcessPilot.new(source) }
+      let(:context) { Orchestr8.new(source) }
       let(:process) { context.process_by_id("MessageEventDefinitionTest") }
 
       before { @log = [] }
@@ -86,7 +86,7 @@ module ProcessPilot
           let(:process) { @processes.first }
           let(:message_name) { "Message_Start" }
 
-          before { @processes = ProcessPilot.new(source).start_with_message(message_name: message_name) }
+          before { @processes = Orchestr8.new(source).start_with_message(message_name: message_name) }
 
           it "should return an array of matching executions" do
             _(processes.length).must_equal 1
@@ -139,7 +139,7 @@ module ProcessPilot
 
     describe TerminateEventDefinition do
       let(:source) { fixture_source("terminate_event_definition_test.bpmn") }
-      let(:context) { ProcessPilot.new(source) }
+      let(:context) { Orchestr8.new(source) }
       let(:process) { context.process_by_id("TerminateEventDefinitionTest") }
 
       describe :definitions do
@@ -158,7 +158,7 @@ module ProcessPilot
         let(:end_none_event) { process.child_by_step_id("EndNone") }
         let(:end_terminated_event) { process.child_by_step_id("EndTerminated") }
 
-        before { @process = ProcessPilot.new(source).start }
+        before { @process = Orchestr8.new(source).start }
 
         it "should wait at two parallel tasks" do
           _(task_a.waiting?).must_equal true
@@ -192,7 +192,7 @@ module ProcessPilot
 
     describe TimerEventDefinition do
       let(:source) { fixture_source("timer_event_definition_test.bpmn") }
-      let(:context) { ProcessPilot.new(source) }
+      let(:context) { Orchestr8.new(source) }
       let(:process) { context.process_by_id("TimerEventDefinitionTest") }
 
       describe :definitions do
@@ -210,7 +210,7 @@ module ProcessPilot
         let(:process) { @process }
         let(:catch_event) { process.child_by_step_id("Catch") }
 
-        before { @process = ProcessPilot.new(source).start }
+        before { @process = Orchestr8.new(source).start }
 
         it "should wait at catch event and set the timer" do
           _(catch_event.waiting?).must_equal true

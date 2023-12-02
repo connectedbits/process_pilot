@@ -2,11 +2,11 @@
 
 require "test_helper"
 
-module ProcessPilot
+module Orchestr8
   module Bpmn
     describe Builder do
       let(:source) { fixture_source("execution_test.bpmn") }
-      let(:moddle) { ProcessPilot::Services::ProcessReader.call(source) }
+      let(:moddle) { Orchestr8::Services::ProcessReader.call(source) }
       let(:builder) { Builder.new(moddle) }
       let(:process) { builder.process_by_id("Process") }
 

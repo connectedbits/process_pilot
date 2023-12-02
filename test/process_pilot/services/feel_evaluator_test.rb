@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ProcessPilot
+module Orchestr8
   module Services
     describe FeelEvaluator do
       let(:service) { FeelEvaluator }

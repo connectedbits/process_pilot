@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ProcessPilot
+module Orchestr8
   module Services
     describe DecisionEvaluator do
       describe(:example_one) do

@@ -2,11 +2,11 @@
 
 require "test_helper"
 
-module ProcessPilot
+module Orchestr8
 
   describe "IO Mapping" do
     let(:source) { fixture_source("io_mapping.bpmn") }
-    let(:context) { ProcessPilot.new(source) }
+    let(:context) { Orchestr8.new(source) }
 
     describe :definition do
       let(:process) { context.process_by_id("IOMapping") }
@@ -29,7 +29,7 @@ module ProcessPilot
       let(:collect_money) { process.child_by_step_id("CollectMoney") }
       let(:end_event) { process.child_by_step_id("End") }
 
-      before { @process = ProcessPilot.new(source).start(variables: { order_id: "order-123", total_price: 25.0, customer: { name: "John", iban: "DE456" } }); }
+      before { @process = Orchestr8.new(source).start(variables: { order_id: "order-123", total_price: 25.0, customer: { name: "John", iban: "DE456" } }); }
 
       describe :input_mapping do
         it "should map input variables" do

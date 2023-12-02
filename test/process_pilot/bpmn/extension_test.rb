@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-module ProcessPilot
+module Orchestr8
   module Bpmn
     describe :extensions do
       let(:bpmn_source) { fixture_source("extension_elements_test.bpmn") }
@@ -18,7 +18,7 @@ module ProcessPilot
           },
         }
       }
-      let(:context) { ProcessPilot::Context.new(sources: [bpmn_source, dmn_source], services: services) }
+      let(:context) { Orchestr8::Context.new(sources: [bpmn_source, dmn_source], services: services) }
 
       describe :definition do
         let(:process) { context.process_by_id("ZeebeExtensionsTest") }
