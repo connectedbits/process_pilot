@@ -1,14 +1,14 @@
-# Process Pilot
+# BPMN Process Pilot
 
-Process Pilot is a workflow gem for Rails applications based on the [bpmn](https://www.bpmn.org) standard. It executes business processes and rules defined in a [modeler](https://camunda.com/download/modeler/).
+BPMN Process Pilot is a workflow gem for Rails applications based on the [bpmn](https://www.bpmn.org) standard. It executes business processes and rules defined in a [modeler](https://camunda.com/download/modeler/).
 
 ## Usage
 
-Process Pilot executes business processes like [this one](/test/fixtures/files/hello_world.bpmn).
+The engine executes business processes like [this one](/test/fixtures/files/hello_world.bpmn).
 
 ![Example](test/fixtures/files/hello_world.png)
 
-To start the process, initialize Process Pilot with the BPMN source, then call `start`.
+To start the process, initialize the engine with the BPMN and DMN sources, then call `start`.
 
 ```ruby
 process = ProcessPilot.new(File.read("hello_world.bpmn")).start
@@ -80,13 +80,13 @@ TODO: Add a kitchen sink example.
 Execute:
 
 ```bash
-$ bundle add "process_pilot"
+$ bundle add "bpmn_process_pilot"
 ```
 
 Or install it directly:
 
 ```bash
-$ gem install process_pilot
+$ gem install bpmn_process_pilot
 ```
 
 ## Development
