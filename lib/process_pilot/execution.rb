@@ -182,7 +182,8 @@ module ProcessPilot
     end
 
     def evaluate_expression(expression, variables: parent.variables)
-      ProcessPilot::Services::ExpressionEvaluator.call(expression:, variables:)
+      #ProcessPilot::Services::ExpressionEvaluator.call(expression:, variables:)
+      Feel.evaluate(expression, with: variables)
     end
 
     def run_automated_tasks

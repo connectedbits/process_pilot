@@ -1,0 +1,375 @@
+module Feel
+  grammar Grammar
+    rule expression
+      built_in_function /
+      if_then_else /
+      conjunction /
+      disjunction /
+      comparison /
+      inequality /
+      equality /
+      negation /
+      arithmetic /
+      simple_expression /
+      sub_expression
+    end
+
+    #
+    # Functions
+    #
+
+    rule built_in_function
+      now_function /
+      today_function
+    end
+
+    rule today_function
+      'today()' {
+        def eval(env={})
+          Date.today
+        end     
+      }
+    end
+
+    rule now_function
+      'now()' {
+        def eval(env={})
+          Time.zone.now
+        end     
+      }
+    end
+
+    #
+    # Expressions
+    #
+
+    rule if_then_else
+      'if' space condition:expression space 'then' true_case:expression space 'else' space false_case:expression {
+        def eval(env={})
+          if condition.eval(env)
+            true_case.eval(env)
+          else
+            false_case.eval(env)
+          end
+        end
+      }
+    end
+
+    rule equality
+      left:(sub_expression / simple_expression) '=' right:expression {
+        def eval(env={})
+          left.eval(env) == right.eval(env)
+        end
+      }
+    end
+
+    rule inequality
+      left:(sub_expression / simple_expression) '!=' right:expression {
+        def eval(env={})
+          left.eval(env) != right.eval(env)
+        end
+      }
+    end
+
+    rule comparison
+      left:(sub_expression / simple_expression) operator:('<=' / '<' / '>=' / '>') right:expression {
+        def eval(env={})
+          case operator.text_value
+            when '<' then left.eval(env) < right.eval(env)
+            when '<=' then left.eval(env) <= right.eval(env)
+            when '>=' then left.eval(env) >= right.eval(env)
+            when '>' then left.eval(env) > right.eval(env)
+          end
+        end
+      }
+    end
+
+    rule negation
+      'not(' expression ')' {
+        def eval(env={})
+          !expression.eval(env)
+        end
+      }
+    end
+
+    rule conjunction
+      left:(sub_expression / simple_expression) 'and ' right:expression {
+        def eval(env={})
+          left.eval(env) && right.eval(env)
+        end
+      }
+    end
+
+    rule disjunction
+      left:(sub_expression / simple_expression) 'or ' right:expression {
+        def eval(env={})
+          left.eval(env) || right.eval(env) 
+        end
+      }
+    end
+
+    rule arithmetic
+      left:(sub_expression / simple_expression) operator:('+' / '-' / '*' / '/') right:expression {
+        def eval(env={})
+          case operator.text_value
+            when '+' then left.eval(env) + right.eval(env)
+            when '-' then left.eval(env) - right.eval(env)
+            when '*' then left.eval(env) * right.eval(env)
+            when '/' then left.eval(env) / right.eval(env)
+          end
+        end
+      }
+    end
+    
+    rule simple_expression
+      space flat_expression space {
+        def eval(env={})
+          flat_expression.eval(env)
+        end
+      }
+    end
+
+    rule flat_expression
+      data_type /
+      path_expression
+    end
+
+    rule sub_expression
+      space '(' expression ')' space {
+        def eval(env={})
+          expression.eval(env)
+        end
+      }
+    end
+
+    rule path_expression
+      identifier '.' path_expression {
+        def eval(env={})
+          env = identifier.eval(env)
+          nil if env.nil?
+          path_expression.eval(env)
+        end
+      } / identifier '' {
+        def eval(env={})
+          identifier.eval(env)
+        end
+      }
+    end
+
+    rule identifier
+      identifier_letters:([a-zA-Z] [a-zA-Z0-9_]*) '' {
+        def eval(env={})
+          identifier_text = identifier_letters.text_value
+          if env.has_key?(identifier_text)
+            env[identifier_text] 
+          else
+            env[identifier_text.to_sym]
+          end
+        end
+      }
+    end
+
+    rule data_type
+      literal /
+      list /
+      context
+    end
+
+    rule list
+      '[' space list_entries space ']' {
+        def eval(env={})
+          list_entries.eval(env)
+        end
+      }
+      /
+      '[]' {
+        def eval(env={})
+          []
+        end
+      }
+    end
+
+    rule list_entries
+      expression more_expressions:(space ',' space expression)* {
+
+        def eval(env={})
+          expressions.inject([]) { |arr, exp| arr << exp.eval(env) }
+        end
+
+        def expressions
+          [ expression ] + more_expressions.elements.map { |e| e.expression }
+        end
+      }
+    end
+
+    rule context
+      '{' space context_entry_list space '}' {
+        def eval(env={})
+          context_entry_list.eval(env)
+        end
+      }
+      /
+      '{}' {
+        def eval(env={})
+          {}
+        end
+      }
+    end
+
+    rule context_entry_list
+      context_entry tail:(space ',' space context_entry)* ','? {
+        def eval(env={})
+          context_entries.inject({}) do |hash, entry|
+            hash.merge(entry.eval(env))
+          end
+        end
+
+        def context_entries
+          [ context_entry ] + tail.elements.map { |e| e.context_entry }
+        end
+      }
+    end
+
+    rule context_entry
+      context_key:expression space ':' space context_value:expression {
+        def eval(env={})
+          { context_key.eval(env) => context_value.eval(env) }
+        end
+      }
+    end
+
+    #
+    # Literals
+    #
+
+    rule literal
+      simple_literal /
+      null_literal
+    end
+
+    rule simple_literal
+      numeric_literal /
+      string_literal /
+      boolean_literal /
+      date_time_literal
+    end
+
+    rule date_time_literal
+      symbol:date_time_keyword space "(" space date_exp:expression space ")" {
+        def eval(ctx = {})
+          val = date_exp.text_value.strip.delete_prefix('"').delete_suffix('"')
+          case symbol.text_value
+          when "date and time"
+            DateTime.parse(val)
+          when "date"
+            Date.parse(val)
+          when "time"
+            Time.parse(val)
+          when "duration"
+            ActiveSupport::Duration.parse(val)
+          end
+        end         
+      }
+    end
+
+    rule string_literal
+      '"' (!'"' . )* '"' {
+        def eval(env={})
+          text_value[1..-2]
+        end
+      }
+    end
+
+    rule numeric_literal
+      integer_literal / float_literal
+    end
+
+    rule integer_literal
+      number_chars:('-'? digits) !'.' {
+        def eval(env={})
+          number_chars.text_value.to_i
+        end
+      }
+    end
+
+    rule float_literal
+      number_chars:('-'? digits '.' digits) '' {
+        def eval(env={})
+          number_chars.text_value.to_f
+        end
+      }
+    end
+
+    rule boolean_literal
+      true_token {
+        def eval(env={})
+          true
+        end
+      } / false_token {
+        def eval(env={})
+          false
+        end        
+      }
+    end
+
+    rule null_literal
+      null_token {
+        def eval(env={})
+          nil
+        end
+      }
+    end
+
+    #
+    # Keywords
+    #
+
+    rule date_time_keyword
+      "date and time" !name_part_char /
+      "time" !name_part_char /
+      "date" !name_part_char /
+      "duration" !name_part_char
+    end
+
+    #
+    # Tokens
+    #
+
+    rule true_token
+      "true" / "TRUE" / "True"
+    end
+
+    rule false_token
+      "false" / "FALSE" / "False"
+    end
+
+    rule null_token
+      "null"
+    end
+
+    rule name_start_char
+      [?] /
+      [A-Z] /
+      [_] /
+      [a-z]
+    end
+
+    rule name_part_char
+      name_start_char /
+      digit /
+      [']
+    end
+
+    rule digit
+      [0-9]
+    end
+
+    rule digits
+      [0-9]+
+    end
+
+    rule space
+      [\s\r\n\t]*
+    end
+  end
+end

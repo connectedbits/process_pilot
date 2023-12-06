@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+rm ./lib/process_pilot/feel/feel_grammar.rb
+tt ./lib/process_pilot/feel/feel_grammar.treetop -o ./lib/process_pilot/feel/feel_grammar.rb

@@ -31,4 +31,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop-performance"
   spec.add_development_dependency "solargraph"
   spec.add_development_dependency "simplecov"
+  spec.add_development_dependency "treetop"
 end
