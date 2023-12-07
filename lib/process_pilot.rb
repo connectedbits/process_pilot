@@ -26,10 +26,18 @@ require "process_pilot/bpmn/expression"
 require "process_pilot/bpmn/event_definition"
 require "process_pilot/bpmn/text_annotation"
 
+require "process_pilot/dmn/element"
+require "process_pilot/dmn/builder"
+require "process_pilot/dmn/decision"
+require "process_pilot/dmn/input"
+require "process_pilot/dmn/output"
+require "process_pilot/dmn/rule"
+
 require "process_pilot/feel"
 
 require "process_pilot/context"
 require "process_pilot/execution"
+require "process_pilot/evaluation"
 require "process_pilot/task_runner"
 
 require "process_pilot/services/application_service"

@@ -16,7 +16,7 @@ module ProcessPilot
       Array.wrap(sources).each do |source|
         if source.include?("http://www.omg.org/spec/DMN/20180521/DC/")
           moddle = ProcessPilot::Services::DecisionReader.call(source)
-          moddle["drgElement"].each { |d| decisions[d["id"]] = source }
+          moddle["drgElement"].each { |d| decisions[d["id"]] = ProcessPilot::Dmn::Decision.new(d) }
         else
           moddle = ProcessPilot::Services::ProcessReader.call(source)
           builder = Bpmn::Builder.new(moddle)
@@ -81,6 +81,10 @@ module ProcessPilot
         end
       end
       nil
+    end
+
+    def decision_by_id(id)
+      decisions[id]
     end
 
     def element_by_id(id)

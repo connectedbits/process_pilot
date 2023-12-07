@@ -10,6 +10,7 @@ module ProcessPilot
 
       it "should parse dmn moddle" do
         _(moddle).wont_be_nil
+         #File.write('moddle.json', moddle.to_json)
         _(moddle["drgElement"].first["id"]).must_equal("Dish")
       end
     end

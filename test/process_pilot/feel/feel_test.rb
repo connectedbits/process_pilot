@@ -11,6 +11,10 @@ module Feel
         _(Feel.evaluate('if 20 > 0 then "YES" else "NO"')).must_equal "YES"
         _(Feel.evaluate("37 + (1 + 2)")).must_equal 40
       end
+
+      it "should work" do
+        _(Feel.evaluate('(language = "en") and (formal = false)', with: { "language": "en", "formal": false })).must_equal true
+      end
     end
 
     describe :parsing do
@@ -82,7 +86,7 @@ module Feel
       end
 
       it "should parse ranges" do
-        # TODO: _(feel.parse('( 2 .. 5 )').eval).must_equal(2..5)
+        #_(feel.parse('[2..5]').eval).must_equal(2..5)
       end
     end
 

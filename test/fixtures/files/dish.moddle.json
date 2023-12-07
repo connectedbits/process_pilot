@@ -1,0 +1,215 @@
+{
+  "$type": "dmn:Definitions",
+  "id": "Definitions_Dish",
+  "name": "Dish",
+  "namespace": "http://camunda.org/schema/1.0/dmn",
+  "exporter": "Camunda Modeler",
+  "exporterVersion": "5.17.0",
+  "drgElement": [
+    {
+      "$type": "dmn:Decision",
+      "id": "Dish",
+      "name": "Dish",
+      "decisionLogic": {
+        "$type": "dmn:DecisionTable",
+        "id": "DecisionTable_1f9ezlr",
+        "input": [
+          {
+            "$type": "dmn:InputClause",
+            "id": "Input_1",
+            "label": "Season",
+            "inputExpression": {
+              "$type": "dmn:LiteralExpression",
+              "id": "InputExpression_1",
+              "typeRef": "string",
+              "text": "season"
+            }
+          },
+          {
+            "$type": "dmn:InputClause",
+            "id": "InputClause_1svwdcr",
+            "label": "Guests",
+            "inputExpression": {
+              "$type": "dmn:LiteralExpression",
+              "id": "LiteralExpression_0gdouhc",
+              "typeRef": "number",
+              "text": "guests"
+            }
+          }
+        ],
+        "output": [
+          {
+            "$type": "dmn:OutputClause",
+            "id": "Output_1",
+            "label": "Dish",
+            "name": "dish",
+            "typeRef": "string"
+          }
+        ],
+        "rule": [
+          {
+            "$type": "dmn:DecisionRule",
+            "id": "DecisionRule_0san773",
+            "inputEntry": [
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_1a6vmqa",
+                "text": "\"Fall\""
+              },
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_0ugjhau",
+                "text": "\u003c= 8"
+              }
+            ],
+            "outputEntry": [
+              {
+                "$type": "dmn:LiteralExpression",
+                "id": "LiteralExpression_19rdyr9",
+                "text": "\"Spareribs\""
+              }
+            ]
+          },
+          {
+            "$type": "dmn:DecisionRule",
+            "id": "DecisionRule_1wl96en",
+            "inputEntry": [
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_1linnex",
+                "text": "\"Winter\""
+              },
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_17xdxf3",
+                "text": "\u003c= 8"
+              }
+            ],
+            "outputEntry": [
+              {
+                "$type": "dmn:LiteralExpression",
+                "id": "LiteralExpression_03flibw",
+                "text": "\"Roastbeef\""
+              }
+            ]
+          },
+          {
+            "$type": "dmn:DecisionRule",
+            "id": "DecisionRule_1qqo311",
+            "inputEntry": [
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_05nicw7",
+                "text": "\"Spring\""
+              },
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_1e2jrwc",
+                "text": "\u003c= 4"
+              }
+            ],
+            "outputEntry": [
+              {
+                "$type": "dmn:LiteralExpression",
+                "id": "LiteralExpression_0b7uajf",
+                "text": "\"Dry Aged Gourmet Steak\""
+              }
+            ]
+          },
+          {
+            "$type": "dmn:DecisionRule",
+            "id": "DecisionRule_1g0rhbp",
+            "description": "Save money",
+            "inputEntry": [
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_0i7l85a",
+                "text": "\"Spring\""
+              },
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_1r72ktt",
+                "text": "[5..8]"
+              }
+            ],
+            "outputEntry": [
+              {
+                "$type": "dmn:LiteralExpression",
+                "id": "LiteralExpression_0lhbix9",
+                "text": "\"Steak\""
+              }
+            ]
+          },
+          {
+            "$type": "dmn:DecisionRule",
+            "id": "DecisionRule_1q5rmo5",
+            "description": "Less effort",
+            "inputEntry": [
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_01uuoc5",
+                "text": "\"Fall\",\"Winter\",\"Spring\""
+              },
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_0l7ugrb",
+                "text": "\u003e 8"
+              }
+            ],
+            "outputEntry": [
+              {
+                "$type": "dmn:LiteralExpression",
+                "id": "LiteralExpression_1r048qx",
+                "text": "\"Stew\""
+              }
+            ]
+          },
+          {
+            "$type": "dmn:DecisionRule",
+            "id": "DecisionRule_1pc5gsv",
+            "description": "Hey, why not?",
+            "inputEntry": [
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_0dzir57",
+                "text": "\"Summer\""
+              },
+              {
+                "$type": "dmn:UnaryTests",
+                "id": "UnaryTests_1a8t73z",
+                "text": ""
+              }
+            ],
+            "outputEntry": [
+              {
+                "$type": "dmn:LiteralExpression",
+                "id": "LiteralExpression_0usq3fd",
+                "text": "\"Light Salad and nice Steak\""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "dmnDI": {
+    "$type": "dmndi:DMNDI",
+    "diagrams": [
+      {
+        "$type": "dmndi:DMNDiagram",
+        "diagramElements": [
+          {
+            "$type": "dmndi:DMNShape",
+            "bounds": {
+              "$type": "dc:Bounds",
+              "height": 80,
+              "width": 180,
+              "x": 160,
+              "y": 100
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
