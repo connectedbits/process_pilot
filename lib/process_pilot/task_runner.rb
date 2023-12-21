@@ -51,10 +51,9 @@ module ProcessPilot
       decision_id = execution.step.decision_id
       raise ExecutionError.new("A decision id is required for a Business Rule Task") unless decision_id
 
-      source = context.decisions[decision_id]
-      raise ExecutionError.new("No source found for decision is #{decision_id}") unless source
+      puts "Calling #{decision_id} with #{variables}}"
 
-      result = ProcessPilot::Services::DecisionEvaluator.call(decision_id, source, variables)
+      result = Evaluation.new(context).evaluate(decision_id, with: variables)
       execution.signal(result)
     end
   end

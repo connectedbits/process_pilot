@@ -20,6 +20,10 @@ module ProcessPilot
           end
         end
       end
+
+      def decision_by_id(decision_id)
+        @decisions[decision_id]
+      end
     end
   end
 end

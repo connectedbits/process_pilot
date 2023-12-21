@@ -147,6 +147,7 @@ module ProcessPilot
           it "should run the business rule task" do
             _(process.completed?).must_equal true
             _(business_rule_task.completed?).must_equal true
+            process.print
             _(business_rule_task.variables["result"]["dish"]).must_equal "Steak"
           end
         end

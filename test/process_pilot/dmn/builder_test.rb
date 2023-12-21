@@ -7,7 +7,7 @@ module ProcessPilot
     describe Builder do
       let(:source) { fixture_source("dish.dmn") }
       let(:moddle) { ProcessPilot::Services::DecisionReader.call(source) }
-      let(:builder) { Builder.new(moddle) }
+      let(:builder) { ProcessPilot::Dmn::Builder.new(moddle) }
       let(:decision) { builder.decision_by_id("Dish") }
 
       it "should parse the decision" do
