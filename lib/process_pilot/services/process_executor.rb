@@ -4,10 +4,9 @@ module ProcessPilot
   module Services
     module ProcessExecutor
 
-      def execute_process(*args, env: nil)
+      def execute_process(*args, env: nil, stdin: nil)
         command = args.shelljoin
 
-        r, w = IO.pipe
         process_env = env || {}
         process_env["PATH"] ||= ENV["PATH"]
         process_env["NODE_PATH"] ||= ENV["NODE_PATH"]
@@ -17,11 +16,14 @@ module ProcessPilot
         #
         # We also specifically drop any env vars that are not indicated by the caller
         # since we likely do not want to bleed any external information into the JS process
-        pid = Process.spawn(process_env, command, unsetenv_others: true, out: w, err: STDERR)
-        status = Process::Status.wait(pid)
-        w.close
-        stdout = r.read.chomp rescue nil
-        r.close
+        stdout = String.new
+        IO.popen(process_env, command, "r+", unsetenv_others: true, err: STDERR) do |io|
+          io.write(stdin) if stdin != nil
+          io.close_write
+          stdout += io.read.chomp until io.eof?
+        end
+
+        status = $?
         if status.success?
           stdout
         else
@@ -29,8 +31,8 @@ module ProcessPilot
         end
       end
 
-      def execute_json_process(*args, env: nil)
-        JSON.parse(execute_process(*args, env: env))
+      def execute_json_process(...)
+        JSON.parse(execute_process(...))
       end
     end
   end
