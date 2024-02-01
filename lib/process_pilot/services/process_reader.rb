@@ -12,7 +12,7 @@ module ProcessPilot
       end
 
       def call
-        execute_json_process(PROCESS_READER_BIN, @source, env: @env)
+        execute_json_process(PROCESS_READER_BIN, stdin: @source, env: @env)
       end
     end
   end

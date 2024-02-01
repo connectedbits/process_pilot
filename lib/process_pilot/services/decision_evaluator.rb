@@ -15,7 +15,7 @@ module ProcessPilot
       end
 
       def call
-        execute_json_process(EVALUATE_BIN, @decision_id, @source, @context.to_json, *@functions, env: @env)
+        execute_json_process(EVALUATE_BIN, @decision_id, @context.to_json, *@functions, stdin: @source, env: @env)
       end
     end
   end
